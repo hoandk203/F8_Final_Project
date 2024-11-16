@@ -1,22 +1,25 @@
 ### F8 project
 
-install project
+Install Nest project
 ```
-git clone https://github.com/Bangtx/f8-k9-final-project.git
-docker-compose run --rm api npm i
+docker-compose run --rm api
 npm i
 ```
-
-up
 ```
-docker-compose up
+docker-compose up api
 ```
-
-access
 ```
 http://localhost:3000
 ```
 
-```agsl
-test thoi nhes 1
+Install Next project
+```
+docker-compose run --rm web
+npm i
+```
+```
+docker-compose up web
+```
+```
+http://localhost:5000
 ```
