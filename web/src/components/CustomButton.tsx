@@ -8,7 +8,7 @@ interface CustomButtonProps {
 
 const CustomButton: React.FC<CustomButtonProps> = ({label, focus}) => {
     return (
-        <Button variant="contained" className={focus ? "bg-gray-800 text-white" : "bg-gray-200 text-black"}>
+        <Button variant="contained" className={focus ? "bg-zinc-900 text-white" : "bg-gray-200 text-black"}>
             {label}
         </Button>
     );

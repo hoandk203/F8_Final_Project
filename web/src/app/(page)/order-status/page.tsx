@@ -4,7 +4,7 @@ const OrderStatusPage = () => {
     return (
         <>
             <div className="container mx-auto">
-                <div className="px-3">
+                <div className="px-4">
                     <h1>Order Status Page</h1>
                     <div className="flex flex-col gap-y-2">
                         <CustomButton label={"Mark as moving"} focus={true}/>
