@@ -1,11 +1,17 @@
+import React from "react";
+import {Button} from '@mui/material';
 
-
-const CustomButton = () => {
-    return (
-        <div>
-            <button>click click</button>
-        </div>
-    )
+interface CustomButtonProps {
+    label: string,
+    focus: boolean
 }
 
-export default CustomButton
+const CustomButton: React.FC<CustomButtonProps> = ({label, focus}) => {
+    return (
+        <Button variant="contained" className={focus ? "bg-gray-800 text-white" : "bg-gray-200 text-black"}>
+            {label}
+        </Button>
+    );
+};
+
+export default CustomButton;
