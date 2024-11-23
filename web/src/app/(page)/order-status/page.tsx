@@ -1,6 +1,6 @@
 import CustomButton from "@/components/CustomButton";
 import Contact from "@/components/Contact";
-import StepperOrder from "@/components/StepperOrder";
+import StepperOrder from "./components/StepperOrder";
 import OrderInfo from "@/components/OrderInfo";
 
 

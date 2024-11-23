@@ -3,8 +3,8 @@ import {Button} from '@mui/material';
 
 interface CustomButtonProps {
     label: string,
-    variant?: 'dark' | 'light',
-    size?: "small" | "medium" | "large"
+    variant: 'dark' | 'light',
+    size: "small" | "medium" | "large"
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({label, variant= "dark", size}) => {
