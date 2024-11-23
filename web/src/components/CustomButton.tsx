@@ -3,12 +3,25 @@ import {Button} from '@mui/material';
 
 interface CustomButtonProps {
     label: string,
-    focus: boolean
+    variant?: 'dark' | 'light',
+    size?: "small" | "medium" | "large"
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({label, focus}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({label, variant= "dark", size}) => {
+    const buttonStyles = {
+        dark: {
+            backgroundColor: "#1d1d1d",
+        },
+        light: {
+            backgroundColor: "#efeef3",
+            color: "black",
+        },
+    }
+
     return (
-        <Button variant="contained" className={focus ? "bg-zinc-900 text-white" : "bg-gray-200 text-black"}>
+        <Button variant="contained"
+                sx={buttonStyles[variant]}
+                size={size}>
             {label}
         </Button>
     );

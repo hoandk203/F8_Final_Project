@@ -11,7 +11,7 @@ export default function Home() {
                         <h1 className="text-2xl mb-1">Welcome, Driver</h1>
                         <p className="text-[#666]">Statistics from October, 2024</p>
                     </div>
-                    <Statistics data={{}}/>
+                    <Statistics/>
                     <div className="text-[14px]">
                         <span>72.894 INR</span>
                         <span className="text-[#666] mx-2">available to withdraw</span>

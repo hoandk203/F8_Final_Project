@@ -10,16 +10,24 @@ interface OrderInfoProps {
 const OrderInfo: React.FC<OrderInfoProps> = ({type}) => {
     return (
         <div className="bg-gray-200 rounded-xl p-4">
-            <div className="flex justify-between items-center mb-2">
-                <div>
+            
+            {type === "waiting" ?
+                <div className="flex justify-between items-center mb-2">
+                    <div>
+                        <div className="text-[#666] uppercase mb-1">Order #12941875</div>
+                        <span className="inline-block bg-black px-2 py-1 text-[12px] text-white rounded-md capitalize">{type}</span>
+                    </div>
+                    <div>
+                        <span className="text-xl font-bold">04:54</span> left
+                    </div>
+                </div>
+                :
+                <div className="flex justify-between items-center mb-2">
                     <div className="text-[#666] uppercase mb-1">Order #12941875</div>
-                    <span
-                        className="inline-block bg-black px-2 py-1 text-[12px] text-white rounded-md capitalize">{type}</span>
+                    <span className="inline-block bg-black px-2 py-1 text-[12px] text-white rounded-md capitalize">{type}</span>
                 </div>
-                <div>
-                    <span className="text-xl font-bold">04:54</span> left
-                </div>
-            </div>
+            }
+            
             <div className="flex flex-col gap-2">
                 <h3 className="capitalize text-[16px] font-bold">Spice Haven Restaurant</h3>
                 <div className="flex gap-2 items-center">
