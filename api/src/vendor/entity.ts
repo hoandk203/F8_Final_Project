@@ -1,11 +1,8 @@
-// class VendorEntity {
-//
-// }
+import {Entity} from "typeorm";
+import {User} from "../base/user.entity";
 
-export const vendors = [
-  {
-    id: 1,
-    name: 'Vendor 1',
-    location: 'Location 1',
-  },
-];
+
+@Entity()
+export class Vendor extends User{
+
+}

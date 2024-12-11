@@ -1,31 +1,35 @@
-import { vendors } from './entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { Vendor } from './entity';
+import {BaseService} from "../base/base.service";
 
 @Injectable()
-export class VendorService {
-  getList() {
-    return vendors;
+export class VendorService extends BaseService{
+  constructor(
+      @Inject('VENDOR_REPOSITORY')
+      private vendorRepository: Repository<Vendor>,
+  ) {
+    super(vendorRepository)
   }
 
-  getOne(id: number) {
-    return vendors.find((vendor) => vendor.id === id);
+  handleSelect() {
+    return this.vendorRepository
+      .createQueryBuilder("vendor")
+      .select([
+        '*'
+      ])
   }
 
-  create(vendor) {
-    vendors.push({ id: 2, ...vendor });
-    return vendor;
-  }
+  searchByName(name: string) {
+    const query = this.vendorRepository
+        .createQueryBuilder("vendor")
+        .select([
+          '*'
+        ])
+        .where("lower(vendor.name) LIKE :name", { name: `%${name.toLowerCase()}%` })
+        .andWhere("vendor.active = :active", { active: true })
+        .orderBy("vendor.id", "DESC");
 
-  update(id: number, vendor) {
-    const vendorId = vendors.findIndex((item) => item.id === id);
-    vendors[vendorId] = { ...vendors[vendorId], ...vendor };
-    return vendor;
-  }
-
-  delete(id: number) {
-    const vendorId = vendors.findIndex((item) => item.id === id);
-    const vendorDeleted = vendors[vendorId];
-    vendors.splice(vendorId, 1);
-    return vendorDeleted;
+    return query.getRawMany();
   }
 }

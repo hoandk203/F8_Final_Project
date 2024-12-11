@@ -3,17 +3,19 @@
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import InboxIcon from '@mui/icons-material/Inbox';
-import React from 'react';
+import React, {useEffect} from 'react';
 import NewOrderDialog from './NewOrderDialog';
 
 interface OrderInfoProps {
     type: string
+    activeDialog?: boolean
 }
 
-const OrderInfo: React.FC<OrderInfoProps> = ({type}) => {
+const OrderInfo: React.FC<OrderInfoProps> = ({type, activeDialog=true}) => {
     const [open, setOpen] = React.useState(false);
 
     const handleClickOpen = () => {
+      if (!activeDialog) return;
       setOpen(true);
     };
 
@@ -24,7 +26,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({type}) => {
     return (
         <div className="bg-gray-200 rounded-xl p-4">
             {type === "waiting" && <NewOrderDialog open={open} handleClose={handleClose}/>}
-            <div onClick={() => {handleClickOpen()}}>
+            <div onClick={handleClickOpen}>
                 {type === "waiting" ?
                     <div className="flex justify-between items-center mb-2">
                         <div className="text-start">

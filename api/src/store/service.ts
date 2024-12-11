@@ -1,31 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { stores } from './entity';
+import { Injectable, Inject } from '@nestjs/common';
+import {Repository} from "typeorm";
+import {Store} from "./entity";
+import {BaseService} from "../base/base.service";
+import {Vendor} from "../vendor/entity";
 
 @Injectable()
-export class StoreService {
-  getListStore() {
-    return stores;
+export class StoreService extends BaseService{
+  constructor(
+      @Inject('STORE_REPOSITORY')
+      private storeRepository: Repository<Store>,
+  ) {
+      super(storeRepository)
   }
 
-  getStore(id: number) {
-    return stores.find((item) => item.id === id);
-  }
+    handleSelect(){
+      return this.storeRepository
+          .createQueryBuilder("store")
+          .select([
+              'store.*',
+              'vendor.name as vendor_name',
+              'json_build_object(\'id\', vendor.id, \'name\', vendor.name) as vendor'
+          ])
+          .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
+    }
 
-  createStore(store) {
-    stores.push({ id: 2, ...store });
-    return store;
-  }
+    handleOrder(query){
+        return query.orderBy("store.id", "DESC")
+    }
 
-  updateStore(id: number, store) {
-    const storeId = stores.findIndex((item) => item.id === id);
-    stores[storeId] = { ...stores[storeId], ...store };
-    return store;
-  }
+    searchByName(name: string) {
+        const query = this.storeRepository
+            .createQueryBuilder("store")
+            .select([
+                '*',
+                'json_build_object(\'id\', vendor.id, \'name\', vendor.name) as vendor'
+            ])
+            .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
+            .where("lower(store.name) LIKE :name", { name: `%${name.toLowerCase()}%` })
+            .andWhere("store.active = :active", { active: true })
+            .orderBy("store.id", "DESC");
 
-  deleteStore(id: number) {
-    const storeId = stores.findIndex((item) => item.id === id);
-    const storeDeleted = stores[storeId];
-    stores.splice(storeId, 1);
-    return storeDeleted;
-  }
+        return query.getRawMany();
+    }
+
 }

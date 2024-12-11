@@ -2,6 +2,9 @@
 
 import {useState} from 'react';
 import {Stepper, Step, StepButton} from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { stepOrderSlice } from '@/redux/slice/stepOrderSlice';
+
 
 const steps = [
     'Accepted order',
@@ -11,15 +14,16 @@ const steps = [
   ];
 
 const StepperOrder = () => {
-    const [activeStep, setActiveStep] = useState(0);
+    const step = useSelector((state: any) => state.stepOrder.step)
+    const dispatch= useDispatch()
 
-    const handleStep = (step: number) => () => {
-        setActiveStep(step);
+    const handleStep = (updateStep: number) => () => {
+        dispatch(stepOrderSlice.actions.setStep(updateStep))
     };
 
     return (
         <div>
-            <Stepper activeStep={activeStep} alternativeLabel
+            <Stepper activeStep={step} alternativeLabel
                 sx={{
                     '& .MuiStepIcon-root.Mui-active': {
                         color: '#1d1d1d',

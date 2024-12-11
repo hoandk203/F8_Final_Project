@@ -3,19 +3,19 @@ import { ApiProperty } from '@nestjs/swagger';
 class CreateDto {
   @ApiProperty({
     description: 'name of vendor',
-    example: 'Dien May Xanh',
+    example: 'Hoan',
   })
   name: string;
 
   @ApiProperty({
-    example: 'Ha Noi',
+    example: 'Thai Nguyen',
   })
   location: string;
 
   @ApiProperty({
-    default: '0123456789',
+    default: 'hoan1@gmail.com',
   })
-  phone: string;
+  email: string;
 }
 
 class UpdateDto extends CreateDto {}

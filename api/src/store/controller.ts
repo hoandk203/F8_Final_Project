@@ -5,7 +5,7 @@ import {
   Post,
   Controller,
   Put,
-  Delete,
+  Delete, Query,
 } from '@nestjs/common';
 import { StoreService } from './service';
 import { CreateStoreDto, UpdateStoreDto } from './dto';
@@ -16,26 +16,33 @@ export class StoreController {
 
   @Get()
   getAll() {
-    return this.storeService.getListStore();
+    return this.storeService.getList();
   }
 
-  @Get(':id')
-  getOne(@Param('id') id: string) {
-    return this.storeService.getStore(Number(id));
+  @Get('/search')
+
+  searchByName(@Query('name') name:string)
+  {
+    return this.storeService.searchByName(name || "")
   }
+
+  // @Get(':id')
+  // getOne(@Param('id') id: string) {
+  //   return this.storeService.getStore(Number(id));
+  // }
 
   @Post()
   create(@Body() store: CreateStoreDto) {
-    return this.storeService.createStore(store);
+    return this.storeService.create(store);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() store: UpdateStoreDto) {
-    return this.storeService.updateStore(Number(id), store);
+    return this.storeService.updateOne(Number(id), store);
   }
 
   @Delete(':id')
   delete(@Param('id') id: number) {
-    return this.storeService.deleteStore(Number(id));
+    return this.storeService.softDelete(Number(id));
   }
 }

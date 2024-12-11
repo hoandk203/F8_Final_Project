@@ -5,7 +5,7 @@ import {
   Post,
   Controller,
   Put,
-  Delete,
+  Delete, Query,
 } from '@nestjs/common';
 import { CreateDto, UpdateDto } from './dto';
 import { VendorService } from './service';
@@ -19,9 +19,16 @@ export class VendorController {
     return this.vendorService.getList();
   }
 
-  @Get(':id')
-  getOne(@Param('id') id: string) {
-    return this.vendorService.getOne(Number(id));
+  // @Get(':id')
+  // getOne(@Param('id') id: string) {
+  //   return this.vendorService.getOne(Number(id));
+  // }
+
+  @Get('/search')
+
+  searchByName(@Query('name') name:string)
+  {
+    return this.vendorService.searchByName(name || "")
   }
 
   @Post()
@@ -31,11 +38,11 @@ export class VendorController {
 
   @Put(':id')
   update(@Param('id') id: string, @Body() vendor: UpdateDto) {
-    return this.vendorService.update(Number(id), vendor);
+    return this.vendorService.updateOne(Number(id), vendor);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return this.vendorService.delete(Number(id));
+    return this.vendorService.softDelete(Number(id));
   }
 }

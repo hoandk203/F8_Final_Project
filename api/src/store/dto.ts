@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 class CreateStoreDto {
   @ApiProperty({
-    default: 'Dien may xanh Cau Giay',
+    default: 'Store 1',
   })
   name: string;
 
@@ -10,6 +10,16 @@ class CreateStoreDto {
     default: 'Cay Giay, Ha Noi',
   })
   location: string;
+
+  @ApiProperty({
+    default: 'Store1@gmail.com',
+  })
+  email: string;
+
+  @ApiProperty({
+    default: 1,
+  })
+  vendorId: number;
 }
 
 class UpdateStoreDto extends CreateStoreDto {}

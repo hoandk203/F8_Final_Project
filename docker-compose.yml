@@ -26,7 +26,7 @@ services:
     volumes:
       - './web:/app/web'
     ports:
-      - '5000:5173'
+      - '5000:3000'
     command: ['npm', 'run', 'dev']
 
   db:

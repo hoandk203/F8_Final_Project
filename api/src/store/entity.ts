@@ -1,7 +1,9 @@
-export const stores = [
-  {
-    id: 1,
-    name: 'Dien may xanh Hoang Mai',
-    location: 'Hoang Mai, Ha Noi',
-  },
-];
+import {Column, Entity} from "typeorm";
+import {User} from "../base/user.entity";
+
+
+@Entity()
+export class Store extends User{
+    @Column({name: "vendor_id", nullable: true})
+    vendorId: number
+}
