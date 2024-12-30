@@ -1,0 +1,163 @@
+"use client"
+
+import React, {useCallback, useEffect} from "react";
+import axios from "axios";
+import {useDispatch, useSelector} from "react-redux";
+import { RootState, AppDispatch } from "@/redux/store";
+import {debounce} from "lodash";
+import {toast} from "react-toastify";
+
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    InputAdornment,
+    TextField
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+
+import CommonTable from "@/components/commonTable/CommonTable";
+import {fetchVendorList} from "@/redux/middlewares/vendorMiddleware";
+import CustomButton from "@/components/CustomButton";
+import VendorDialog from "@/app/admin/vendors/components/VendorDialog";
+import {searchVendorByName, softDeleteVendor} from "@/redux/slice/vendorSlice";
+import LoadingOverlay from "@/components/LoadingOverlay";
+
+
+
+const columns= [
+    {
+        name: "ID",
+        key: "id",
+    },
+    {
+        name: "Vendor",
+        key: "name",
+    },
+    {
+        name: "Location",
+        key: "location",
+    },
+    {
+        name: "Created time",
+        key: "created_at"
+    },
+    {
+        name: "Email",
+        key: "email",
+    },
+    {
+        name: "Action",
+        key: "action",
+    }
+]
+
+const VendorsPage = () => {
+    const dispatch= useDispatch<AppDispatch>()
+    const vendorList= useSelector((state: RootState) => state.vendor.vendorList)
+    const vendorListStatus= useSelector((state: RootState) => state.vendor.status)
+    const [open, setOpen] = React.useState(false);
+    const [currentData, setCurrentData] = React.useState({
+        id: null,
+        name: "",
+        email: "",
+        location: "",
+        vendorId: ""
+    });
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setCurrentData({
+            id: null,
+            name: "",
+            email: "",
+            location: "",
+            vendorId: ""
+        })
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        if(vendorList.length === 0){
+            dispatch(fetchVendorList())
+        }
+
+    }, []);
+
+    const softDelete = async (id: number) => {
+        try {
+            const response=await axios.delete(`http://localhost:3000/vendor/${id}`)
+            if(response.data){
+                dispatch(softDeleteVendor(id))
+                toast.success("Vendor deleted successfully")
+            }
+        }catch (e) {
+            toast.error("Vendor delete failed")
+            console.log(e)
+            return e
+        }
+    }
+
+    const fetchSearch= async (name: string) => {
+        try {
+            const  response= await axios.get(`http://localhost:3000/vendor/search?name=${name}`)
+            if(response.data){
+                dispatch(searchVendorByName(response.data))
+            }
+        }catch (e) {
+            console.log(e)
+            return e
+        }
+    }
+
+    const debounceSearch = useCallback(debounce((nextValue) => fetchSearch(nextValue), 1000), [])
+
+    const handleSearch= (name: any) => {
+        debounceSearch(name)
+    }
+    
+    return (
+        <div className={"container mx-auto"}>
+
+            {vendorListStatus === 'pending' && <LoadingOverlay/>}
+
+            <h1 className="text-xl font-bold lg:hidden mb-5">Vendors management</h1>
+            <div>
+                <div className={"mb-5 flex justify-between"}>
+                    <div>
+                        <TextField
+                            id="input-with-icon-textfield"
+                            label="Search for vendor name"
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                            variant="outlined"
+                            onChange={(e) => {handleSearch(e.target.value)}}
+                        />
+                    </div>
+                    <div>
+                        <CustomButton label={"Add vendor"} variant={"dark"} handleOpenDialog={handleClickOpen}/>
+                        <VendorDialog open={open} handleClose={handleClose} currentData={currentData} currentId={currentData.id}/>
+                    </div>
+                </div>
+               <div>
+                    <CommonTable columns={columns} rows={vendorList} handleOpenDialog={handleClickOpen} setCurrentData={setCurrentData} softDelete={softDelete}/>
+               </div>
+            </div>
+        </div>
+    )
+}
+
+export default VendorsPage
