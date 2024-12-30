@@ -14,9 +14,9 @@ const AdminHeader= ({showSidebar, setShowSidebar}: props) => {
     let pathname = usePathname()
     pathname = pathname.split("/")[2]
     return (
-        <div className={"shadow"}>
+        <div className={""}>
             <div className={"container mx-auto p-4 ps-0 lg:ps-4"}>
-                <div className={"text-[28px] font-[900] capitalize inline- hidden lg:block"}>{pathname} management</div>
+                <div className={"text-[24px] font-[900] capitalize inline- hidden lg:block"}>{pathname} management</div>
                 <span onClick={() => setShowSidebar(!showSidebar)} className={"inline-block cursor-pointer lg:hidden"}>
                     <div className={"flex items-center gap-2"}>
                         <span

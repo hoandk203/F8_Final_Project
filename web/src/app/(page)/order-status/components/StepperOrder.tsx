@@ -17,9 +17,9 @@ const StepperOrder = () => {
     const step = useSelector((state: any) => state.stepOrder.step)
     const dispatch= useDispatch()
 
-    const handleStep = (updateStep: number) => () => {
-        dispatch(stepOrderSlice.actions.setStep(updateStep))
-    };
+    // const handleStep = (updateStep: number) => () => {
+    //     dispatch(stepOrderSlice.actions.setStep(updateStep))
+    // };
 
     return (
         <div>

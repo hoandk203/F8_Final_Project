@@ -15,6 +15,7 @@ const AdminDialog= ({children, title, open, handleClose}: props) => {
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
+            className="flex justify-center items-center"
         >
             <DialogTitle id="alert-dialog-title">
                 {title}

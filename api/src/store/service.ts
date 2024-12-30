@@ -19,7 +19,6 @@ export class StoreService extends BaseService{
           .select([
               'store.*',
               'vendor.name as vendor_name',
-              'json_build_object(\'id\', vendor.id, \'name\', vendor.name) as vendor'
           ])
           .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
     }
@@ -32,8 +31,8 @@ export class StoreService extends BaseService{
         const query = this.storeRepository
             .createQueryBuilder("store")
             .select([
-                '*',
-                'json_build_object(\'id\', vendor.id, \'name\', vendor.name) as vendor'
+                'store.*',
+                'vendor.name as vendor_name',
             ])
             .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
             .where("lower(store.name) LIKE :name", { name: `%${name.toLowerCase()}%` })

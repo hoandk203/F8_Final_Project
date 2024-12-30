@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useState} from "react";
-import AdminSideBar from "./components/AdminSideBar";
+import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "@/app/admin/components/AdminHeader";
 
 
@@ -16,8 +16,8 @@ const AdminLayout = ({children}: {children: React.ReactNode}) => {
             }} className={"fixed inset-0 bg-black opacity-50 z-10 lg:hidden"}></div>}
             <div className="flex relative">
                 <div
-                    className={`fixed lg:static top-0 bottom-0 z-10 -left-full lg:left-0 transition-all duration-300 ease-in-out ${showSidebar ? "!left-0" : ""}`}>
-                    <AdminSideBar/>
+                    className={`fixed max-w-[250px] bg-white lg:static top-0 bottom-0 z-10 -left-full lg:left-0 transition-all duration-300 ease-in-out ${showSidebar ? "!left-0" : ""}`}>
+                    <AdminSidebar/>
                 </div>
 
                 <div className={"flex-1"}>

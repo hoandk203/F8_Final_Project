@@ -40,7 +40,7 @@ const columns= [
     },
     {
         name: "Vendor",
-        key: "vendor",
+        key: "vendor_name",
     },
     {
         name: "Location",

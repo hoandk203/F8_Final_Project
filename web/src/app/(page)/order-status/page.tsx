@@ -11,7 +11,12 @@ const OrderStatusPage = () => {
                 <div className="px-4 pt-8 text-[14px] h-full pb-[250px]">
                     <h1 className="font-bold mb-4">Order status</h1>
                     <StepperOrder/>
-                    <div className="flex flex-col gap-y-3 mt-4 h-full pb-[120px] overflow-y-auto">
+                    <div className="flex flex-col gap-y-3 mt-4 overflow-y-auto h-[calc(100%-131px)]"> {/* 2 nút 83px */}
+                        <OrderInfo type="accepted"/>
+                        <OrderInfo type="accepted"/>
+                        <OrderInfo type="accepted"/>
+                        <OrderInfo type="accepted"/>
+                        <OrderInfo type="accepted"/>
                         <OrderInfo type="accepted"/>
                     </div>
                 </div>

@@ -7,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {toast} from "react-toastify";
 import { useDispatch } from "react-redux";
-import {AppDispatch} from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
 
 import AdminDialog from "@/app/admin/components/AdminDialog";
 import TextField from "@mui/material/TextField";
@@ -15,7 +15,7 @@ import CustomButton from "@/components/CustomButton";
 
 
 import {createVendor, updateVendor} from "@/redux/slice/vendorSlice";
-import {fetchVendorList} from "@/redux/middlewares/vendorMiddleware";
+import { fetchVendorList } from "@/redux/middlewares/vendorMiddleware";
 
 
 

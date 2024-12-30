@@ -21,3 +21,13 @@ button {
 #upload-file-button span {
     margin: 0 !important;
 }
+
+.MuiPaper-root {
+    display: grid !important;
+    grid-template-columns: none !important;
+}
+
+.MuiDialog-container {
+    display: grid !important;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
