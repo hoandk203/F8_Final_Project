@@ -1,5 +1,5 @@
-import VerifyEmail from "./components/VerifyEmail";
-import VerifyIdentity from "./components/VerifyIdentity";
+
+import VerifyDriverContainer from "@/app/(page)/verify-driver/components/VerifyDriverContainer";
 
 
 const VerifyDriverPage = () => {
@@ -7,8 +7,7 @@ const VerifyDriverPage = () => {
         <div className="container mx-auto">
             <div className="text-[16px] pt-8 px-4">
                 <div className="text-center py-8">
-                    {/* <VerifyEmail/> */}
-                    <VerifyIdentity/>
+                    <VerifyDriverContainer/> {/* components này để bọc components con rồi dùng useSelector để VerifyDriverPage giữ server side*/}
                 </div>
             </div>
         </div>

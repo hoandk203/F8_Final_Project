@@ -1,7 +1,18 @@
 import OTPInput from "@/components/OTPInput";
 import CustomButton from "@/components/CustomButton";
 
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "@/redux/store";
+import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
+
+
 const VerifyEmail = () => {
+    const dispatch= useDispatch<AppDispatch>()
+
+    const handleVerifyDriverStep = () => {
+        dispatch(setVerifyDriverStep(1))
+    }
+
     return (
         <>
             <h1 className="text-3xl font-bold mb-1">Verify your email</h1>
@@ -15,7 +26,7 @@ const VerifyEmail = () => {
                 <p className="text-black font-semibold">Resend in 30 seconds</p>
             </div>
             <div className={"grid grid-cols-1 mt-5"}>
-                <CustomButton label="Verify Code" variant="dark" size="large"/>
+                <CustomButton label="Verify Code" variant="dark" size="large" handleVerifyDriverStep={handleVerifyDriverStep}/>
             </div>
             <div className="text-center mt-5">
                 Need help? <a href="/contact-us" className="text-black underline font-semibold">Contact support</a>

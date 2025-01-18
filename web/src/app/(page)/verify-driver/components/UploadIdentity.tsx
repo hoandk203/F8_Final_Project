@@ -1,7 +1,18 @@
+"use client"
+
 import CustomButton from "@/components/CustomButton";
 import UploadImages from "@/components/UploadImages";
 
-const UploadIdentity = () => {
+interface Props {
+    setStep: (step: number) => void
+}
+
+const UploadIdentity = ({setStep}:Props) => {
+
+    const handleVerifyIdStep = () => {
+        setStep(1)
+    }
+
     return (
         <div>
             <h1 className="text-3xl font-bold mb-1">Verify driver identity</h1>
@@ -20,7 +31,7 @@ const UploadIdentity = () => {
                 </div>
             </div>
             <div className={"grid grid-cols-1 mt-10"}>
-                <CustomButton label="Verify ID card" variant="dark" size="large"/>
+                <CustomButton label="Verify ID card" variant="dark" size="large" handleVerifyIdStep={handleVerifyIdStep}/>
             </div>
         </div>
     )

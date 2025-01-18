@@ -12,11 +12,11 @@ interface CustomButtonProps {
     size?: "small" | "medium" | "large",
     handleCloseDialog?: () => void
     handleOpenDialog?: () => void
-    setVerifyStep?: () => void
-    changeVerifyIdStep?: () => void
+    handleVerifyDriverStep?: () => void
+    handleVerifyIdStep?: () => void
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", handleCloseDialog, handleOpenDialog, setVerifyStep, changeVerifyIdStep}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep}) => {
     const buttonStyles = {
         dark: {
             backgroundColor: "#303030",
@@ -34,11 +34,11 @@ const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disab
         if (handleOpenDialog) {
             handleOpenDialog();
         }
-        if (setVerifyStep) {
-            setVerifyStep();
+        if (handleVerifyDriverStep) {
+            handleVerifyDriverStep();
         }
-        if (changeVerifyIdStep) {
-            changeVerifyIdStep();
+        if (handleVerifyIdStep) {
+            handleVerifyIdStep();
         }
     }
 
