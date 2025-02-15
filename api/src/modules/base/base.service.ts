@@ -1,9 +1,5 @@
-
-
 import { Repository } from "typeorm";
 import { Base } from "./base.entity";
-
-
 
 export class BaseService {
     constructor(protected repository: Repository<Base>) {}
@@ -18,7 +14,8 @@ export class BaseService {
     }
 
     handleOrder(query){
-        return query.orderBy("id", "DESC")
+        const alias = query.expressionMap.mainAlias?.name || '';
+        return query.orderBy(`${alias}.id`, "DESC")
     }
 
     getList(){
@@ -27,11 +24,21 @@ export class BaseService {
         query= this.handleOrder(query)
         return query.getRawMany()
     }
+
+    getOne(id){
+        let query = this.handleSelect()
+        query = this.handleFind(query)
+        const alias = query.expressionMap.mainAlias?.name || '';
+        query = query.andWhere(`${alias}.id = :id`, { id })
+        return query.getRawOne()
+    }
+
     create(data) {
         this.repository
             .createQueryBuilder()
             .insert()
-            .values(data).execute()
+            .values(data)
+            .execute()
         return data
     }
 
@@ -47,6 +54,8 @@ export class BaseService {
     }
 
     softDelete(id) {
-        return this.updateOne(id, {active: false})
+        const object= this.getOne(id)
+        this.updateOne(id, {active: false})
+        return object
     }
 }

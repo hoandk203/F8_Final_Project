@@ -19,10 +19,10 @@ export class VendorController {
         return this.vendorService.getList();
     }
 
-    // @Get(':id')
-    // getOne(@Param('id') id: string) {
-    //   return this.vendorService.getOne(Number(id));
-    // }
+    @Get(':id')
+    getOne(@Param('id') id: string) {
+      return this.vendorService.getOne(Number(id));
+    }
 
     @Get('/search')
 

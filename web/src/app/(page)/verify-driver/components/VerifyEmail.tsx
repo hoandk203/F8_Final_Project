@@ -1,13 +1,18 @@
+"use client";
+
+import {useState} from "react";
+
 import OTPInput from "@/components/OTPInput";
 import CustomButton from "@/components/CustomButton";
-
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
 
 
+
 const VerifyEmail = () => {
     const dispatch= useDispatch<AppDispatch>()
+    const [otp, setOtp] = useState('');
 
     const handleVerifyDriverStep = () => {
         dispatch(setVerifyDriverStep(1))

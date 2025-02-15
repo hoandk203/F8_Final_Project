@@ -93,6 +93,7 @@ create table material
 alter table material
     owner to postgres;
 
+drop table if exists "order" cascade;
 create table "order"
 (
     id             bigserial
@@ -137,3 +138,72 @@ create table order_detail
 alter table order_detail
     owner to postgres;
 
+-- THÊM USERS VÀ DRIVER
+-- Bảng users quản lý tất cả người dùng hệ thống (admin, vendor, driver)
+drop table if exists users cascade;
+CREATE TABLE users (
+                       id SERIAL PRIMARY KEY,
+                       password VARCHAR(255) NOT NULL,
+                       email VARCHAR(255) UNIQUE NOT NULL,
+                       role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'vendor', 'driver')),
+                       active BOOLEAN DEFAULT true NOT NULL,
+                       created_at TIMESTAMP DEFAULT NOW(),
+                       created_by INTEGER REFERENCES users(id),
+                       modified_at TIMESTAMP,
+                       modified_by INTEGER REFERENCES users(id),
+                       deleted_at TIMESTAMP,
+                       deleted_by INTEGER REFERENCES users(id)
+);
+
+-- Bảng driver mở rộng thông tin cho tài xế (quan hệ 1-1 với users)
+drop table if exists driver cascade;
+CREATE TABLE driver (
+                        user_id INTEGER PRIMARY KEY REFERENCES users(id),
+                        fullname VARCHAR(50),
+                        date_of_birth DATE,
+                        gst_number VARCHAR(20),
+                        address VARCHAR(50),
+                        city VARCHAR(50),
+                        state VARCHAR(50),
+                        phone_number VARCHAR(20),
+--                         status VARCHAR(20) CHECK (status IN ('available', 'busy', 'offline')),
+                        active BOOLEAN DEFAULT true NOT NULL,
+                        created_at TIMESTAMP DEFAULT NOW(),
+                        created_by INTEGER REFERENCES users(id),
+                        modified_at TIMESTAMP,
+                        modified_by INTEGER REFERENCES users(id),
+                        deleted_at TIMESTAMP,
+                        deleted_by INTEGER REFERENCES users(id)
+);
+
+-- Chỉnh sửa lại bảng vendor để tham chiếu tới users
+ALTER TABLE vendor
+    ADD COLUMN user_id INTEGER UNIQUE REFERENCES users(id),
+DROP COLUMN email; -- Email đã có trong bảng users
+
+-- Chỉnh sửa bảng store để thêm quan hệ với users
+ALTER TABLE store
+    ADD COLUMN user_id INTEGER REFERENCES users(id);
+
+-- Chỉnh sửa bảng location (sửa kiểu dữ liệu và thêm FK)
+ALTER TABLE location
+ALTER COLUMN latitude TYPE NUMERIC(10,6),
+    ALTER COLUMN longitude TYPE NUMERIC(10,6),
+    ADD CONSTRAINT fk_location_driver FOREIGN KEY (driver_id) REFERENCES driver(user_id);
+
+-- Chỉnh sửa bảng order để cải thiện quan hệ
+ALTER TABLE "order"
+ALTER COLUMN driver_id TYPE INTEGER USING driver_id::INTEGER,
+    ADD CONSTRAINT fk_order_driver FOREIGN KEY (driver_id) REFERENCES driver(user_id),
+    ADD CONSTRAINT fk_order_store FOREIGN KEY (store_id) REFERENCES store(id),
+    ADD CONSTRAINT fk_order_image FOREIGN KEY (image_id) REFERENCES image(id);
+
+-- Thêm các FK constraint cho các bảng hiện có
+ALTER TABLE material
+    ADD CONSTRAINT fk_material_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+    ADD CONSTRAINT fk_material_modified_by FOREIGN KEY (modified_by) REFERENCES users(id),
+    ADD CONSTRAINT fk_material_deleted_by FOREIGN KEY (deleted_by) REFERENCES users(id);
+
+ALTER TABLE order_detail
+    ADD CONSTRAINT fk_order_detail_order FOREIGN KEY (order_id) REFERENCES "order"(id),
+    ADD CONSTRAINT fk_order_detail_material FOREIGN KEY (material_id) REFERENCES material(id);

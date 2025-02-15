@@ -1,8 +1,8 @@
 import {Entity} from "typeorm";
-import {User} from "../base/user.entity";
+import {Info} from "../base/info.entity";
 
 
 @Entity()
-export class Vendor extends User{
+export class Vendor extends Info{
 
 }

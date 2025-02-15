@@ -26,10 +26,10 @@ export class StoreController {
         return this.storeService.searchByName(name || "")
     }
 
-    // @Get(':id')
-    // getOne(@Param('id') id: string) {
-    //   return this.storeService.getStore(Number(id));
-    // }
+    @Get(':id')
+    getOne(@Param('id') id: string) {
+      return this.storeService.getOne(Number(id));
+    }
 
     @Post()
     create(@Body() store: CreateStoreDto) {

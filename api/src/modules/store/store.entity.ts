@@ -1,9 +1,9 @@
 import {Column, Entity} from "typeorm";
-import {User} from "../base/user.entity";
+import {Info} from "../base/info.entity";
 
 
 @Entity()
-export class Store extends User{
+export class Store extends Info{
     @Column({name: "vendor_id", nullable: true})
     vendorId: number
 }
