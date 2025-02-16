@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {Inject, Injectable} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as otpGenerator from 'otp-generator';
 import { EmailVerification } from './entities/email-verification.entity';
@@ -7,8 +6,8 @@ import { EmailVerification } from './entities/email-verification.entity';
 @Injectable()
 export class OtpService {
     constructor(
-        @InjectRepository(EmailVerification)
-        private readonly otpRepo: Repository<EmailVerification>,
+        @Inject('OTP_REPOSITORY')
+        public otpRepo: Repository<EmailVerification>,
     ) {}
 
     async generateOtp(email: string): Promise<string> {

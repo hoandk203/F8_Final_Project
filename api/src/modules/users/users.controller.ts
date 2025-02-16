@@ -27,13 +27,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Post(`/login`)
-  login(@Body() dataLogin) {
-      const {email, password}= dataLogin
-
-      return this.usersService.login(email, password)
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateOne(+id, updateUserDto);

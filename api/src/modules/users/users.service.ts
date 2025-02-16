@@ -1,13 +1,12 @@
 import {ConflictException, Inject, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as otpGenerator from 'otp-generator';
 // import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import {BaseService} from "../base/base.service";
 import {Repository} from "typeorm";
 import {User} from "./entities/user.entity";
 import {MailerService} from "@nestjs-modules/mailer";
-
+import {OtpService} from "../email-verification/otp.service";
 
 
 @Injectable()
@@ -15,7 +14,8 @@ export class UsersService extends BaseService{
   constructor(
       @Inject('USER_REPOSITORY')
       private userRepository: Repository<User>,
-      private mailerService: MailerService
+      private mailerService: MailerService,
+      private otpService: OtpService
   ) {
     super(userRepository)
   }
@@ -30,8 +30,8 @@ export class UsersService extends BaseService{
       throw new ConflictException('Email already registered');
     }
 
-    // const otpCode= await this.otpService.generateOtp(email)
-    const otpCode = otpGenerator.generate(6, { digits: true, upperCase: false, specialChars: false });
+    //goi generate otp tu OtpService
+    const otpCode= await this.otpService.generateOtp(email)
     await this.mailerService.sendMail({
       from: "hoanyttv@gmail.com",
       to: email,
@@ -97,22 +97,22 @@ export class UsersService extends BaseService{
   async create(data: any) {
     const {password}= data
 
-    // check email already exist
-    // const userExist = await this.userRepository.findOne({ where: { email } });
-    // if (userExist) {
-    //   throw new ConflictException('Email already registered');
-    // }
+    const validateOtp= await this.otpService.validateOtp(data.email, data.otp)
 
-    //hash password
-    data.password  = await bcrypt.hash(password, 10);
+    if(validateOtp){
+      //hash password
+      data.password  = await bcrypt.hash(password, 10);
 
-    await this.repository
-        .createQueryBuilder()
-        .insert()
-        .values(data)
-        .execute()
+      await this.repository
+          .createQueryBuilder()
+          .insert()
+          .values(data)
+          .execute()
 
-    return data
+      return data
+    }
+
+    throw new UnauthorizedException('Invalid OTP code');
   }
 
   handleSelect() {
@@ -124,7 +124,7 @@ export class UsersService extends BaseService{
   }
 
   // LOGIN
-  async login(email: string, password: string) {
+  async validateUser(email: string, password: string) {
     //check user exist
     const user= await this.userRepository.findOne({ where: { email } });
     if (!user) {
@@ -137,6 +137,10 @@ export class UsersService extends BaseService{
       throw new UnauthorizedException('Invalid password');
     }
     return user
+  }
+
+  getByEmail(email: string) {
+    return this.userRepository.findOne({ where: { email } });
   }
 
   // update(id: number, updateUserDto: UpdateUserDto) {

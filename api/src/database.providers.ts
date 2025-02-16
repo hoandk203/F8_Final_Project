@@ -8,6 +8,7 @@ import {Order} from "./modules/order/order.entity";
 import {OrderDetail} from "./modules/order-detail/order-detail.entity";
 import {Store} from "./modules/store/store.entity";
 import {User} from "./modules/users/entities/user.entity";
+import {EmailVerification} from "./modules/email-verification/entities/email-verification.entity";
 
 export const databaseProviders = [
     {
@@ -28,7 +29,8 @@ export const databaseProviders = [
                     Material,
                     Order,
                     OrderDetail,
-                    User
+                    User,
+                    EmailVerification
                 ],
                 synchronize: true,
             });
