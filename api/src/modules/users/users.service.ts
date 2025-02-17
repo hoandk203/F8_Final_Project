@@ -22,6 +22,7 @@ export class UsersService extends BaseService{
 
   // SEND MAIL
   async sendMail(data: any) {
+    console.log("Dữ liệu nhận được từ Frontend:", data);
     const {email}= data
 
     //check email already exist
@@ -91,6 +92,7 @@ export class UsersService extends BaseService{
     </html>
   `
     })
+    return 'Mail has been sent'
   }
 
   // CREATE USER

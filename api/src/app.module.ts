@@ -11,9 +11,10 @@ import { MaterialModule } from './modules/material/material.module';
 import { UsersModule } from './modules/users/users.module';
 import {OtpModule} from "./modules/email-verification/otp.module";
 import { AuthModule } from './modules/auth/auth.module';
+import {RefreshTokenModule} from "./modules/refresh-token/refresh-token.module";
 
 @Module({
-  imports: [StoreModule, VendorModule, ImageModule, LocationModule, MaterialModule, OrderModule, OrderDetailModule, UsersModule, OtpModule, AuthModule],
+  imports: [StoreModule, VendorModule, ImageModule, LocationModule, MaterialModule, OrderModule, OrderDetailModule, UsersModule, OtpModule, AuthModule, RefreshTokenModule],
   controllers: [AppController],
   providers: [AppService],
 })

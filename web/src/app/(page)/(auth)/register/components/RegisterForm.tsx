@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +10,7 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
+import { sendVerificationEmail } from "@/services/authService";
 
 
 const schema = z.object({
@@ -39,7 +41,7 @@ const schema = z.object({
 type FormInput = z.infer<typeof schema>;
 
 const RegisterForm = () => {
-
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -53,7 +55,7 @@ const RegisterForm = () => {
             confirmPassword: "",
         },
     });
-
+    const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -66,10 +68,20 @@ const RegisterForm = () => {
     };
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        setTimeout(() => {
-            console.log(data)
-            reset()
-        }, 2000)
+        try {
+            const userData = {
+                email: data.email,
+                password: data.password,
+                role: "driver",
+            };
+    
+            await sendVerificationEmail(userData);
+            localStorage.setItem("userData", JSON.stringify(userData));
+            reset();
+            router.push("/verify-driver");
+        } catch (error: any) {
+            setError(error.message);
+        }
     }
 
     return (
@@ -147,6 +159,7 @@ const RegisterForm = () => {
                         }}
                     />
                 </div>
+                {error && <div className="text-red-500">{error}</div>}
                 <div className="grid grid-cols-1 mt-3">
                     <CustomButton
                         type="submit"
