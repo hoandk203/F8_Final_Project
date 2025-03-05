@@ -22,14 +22,16 @@ export class UsersService extends BaseService{
 
   // SEND MAIL
   async sendMail(data: any) {
-    console.log("Dữ liệu nhận được từ Frontend:", data);
-    const {email}= data
+    const {email, resend}= data
 
     //check email already exist
-    const userExist = await this.userRepository.findOne({ where: { email } });
-    if (userExist) {
-      throw new ConflictException('Email already registered');
+    if(!resend){
+      const userExist = await this.userRepository.findOne({ where: { email } });
+      if (userExist) {
+        throw new ConflictException('Email already registered');
+      }
     }
+
 
     //goi generate otp tu OtpService
     const otpCode= await this.otpService.generateOtp(email)
@@ -97,7 +99,12 @@ export class UsersService extends BaseService{
 
   // CREATE USER
   async create(data: any) {
-    const {password}= data
+    const {email, password}= data
+
+    const userExist= await this.userRepository.findOne({where: {email}})
+    if(userExist){
+      throw new ConflictException('Email already registered')
+    }
 
     const validateOtp= await this.otpService.validateOtp(data.email, data.otp)
 

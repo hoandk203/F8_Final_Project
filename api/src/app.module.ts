@@ -12,9 +12,23 @@ import { UsersModule } from './modules/users/users.module';
 import {OtpModule} from "./modules/email-verification/otp.module";
 import { AuthModule } from './modules/auth/auth.module';
 import {RefreshTokenModule} from "./modules/refresh-token/refresh-token.module";
+import {ConfigModule} from "@nestjs/config";
 
 @Module({
-  imports: [StoreModule, VendorModule, ImageModule, LocationModule, MaterialModule, OrderModule, OrderDetailModule, UsersModule, OtpModule, AuthModule, RefreshTokenModule],
+  imports: [
+      ConfigModule.forRoot(),
+      StoreModule,
+      VendorModule,
+      ImageModule,
+      LocationModule,
+      MaterialModule,
+      OrderModule,
+      OrderDetailModule,
+      UsersModule,
+      OtpModule,
+      AuthModule,
+      RefreshTokenModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

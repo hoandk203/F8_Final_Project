@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {Inject, Injectable, UnauthorizedException} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import * as otpGenerator from 'otp-generator';
 import { EmailVerification } from './entities/email-verification.entity';
@@ -39,7 +39,7 @@ export class OtpService {
         });
 
         if (!record || record.expires_at < new Date()) {
-            return false;
+            throw new UnauthorizedException("Invalid OTP code");
         }
 
         // Đánh dấu đã sử dụng

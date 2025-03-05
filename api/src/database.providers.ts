@@ -16,12 +16,12 @@ export const databaseProviders = [
         provide: 'DATA_SOURCE',
         useFactory: async () => {
             const dataSource = new DataSource({
-                type: 'postgres',
-                host: 'db',
-                port: 5432,
-                username: 'postgres',
-                password: 'postgres',
-                database: 'default',
+                type: process.env.DB_TYPE as any,
+                host: process.env.DB_HOST,
+                port: process.env.DB_PORT as any,
+                username: process.env.DB_USERNAME,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME,
                 entities: [
                     Store,
                     Vendor,

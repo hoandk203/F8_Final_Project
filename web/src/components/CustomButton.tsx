@@ -10,13 +10,16 @@ interface CustomButtonProps {
     disabled?: boolean,
     variant: 'dark' | 'light',
     size?: "small" | "medium" | "large",
+    isLoading?: boolean,
     handleCloseDialog?: () => void
     handleOpenDialog?: () => void
     handleVerifyDriverStep?: () => void
     handleVerifyIdStep?: () => void
+    handleVerifyEmail?: () => void
+    handleUploadIdCard?: () => void
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", isLoading, handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep, handleVerifyEmail, handleUploadIdCard}) => {
     const buttonStyles = {
         dark: {
             backgroundColor: "#303030",
@@ -40,8 +43,16 @@ const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disab
         if (handleVerifyIdStep) {
             handleVerifyIdStep();
         }
+        if (handleVerifyEmail) {
+            handleVerifyEmail();
+        }
+        if (handleUploadIdCard){
+            handleUploadIdCard()
+        }
     }
-
+    if(isLoading){
+        label= "Loading..."
+    }
     return (
         <Button variant="contained"
                 type={type}

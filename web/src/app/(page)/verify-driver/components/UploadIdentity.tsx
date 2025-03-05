@@ -1,7 +1,9 @@
 "use client"
 
+import {useCallback, useState} from "react";
 import CustomButton from "@/components/CustomButton";
 import UploadImages from "@/components/UploadImages";
+import {uploadIdCard} from "@/services/imageService";
 
 interface Props {
     setStep: (step: number) => void
@@ -9,9 +11,37 @@ interface Props {
 
 const UploadIdentity = ({setStep}:Props) => {
 
-    const handleVerifyIdStep = () => {
-        setStep(1)
+    // const handleVerifyIdStep = () => {
+    //     setStep(1)
+    // }
+    const [error, setError] = useState("")
+    const [frontSide, setFrontSide] = useState("")
+    const [backSide, setBackSide] = useState("")
+
+    const setFrontSideCallback = useCallback((value: string) => {
+        setError("")
+        setFrontSide(value)
+    }, []);
+    const setBackSideCallback = useCallback((value: string) => {
+        setError("")
+        setBackSide(value)
+    }, []);
+
+    const handleUploadIdCard = async () => {
+        try {
+            // if (frontSide && backSide) {
+                console.log("upload id card")
+                await uploadIdCard(frontSide)
+                // setStep(1)
+            // }else{
+            //     setError("Please upload Front side & Back side")
+            // }
+        } catch (e) {
+            console.log(e)
+        }
+
     }
+
 
     return (
         <div>
@@ -21,17 +51,20 @@ const UploadIdentity = ({setStep}:Props) => {
                 <p className="text-start font-semibold mb-2">Upload driver's license</p>
                 <div className="grid grid-cols-2 gap-3">
                     <div>
-                        <UploadImages/>
+                        <UploadImages setFrontSide={setFrontSideCallback}/>
                         <p className="mt-2">Front side</p>
                     </div>
                     <div>
-                        <UploadImages/>
+                        <UploadImages setBackSide={setBackSideCallback}/>
                         <p className="mt-2">Back side</p>
                     </div>
                 </div>
             </div>
+            <div>
+                {error && <p className="text-red-500 mt-4">{error}</p>}
+            </div>
             <div className={"grid grid-cols-1 mt-10"}>
-                <CustomButton label="Verify ID card" variant="dark" size="large" handleVerifyIdStep={handleVerifyIdStep}/>
+                <CustomButton label="Verify ID card" variant="dark" size="large" handleUploadIdCard={handleUploadIdCard}/>
             </div>
         </div>
     )

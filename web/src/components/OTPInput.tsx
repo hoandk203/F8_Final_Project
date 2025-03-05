@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Input as BaseInput } from '@mui/base/Input';
 import { Box, styled } from '@mui/system';
+import { useEffect } from 'react';
 
 function OTP({
                  separator,
@@ -174,13 +175,17 @@ function OTP({
     );
 }
 
-export default function OTPInput() {
+export default function OTPInput({changeOtp}: {changeOtp: (otp: string) => void}) {
     const [otp, setOtp] = React.useState('');
+
+    // truyen nguoc otp ra verify email page
+    useEffect(() => {
+        changeOtp(otp)
+    }, [otp])
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <OTP separator={<span>-</span>} value={otp} onChange={setOtp} length={6} />
-            <span>Entered value: {otp}</span>
         </Box>
     );
 }

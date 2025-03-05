@@ -15,7 +15,7 @@ const schema = z.object({
     gstNumber: z.string().min(1, { message: "GST number is required" }),
     address: z.string().min(1, { message: "Address is required" }),
     city: z.string().min(1, { message: "City is required" }),
-    state: z.string().min(1, { message: "State is required" }),
+    country: z.string().min(1, { message: "Country is required" }),
 });
 
 type FormInput = z.infer<typeof schema>;
@@ -40,7 +40,7 @@ const ConfirmIdentity = ({setStep}: Props) => {
             gstNumber: "",
             address: "",
             city: "",
-            state: "",
+            country: "",
         },
     });
 
@@ -129,15 +129,15 @@ const ConfirmIdentity = ({setStep}: Props) => {
                     </div>
 
                     <div className="flex flex-col">
-                        <label htmlFor="state" className="font-semibold">State</label>
+                        <label htmlFor="country" className="font-semibold">Country</label>
                         <TextField
-                            {...register("state")}
-                            id="state"
-                            label="State"
+                            {...register("country")}
+                            id="country"
+                            label="Country"
                             variant="outlined"
                             size="small"
-                            error={!!errors.state}
-                            helperText={errors.state?.message}
+                            error={!!errors.country}
+                            helperText={errors.country?.message}
                         />
                     </div>
 

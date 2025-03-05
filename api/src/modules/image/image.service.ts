@@ -20,7 +20,7 @@ export class ImageService extends BaseService {
         const path= `files/images/${v4()}.png`
 
         writeFile(path, payload, 'base64', (e) => {
-            console.log(e);
+            console.log(e)
         })
 
         return super.create({

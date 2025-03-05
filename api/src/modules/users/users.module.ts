@@ -4,7 +4,6 @@ import { UsersController } from './users.controller';
 import {DatabaseModule} from "../../database.module";
 import {userProviders} from "./users.provider";
 import {MailerModule} from "@nestjs-modules/mailer";
-import {OtpService} from "../email-verification/otp.service";
 import {OtpModule} from "../email-verification/otp.module";
 
 const HOST= 'smtp.gmail.com';
