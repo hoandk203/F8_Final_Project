@@ -11,6 +11,7 @@ import {User} from "./modules/users/entities/user.entity";
 import {EmailVerification} from "./modules/email-verification/entities/email-verification.entity";
 import {RefreshToken} from "./modules/refresh-token/entities/refresh-token.entity";
 import {IdentityDocument} from "./modules/identity-document/entities/identity-document.entity";
+import {Driver} from "./modules/driver/entities/driver.entity";
 
 export const databaseProviders = [
     {
@@ -34,7 +35,8 @@ export const databaseProviders = [
                     User,
                     EmailVerification,
                     RefreshToken,
-                    IdentityDocument
+                    IdentityDocument,
+                    Driver
                 ],
                 synchronize: true,
             });

@@ -11,6 +11,7 @@ const VerifyIdentity = () => {
 
     return (
         <div>
+            {/*<ConfirmIdentity/>*/}
             {step===0?<UploadIdentity setStep={setStep}/>:<ConfirmIdentity setStep={setStep}/>}
         </div>
     )

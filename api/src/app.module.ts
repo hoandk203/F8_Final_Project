@@ -14,6 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import {RefreshTokenModule} from "./modules/refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
 import { IdentityDocumentModule } from './modules/identity-document/identity-document.module';
+import { DriverModule } from './modules/driver/driver.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { IdentityDocumentModule } from './modules/identity-document/identity-doc
       OtpModule,
       AuthModule,
       RefreshTokenModule,
-      IdentityDocumentModule
+      IdentityDocumentModule,
+      DriverModule
   ],
   controllers: [AppController],
   providers: [AppService],
