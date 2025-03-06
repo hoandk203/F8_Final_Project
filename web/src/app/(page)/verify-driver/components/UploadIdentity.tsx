@@ -29,13 +29,20 @@ const UploadIdentity = ({setStep}:Props) => {
 
     const handleUploadIdCard = async () => {
         try {
-            // if (frontSide && backSide) {
+            if (frontSide && backSide) {
                 console.log("upload id card")
-                await uploadIdCard(frontSide)
-                // setStep(1)
-            // }else{
-            //     setError("Please upload Front side & Back side")
-            // }
+                const identityData= {
+                    userId: 18,
+                    frontImageUrl: frontSide,
+                    backImageUrl: backSide,
+                    status: "pending"
+                }
+                await uploadIdCard(identityData)
+
+                setStep(1)
+            }else{
+                setError("Please upload Front side & Back side")
+            }
         } catch (e) {
             console.log(e)
         }

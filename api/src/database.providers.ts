@@ -10,6 +10,7 @@ import {Store} from "./modules/store/store.entity";
 import {User} from "./modules/users/entities/user.entity";
 import {EmailVerification} from "./modules/email-verification/entities/email-verification.entity";
 import {RefreshToken} from "./modules/refresh-token/entities/refresh-token.entity";
+import {IdentityDocument} from "./modules/identity-document/entities/identity-document.entity";
 
 export const databaseProviders = [
     {
@@ -32,7 +33,8 @@ export const databaseProviders = [
                     OrderDetail,
                     User,
                     EmailVerification,
-                    RefreshToken
+                    RefreshToken,
+                    IdentityDocument
                 ],
                 synchronize: true,
             });

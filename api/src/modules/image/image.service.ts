@@ -4,6 +4,7 @@ import {Repository} from "typeorm";
 import {Image} from "./image.entity";
 import {BaseService} from "../base/base.service";
 import {writeFile} from 'fs'
+import {ImageCreate} from "./image.dto";
 
 @Injectable()
 export class ImageService extends BaseService {
@@ -14,7 +15,7 @@ export class ImageService extends BaseService {
         super(imageRepository)
     }
 
-    async create(image) {
+    async create(image: ImageCreate) {
 
         const payload= image.payload.split(',')[1]
         const path= `files/images/${v4()}.png`

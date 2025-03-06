@@ -1,3 +1,4 @@
+drop table if exists vendor cascade;
 create table vendor
 (
     active      boolean   default true not null,
@@ -18,6 +19,7 @@ create table vendor
 alter table vendor
     owner to postgres;
 
+drop table if exists store cascade;
 create table store
 (
     vendor_id   integer,
@@ -39,6 +41,7 @@ create table store
 alter table store
     owner to postgres;
 
+drop table if exists image cascade;
 create table image
 (
     active      boolean   default true not null,
@@ -62,6 +65,7 @@ create table image
 alter table image
     owner to postgres;
 
+drop table if exists location cascade;
 create table location
 (
     latitude  numeric(3, 10) not null,
@@ -74,6 +78,7 @@ create table location
 alter table location
     owner to postgres;
 
+drop table if exists material cascade;
 create table material
 (
     id          bigserial
@@ -117,6 +122,7 @@ create table "order"
 alter table "order"
     owner to postgres;
 
+drop table if exists order_detail cascade;
 create table order_detail
 (
     id          bigserial
@@ -155,10 +161,27 @@ CREATE TABLE "user" (
                        deleted_by INTEGER REFERENCES "user"(id)
 );
 
+drop table if exists identity_document cascade;
+CREATE TABLE identity_document (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
+    front_image_url TEXT NOT NULL,
+    back_image_url TEXT NOT NULL,
+    status VARCHAR(20) CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',
+    active BOOLEAN DEFAULT true NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INTEGER REFERENCES "user"(id),
+    modified_at TIMESTAMP,
+    modified_by INTEGER REFERENCES "user"(id),
+    deleted_at TIMESTAMP,
+    deleted_by INTEGER REFERENCES "user"(id)
+);
+
 -- Bảng driver mở rộng thông tin cho tài xế (quan hệ 1-1 với users)
 drop table if exists driver cascade;
 CREATE TABLE driver (
                         user_id INTEGER PRIMARY KEY REFERENCES "user"(id),
+                        identity_document_id INTEGER UNIQUE REFERENCES identity_document(id) ON DELETE SET NULL,
                         fullname VARCHAR(50),
                         date_of_birth DATE,
                         gst_number VARCHAR(20),
@@ -207,3 +230,4 @@ ALTER TABLE material
 ALTER TABLE order_detail
     ADD CONSTRAINT fk_order_detail_order FOREIGN KEY (order_id) REFERENCES "order"(id),
     ADD CONSTRAINT fk_order_detail_material FOREIGN KEY (material_id) REFERENCES material(id);
+

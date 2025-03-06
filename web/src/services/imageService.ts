@@ -2,10 +2,9 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const uploadIdCard = async (file: any) => {
+export const uploadIdCard = async (identityData: any) => {
     try {
-        const image= {payload: file}
-        const response = await axios.post(`${API_BASE_URL}/image`, image, {
+        const response = await axios.post(`${API_BASE_URL}/identity-document`, identityData, {
             headers: {
                 "Content-Type": "application/json"
             }

@@ -1,4 +1,4 @@
-import {Body, Get, Post, Controller, Query, StreamableFile, BadRequestException} from '@nestjs/common';
+import {Body, Get, Post, Controller, Query, StreamableFile} from '@nestjs/common';
 import { ImageCreate } from './image.dto'
 import {ImageService} from "./image.service";
 import { createReadStream} from 'fs'

@@ -13,6 +13,7 @@ import {OtpModule} from "./modules/email-verification/otp.module";
 import { AuthModule } from './modules/auth/auth.module';
 import {RefreshTokenModule} from "./modules/refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
+import { IdentityDocumentModule } from './modules/identity-document/identity-document.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import {ConfigModule} from "@nestjs/config";
       UsersModule,
       OtpModule,
       AuthModule,
-      RefreshTokenModule
+      RefreshTokenModule,
+      IdentityDocumentModule
   ],
   controllers: [AppController],
   providers: [AppService],
