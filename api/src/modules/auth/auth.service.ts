@@ -35,9 +35,9 @@ export class AuthService {
         }
     }
 
-    async refreshToken(oldrefreshToken: string){
+    async refreshToken(oldRefreshToken: string){
         //decode de lay userId
-        const decoded= this.jwtService.decode(oldrefreshToken)
+        const decoded= this.jwtService.decode(oldRefreshToken)
         if(!decoded || !decoded.sub){
             throw new UnauthorizedException('Invalid refresh token')
         }
@@ -50,7 +50,7 @@ export class AuthService {
             throw new UnauthorizedException('Invalid refresh token')
         }
         // dung bcrypt de kiem tra
-        const isMatch= await bcrypt.compare(oldrefreshToken, tokenRecord.token)
+        const isMatch= await bcrypt.compare(oldRefreshToken, tokenRecord.token)
         if(!isMatch){
             throw new UnauthorizedException('Invalid refresh token')
         }
@@ -63,7 +63,7 @@ export class AuthService {
 
         //kiem tra lai key cua refresh token
         try {
-            const payload= this.jwtService.verify(oldrefreshToken, {
+            const payload= this.jwtService.verify(oldRefreshToken, {
                 secret: process.env.JWT_SECRET,
             })
 

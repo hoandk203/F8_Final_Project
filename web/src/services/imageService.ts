@@ -17,3 +17,19 @@ export const uploadIdCard = async (identityData: any) => {
         throw error;
     }
 };
+
+export const uploadVehicle= async (vehicleData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/vehicle`, vehicleData, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}

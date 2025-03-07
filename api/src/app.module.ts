@@ -15,6 +15,7 @@ import {RefreshTokenModule} from "./modules/refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
 import { IdentityDocumentModule } from './modules/identity-document/identity-document.module';
 import { DriverModule } from './modules/driver/driver.module';
+import { VehicleModule } from './modules/vehicle/vehicle.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { DriverModule } from './modules/driver/driver.module';
       AuthModule,
       RefreshTokenModule,
       IdentityDocumentModule,
-      DriverModule
+      DriverModule,
+      VehicleModule
   ],
   controllers: [AppController],
   providers: [AppService],

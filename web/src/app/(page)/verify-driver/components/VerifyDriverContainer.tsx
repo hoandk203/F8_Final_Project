@@ -14,10 +14,9 @@ const VerifyDriverContainer = () => {
 
     return (
         <>
-            <VerifyIdentity/>
-            {/*{verifyDriverStep === 0 && <VerifyEmail/>}*/}
-            {/*{verifyDriverStep === 1 && <VerifyIdentity/>}*/}
-            {/*{verifyDriverStep === 2 && <VerifyVehicle/>}*/}
+            {verifyDriverStep === 0 && <VerifyEmail/>}
+            {verifyDriverStep === 1 && <VerifyIdentity/>}
+            {verifyDriverStep === 2 && <VerifyVehicle/>}
         </>
     )
 }

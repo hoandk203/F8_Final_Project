@@ -34,9 +34,13 @@ const VerifyEmail = () => {
         setIsLoading(true)
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
         try {
-            await verifyEmail({...userData, otp: otp})
+            const response= await verifyEmail({...userData, otp: otp})
+            // lay userId cho vao verifyIdentity
+            localStorage.setItem("userId", JSON.stringify(response.id));
             setIsLoading(false)
             dispatch(setVerifyDriverStep(1))
+            // xoa localStorage khi verify thanh cong
+            localStorage.removeItem("userData")
         } catch (error: any) {
             setIsLoading(false)
             setError(error.message)

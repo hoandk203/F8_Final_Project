@@ -8,6 +8,7 @@ import {LocalStrategy} from "../../passport/local.strategy";
 import {JwtStrategy} from "../../passport/jwt.strategy";
 import {RefreshTokenModule} from "../refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
+import {DriverModule} from "../driver/driver.module";
 
 @Module({
   controllers: [AuthController],
@@ -15,6 +16,7 @@ import {ConfigModule} from "@nestjs/config";
   imports: [
       ConfigModule.forRoot(),
       UsersModule,
+      DriverModule,
       RefreshTokenModule,
       PassportModule,
       JwtModule.register({

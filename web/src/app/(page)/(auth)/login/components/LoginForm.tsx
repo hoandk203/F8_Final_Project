@@ -9,6 +9,8 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
+import {loginAPI} from "@/services/authService";
+import {useRouter} from "next/navigation";
 
 
 const schema = z.object({
@@ -32,8 +34,9 @@ const schema = z.object({
 type FormInput = z.infer<typeof schema>;
 
 const LoginForm = () => {
+    const router= useRouter();
     const [showPassword, setShowPassword] = useState(false);
-
+    const [error, setError] = useState("");
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
     };
@@ -52,10 +55,21 @@ const LoginForm = () => {
     });
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        setTimeout(() => {
-            console.log(data)
-            reset()
-        }, 2000)
+
+        try {
+            const response= await loginAPI(data);
+            localStorage.setItem("access_token", response.access_token);
+            localStorage.setItem("refresh_token", response.refresh_token);
+            router.push("/");
+        }catch (e) {
+            if (e instanceof Error) {
+                setError(e.message);
+            } else {
+                setError("An unknown error occurred");
+            }
+        }
+        reset()
+
     }
 
     return (
@@ -104,6 +118,7 @@ const LoginForm = () => {
                         }}
                     />
                 </div>
+                {error && <p className="text-red-500">{error}</p>}
                 <div className="grid grid-cols-1 mt-3">
                     <CustomButton
                         type="submit"

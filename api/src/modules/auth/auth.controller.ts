@@ -3,12 +3,14 @@ import { AuthService } from './auth.service';
 import {UsersService} from "../users/users.service";
 import {LocalAuthGuard} from "../../guard/local-auth.guard";
 import {JwtAuthGuard} from "../../guard/jwt-auth.guard";
+import {DriverService} from "../driver/driver.service";
 
 @Controller('auth')
 export class AuthController {
   constructor(
       private readonly authService: AuthService,
-      private readonly userService: UsersService
+      private readonly userService: UsersService,
+      private readonly driverService: DriverService
   ) {}
 
   @Post('/register')
@@ -30,7 +32,15 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  profile(@Request() request: any){
+  async profile(@Request() request: any){
+    const userData= request.user
+    if(userData.role === "driver"){
+      const driver= await this.driverService.getByUserId(userData.id)
+      return {
+        ...request.user,
+        driver: {...driver}
+      }
+    }
     return request.user
   }
 

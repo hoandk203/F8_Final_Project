@@ -6,9 +6,11 @@ import {readFile} from "@/utils/readFile";
 interface props {
     setFrontSide?: (value:any) => void
     setBackSide?: (value:any) => void
+    setVehicleImageCallback?: (value:any) => void
+    setVehicleRCImageCallback?: (value:any) => void
 }
 
-const UploadImages = React.memo(({setFrontSide, setBackSide}:props) => {
+const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback}:props) => {
     console.log('UploadImages')
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = React.useState("");
@@ -32,6 +34,12 @@ const UploadImages = React.memo(({setFrontSide, setBackSide}:props) => {
                         }
                         if(setBackSide){
                             setBackSide(imageFile)
+                        }
+                        if(setVehicleImageCallback){
+                            setVehicleImageCallback(imageFile)
+                        }
+                        if(setVehicleRCImageCallback){
+                            setVehicleRCImageCallback(imageFile)
                         }
                     } else {
                         alert("Ảnh phải có định dạng PNG, JPG, JPEG");

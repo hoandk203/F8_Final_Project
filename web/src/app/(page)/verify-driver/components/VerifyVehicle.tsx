@@ -7,6 +7,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {TextField} from "@mui/material";
 import UploadImages from "@/components/UploadImages";
 import CustomButton from "@/components/CustomButton";
+import {useCallback, useState} from "react";
+import {uploadVehicle} from "@/services/imageService";
+import {useRouter} from "next/navigation";
 
 const schema = z.object({
     vehiclePlateNumber: z.string().min(1, {message: "Vehicle plate number is required"}),
@@ -16,6 +19,8 @@ const schema = z.object({
 type FormInput = z.infer<typeof schema>;
 
 const VerifyVehicle = () => {
+    const router= useRouter()
+
     const {
         register,
         handleSubmit,
@@ -29,11 +34,41 @@ const VerifyVehicle = () => {
         },
     })
 
+    const [error, setError] = useState("")
+    const [vehicleImage, setVehicleImage] = useState("")
+    const [vehicleRCImage, setVehicleRCImage] = useState("")
+
+    const setVehicleImageCallback = useCallback((value: string) => {
+        setError("")
+        setVehicleImage(value)
+    }, []);
+    const setVehicleRCImageCallback = useCallback((value: string) => {
+        setError("")
+        setVehicleRCImage(value)
+    }, []);
+
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        setTimeout(() => {
-            console.log(data)
+        try {
+            if(vehicleImage && vehicleRCImage){
+                const driverId= JSON.parse(localStorage.getItem("driverId") || "{}")
+                const vehicleData= {
+                    driverId,
+                    ...data,
+                    vehicleImage,
+                    vehicleRCImage,
+                    status: "pending"
+                }
+                await uploadVehicle(vehicleData)
+                localStorage.removeItem("driverId")
+                router.push("/");
+            }else{
+                setError("Please upload vehicle images & RC image")
+            }
             reset()
-        }, 2000)
+        }catch (e) {
+            console.log(e)
+        }
+
     }
 
     return (
@@ -65,13 +100,14 @@ const VerifyVehicle = () => {
                             helperText={errors.vehicleColor?.message}
                         />
                     </div>
+                    {error && <p className="text-red-500">{error}</p>}
                     <div className="flex flex-col">
                         <label htmlFor="vehicleImages" className="font-semibold">Vehicle's Images</label>
-                        <UploadImages/>
+                        <UploadImages setVehicleImageCallback={setVehicleImageCallback}/>
                     </div>
                     <div className="flex flex-col">
                         <label htmlFor="vehicleRCImages" className="font-semibold">Vehicle's RC Images</label>
-                        <UploadImages/>
+                        <UploadImages setVehicleRCImageCallback={setVehicleRCImageCallback}/>
                     </div>
                     <div className={"grid grid-cols-1 mt-8"}>
                         <CustomButton type="submit" label="Save & Continue" variant="dark" size="large"/>

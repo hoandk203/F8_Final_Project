@@ -11,5 +11,6 @@ import {driverProviders} from "./driver.providers";
       ...driverProviders,
       DriverService
   ],
+  exports: [DriverService]
 })
 export class DriverModule {}

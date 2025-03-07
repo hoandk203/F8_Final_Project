@@ -7,13 +7,12 @@ import {uploadIdCard} from "@/services/imageService";
 
 interface Props {
     setStep: (step: number) => void
+    userId: number,
+    setIdentityDocumentId: (id: number) => void
 }
 
-const UploadIdentity = ({setStep}:Props) => {
+const UploadIdentity = ({setStep, userId, setIdentityDocumentId}:Props) => {
 
-    // const handleVerifyIdStep = () => {
-    //     setStep(1)
-    // }
     const [error, setError] = useState("")
     const [frontSide, setFrontSide] = useState("")
     const [backSide, setBackSide] = useState("")
@@ -30,16 +29,16 @@ const UploadIdentity = ({setStep}:Props) => {
     const handleUploadIdCard = async () => {
         try {
             if (frontSide && backSide) {
-                console.log("upload id card")
                 const identityData= {
-                    userId: 18,
+                    userId,
                     frontImageUrl: frontSide,
                     backImageUrl: backSide,
                     status: "pending"
                 }
-                await uploadIdCard(identityData)
-
+                const response= await uploadIdCard(identityData)
+                setIdentityDocumentId(response.id)
                 setStep(1)
+                localStorage.removeItem("userId")
             }else{
                 setError("Please upload Front side & Back side")
             }

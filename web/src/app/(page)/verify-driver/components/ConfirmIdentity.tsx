@@ -8,6 +8,7 @@ import CustomButton from "@/components/CustomButton";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
+import {createDriver} from "@/services/authService";
 
 const schema = z.object({
     fullname: z.string().min(1, { message: "Full name is required" }),
@@ -22,9 +23,11 @@ type FormInput = z.infer<typeof schema>;
 
 interface Props {
     setStep: (step: number) => void
+    userId: number,
+    identityDocumentId: number
 }
 
-const ConfirmIdentity = ({setStep}: Props) => {
+const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
     const dispatch= useDispatch<AppDispatch>()
 
     const {
@@ -45,11 +48,20 @@ const ConfirmIdentity = ({setStep}: Props) => {
     });
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        setTimeout(() => {
-            console.log(data)
+        const driverData= {
+            ...data,
+            userId,
+            identityDocumentId
+        }
+        try {
+            const response= await createDriver(driverData)
+            localStorage.setItem("driverId", JSON.stringify(response.id));
             reset()
             dispatch(setVerifyDriverStep(2))
-        }, 2000)
+        }catch (e) {
+            throw e
+        }
+
     }
 
     const handleVerifyIdStep = () => {

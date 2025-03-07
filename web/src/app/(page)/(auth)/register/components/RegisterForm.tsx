@@ -99,6 +99,7 @@ const RegisterForm = () => {
                         variant="outlined"
                         error={!!errors.email}
                         helperText={errors.email?.message}
+                        inputRef={(input) => input && (input.tabIndex = 1)}
                     />
                 </div>
                 <div className="flex flex-col gap-y-1">
@@ -113,6 +114,7 @@ const RegisterForm = () => {
                         variant="outlined"
                         error={!!errors.password}
                         helperText={errors.password?.message}
+                        inputRef={(input) => input && (input.tabIndex = 2)}
                         slotProps={{
                             input: {
                                 endAdornment: (
@@ -142,6 +144,7 @@ const RegisterForm = () => {
                         variant="outlined"
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message}
+                        inputRef={(input) => input && (input.tabIndex = 3)}
                         slotProps={{
                             input: {
                                 endAdornment: (
