@@ -22,7 +22,7 @@ export const getProfile = async (accessToken: string) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
             headers: {
-                "Bearer": accessToken
+                Authorization: `Bearer ${accessToken}`
             }
         });
         return response.data;
@@ -33,6 +33,24 @@ export const getProfile = async (accessToken: string) => {
         throw error;
     }
 }
+
+export const refreshToken = async (refreshToken: string) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refresh_token: refreshToken}, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
+
 
 export const sendVerificationEmail = async (userData: any) => {
     try {

@@ -3,19 +3,48 @@
 import Statistics from "@/components/Statistics";
 import OrderManager from "@/components/OrderManager";
 import {useEffect} from "react";
-import {getProfile} from "@/services/authService";
+import {getProfile, refreshToken} from "@/services/authService";
+import {useRouter} from "next/navigation";
 
 
 const DriverHome = () => {
+    console.log("driver home")
+    const router= useRouter()
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            const accessToken = localStorage.getItem("access_token");
-            await getProfile(accessToken || "");
-        };
+        const checkAuth= async () => {
+            const accessToken= localStorage.getItem("access_token")
+            if(!accessToken){
+                router.push("/login")
+            }
+            try {
+                const profile= await getProfile(accessToken || "")
+                console.log(profile)
+            }catch (errorGetProfile) {
+                if (errorGetProfile instanceof Error && errorGetProfile.message === "Access token expired") {
+                    try {
+                        const oldRefreshToken= localStorage.getItem("refresh_token")
+                        const newTokens= await refreshToken(oldRefreshToken || "")
+                        console.log(newTokens)
+                        localStorage.setItem("access_token", newTokens.access_token)
+                        localStorage.setItem("refresh_token", newTokens.refresh_token)
+                    }
+                    catch (errorRefreshToken) {
+                        if (errorRefreshToken instanceof Error) {
+                            localStorage.removeItem("access_token")
+                            localStorage.removeItem("refresh_token")
+                            router.push("/login")
+                        } else {
+                            throw errorRefreshToken
+                        }
+                    }
+                }
+                throw errorGetProfile
+            }
+        }
+        checkAuth()
+    }, [])
 
-        fetchProfile();
-    }, []);
 
     return (
         <div className="container mx-auto">

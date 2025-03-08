@@ -1,5 +1,5 @@
 
-import VerifyDriverContainer from "@/app/(page)/verify-driver/components/VerifyDriverContainer";
+import VerifyDriverContainer from "@/app/driver/verify-driver/components/VerifyDriverContainer";
 
 
 const VerifyDriverPage = () => {

@@ -22,8 +22,8 @@ export class AuthController {
   // -> thong qua local auth guard, chay ham validate trong local auth guard
   // -> ham validate goi ham validateUser trong users service
   // -> tra ve user, tra nguoc vao request
-  // -> lay request va truyen vao login trong auth service
-  // -> tra ve access_token
+  // -> lay request.user va truyen vao login trong auth service
+  // -> tra ve access_token + refresh_token
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   login(@Request() request: any){

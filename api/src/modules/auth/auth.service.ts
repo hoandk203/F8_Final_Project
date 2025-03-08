@@ -39,7 +39,7 @@ export class AuthService {
         //decode de lay userId
         const decoded= this.jwtService.decode(oldRefreshToken)
         if(!decoded || !decoded.sub){
-            throw new UnauthorizedException('Invalid refresh token')
+            throw new UnauthorizedException('Invalid refresh token1')
         }
         const userId= decoded.sub
         const uuid= decoded.uuid;
@@ -47,12 +47,12 @@ export class AuthService {
         //lay refresh token cua user
         const tokenRecord= await this.refreshTokenService.findTokenByUuid(userId, uuid)
         if(!tokenRecord){
-            throw new UnauthorizedException('Invalid refresh token')
+            throw new UnauthorizedException('Invalid refresh token, token not found')
         }
         // dung bcrypt de kiem tra
         const isMatch= await bcrypt.compare(oldRefreshToken, tokenRecord.token)
         if(!isMatch){
-            throw new UnauthorizedException('Invalid refresh token')
+            throw new UnauthorizedException('Invalid refresh token, token not match')
         }
 
         //kiem tra thoi gian cua refresh token
@@ -69,7 +69,7 @@ export class AuthService {
 
             // tao 2 token moi
             const newUuid= uuidv4()
-            const newPayload= {email: payload.email, sub: payload.sub}
+            const newPayload= {email: payload.email, sub: payload.sub, uuid: newUuid}
             const newAccessToken= this.jwtService.sign(newPayload)
             const newRefreshToken= this.jwtService.sign(newPayload, {expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,})
             const decodedNew= this.jwtService.decode(newRefreshToken)
@@ -86,7 +86,7 @@ export class AuthService {
             }
         } catch(error){
             console.error('JWT Verify Error:', error);
-            throw new UnauthorizedException('Invalid refresh token')
+            throw new UnauthorizedException('Invalid refresh token4')
         }
     }
 }

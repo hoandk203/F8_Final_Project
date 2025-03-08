@@ -78,7 +78,7 @@ const RegisterForm = () => {
             await sendVerificationEmail(userData);
             localStorage.setItem("userData", JSON.stringify(userData));
             reset();
-            router.push("/verify-driver");
+            router.push("/driver/verify-driver");
         } catch (error: any) {
             setError(error.message);
         }
