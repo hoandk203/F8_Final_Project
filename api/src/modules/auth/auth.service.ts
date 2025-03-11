@@ -89,4 +89,24 @@ export class AuthService {
             throw new UnauthorizedException('Invalid refresh token4')
         }
     }
+    
+    async logout(userId: number, refreshToken: string): Promise<{ success: boolean }> {
+        try {
+            // Giải mã refresh token để lấy UUID
+            const decoded = this.jwtService.decode(refreshToken);
+            if (!decoded || !decoded.uuid) {
+                return { success: false };
+            }
+            
+            const uuid = decoded.uuid;
+            
+            // Xóa refresh token từ database
+            await this.refreshTokenService.deleteTokenByUuid(userId, uuid);
+            
+            return { success: true };
+        } catch (error) {
+            console.error('Logout error:', error);
+            return { success: false };
+        }
+    }
 }

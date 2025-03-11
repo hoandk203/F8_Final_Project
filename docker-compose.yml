@@ -12,7 +12,7 @@ services:
     volumes:
       - './api:/app/api'
     ports:
-      - '3000:3000'
+      - '3001:3000'
     command: ['npm', 'run', 'start:dev']
 #    command:
 #      - npm

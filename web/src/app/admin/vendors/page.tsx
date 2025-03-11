@@ -26,7 +26,14 @@ import VendorDialog from "@/app/admin/vendors/components/VendorDialog";
 import {searchVendorByName, softDeleteVendor} from "@/redux/slice/vendorSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Hàm định dạng thời gian
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN'); // Định dạng: DD/MM/YYYY
+};
 
 const columns= [
     {
@@ -43,7 +50,8 @@ const columns= [
     },
     {
         name: "Created time",
-        key: "created_at"
+        key: "created_at",
+        format: formatDate,
     },
     {
         name: "Email",
@@ -92,7 +100,7 @@ const VendorsPage = () => {
 
     const softDelete = async (id: number) => {
         try {
-            const response=await axios.delete(`http://localhost:3000/vendor/${id}`)
+            const response=await axios.delete(`${BASE_URL}/vendor/${id}`)
             if(response.data){
                 dispatch(softDeleteVendor(id))
                 toast.success("Vendor deleted successfully")
@@ -106,7 +114,7 @@ const VendorsPage = () => {
 
     const fetchSearch= async (name: string) => {
         try {
-            const  response= await axios.get(`http://localhost:3000/vendor/search?name=${name}`)
+            const  response= await axios.get(`${BASE_URL}/vendor/search?name=${name}`)
             if(response.data){
                 dispatch(searchVendorByName(response.data))
             }

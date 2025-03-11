@@ -14,21 +14,24 @@ import { VendorService } from './vendor.service';
 export class VendorController {
     constructor(private vendorService: VendorService) {}
 
-    @Get('/')
+    @Get()
     getAll() {
         return this.vendorService.getList();
     }
 
-    @Get(':id')
-    getOne(@Param('id') id: string) {
-      return this.vendorService.getOne(Number(id));
+    @Get('search')
+    searchByName(@Query('name') name: string) {
+        return this.vendorService.searchByName(name || "");
     }
 
-    @Get('/search')
-
-    searchByName(@Query('name') name:string)
-    {
-        return this.vendorService.searchByName(name || "")
+    @Get(':id')
+    getOne(@Param('id') id: string) {
+        // Kiểm tra id có phải là số hợp lệ không
+        const vendorId = Number(id);
+        if (isNaN(vendorId)) {
+            return { error: 'Invalid ID format' };
+        }
+        return this.vendorService.getOne(vendorId);
     }
 
     @Post()
@@ -38,11 +41,21 @@ export class VendorController {
 
     @Put(':id')
     update(@Param('id') id: string, @Body() vendor: UpdateDto) {
-        return this.vendorService.updateOne(Number(id), vendor);
+        // Kiểm tra id có phải là số hợp lệ không
+        const vendorId = Number(id);
+        if (isNaN(vendorId)) {
+            return { error: 'Invalid ID format' };
+        }
+        return this.vendorService.updateOne(vendorId, vendor);
     }
 
     @Delete(':id')
     delete(@Param('id') id: string) {
-        return this.vendorService.softDelete(Number(id));
+        // Kiểm tra id có phải là số hợp lệ không
+        const vendorId = Number(id);
+        if (isNaN(vendorId)) {
+            return { error: 'Invalid ID format' };
+        }
+        return this.vendorService.softDelete(vendorId);
     }
 }

@@ -48,4 +48,11 @@ export class AuthController {
   async refresh(@Body() body: {refresh_token: string}){
     return this.authService.refreshToken(body.refresh_token)
   }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post('/logout')
+  async logout(@Request() request, @Body() body: { refresh_token: string }) {
+    const userId = request.user.id;
+    return this.authService.logout(userId, body.refresh_token);
+  }
 }

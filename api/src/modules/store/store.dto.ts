@@ -10,11 +10,21 @@ class CreateStoreDto {
         default: 'Cay Giay, Ha Noi',
     })
     location: string;
+    
+    @ApiProperty({
+        default: 'Ha Noi',
+    })
+    city: string;
 
     @ApiProperty({
         default: 'Store1@gmail.com',
     })
     email: string;
+    
+    @ApiProperty({
+        default: '0123456789',
+    })
+    phone: string;
 
     @ApiProperty({
         default: 1,

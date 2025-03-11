@@ -6,4 +6,16 @@ import {Info} from "../base/info.entity";
 export class Store extends Info{
     @Column({name: "vendor_id", nullable: true})
     vendorId: number
+    
+    @Column({nullable: true})
+    city: string
+    
+    @Column({nullable: true})
+    phone: string
+    
+    @Column({name: "cancelled_order", default: 0})
+    cancelledOrder: number
+    
+    @Column({name: "completed_order", default: 0})
+    completedOrder: number
 }

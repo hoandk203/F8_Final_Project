@@ -18,7 +18,7 @@ import {createVendor, updateVendor} from "@/redux/slice/vendorSlice";
 import { fetchVendorList } from "@/redux/middlewares/vendorMiddleware";
 
 
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const schema = z.object({
     name: z.string().min(1, { message: "Name is required" }).min(2, { message: "Name must be at least 2 characters" }),
     email: z
@@ -68,7 +68,7 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         if(currentData && currentData.name !== ""){
             try {
-                const response = await axios.put(`http://localhost:3000/vendor/${currentId}`, data);
+                const response = await axios.put(`${BASE_URL}/vendor/${currentId}`, data);
                 if (response.data) {
                     // dispatch(updateVendor([currentId, data]));
                     dispatch(fetchVendorList())
@@ -84,7 +84,7 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
         }
         if(currentData && currentData.name === "") {
             try {
-                const response = await axios.post("http://localhost:3000/vendor", data);
+                const response = await axios.post(`${BASE_URL}/vendor`, data);
                 if (response.data) {
                     // dispatch(createVendor(data))
                     dispatch(fetchVendorList())

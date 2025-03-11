@@ -17,7 +17,7 @@ import CustomButton from "@/components/CustomButton";
 import { MenuItem } from "@mui/material";
 import { fetchStoreList } from "@/redux/middlewares/storeMiddleware";
 
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const schema = z.object({
     name: z.string().min(1, { message: "Name is required" }).min(2, { message: "Name must be at least 2 characters" }),
@@ -27,6 +27,8 @@ const schema = z.object({
         .min(8, { message: "Email must be at least 8 characters" })
         .regex(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, { message: `Please enter a valid email (aBc123@domain.com)` }),
     location: z.string().min(1, { message: "Location is required" }).min(2, { message: "Location must be at least 2 characters" }),
+    city: z.string().min(1, { message: "City is required" }),
+    phone: z.string().min(1, { message: "Phone is required" }).regex(/^\d{10,11}$/, { message: "Phone must be 10-11 digits" }),
     vendorId: z.string().min(1, { message: "Vendor is required" }),
 });
 
@@ -54,6 +56,8 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
             name: currentData?.name || "",
             email: currentData?.email || "",
             location: currentData?.location || "",
+            city: currentData?.city || "",
+            phone: currentData?.phone || "",
             vendorId: String(currentData?.vendorId) || "",
         },
     });
@@ -67,6 +71,8 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                 name: currentData?.name || "",
                 email: currentData?.email || "",
                 location: currentData?.location || "",
+                city: currentData?.city || "",
+                phone: currentData?.phone || "",
                 vendorId: String(currentData?.vendorId) || "",
             });
         }
@@ -75,6 +81,8 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                 name: currentData?.name || "",
                 email: currentData?.email || "",
                 location: currentData?.location || "",
+                city: currentData?.city || "",
+                phone: currentData?.phone || "",
                 vendorId: String(currentData?.vendorId) || "",
             }); // Reset giá trị form bằng currentData
         }
@@ -83,7 +91,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         if(currentData && currentData.name !== ""){
             try {
-                const response = await axios.put(`http://localhost:3000/store/${currentId}`, data);
+                const response = await axios.put(`${BASE_URL}/store/${currentId}`, data);
                 if (response.data) {
                     // dispatch(updateVendor([currentId, data]));
                     dispatch(fetchStoreList())
@@ -98,7 +106,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
         }
         if(currentData && currentData.name === "") {
             try {
-                const response = await axios.post("http://localhost:3000/store", data);
+                const response = await axios.post(`${BASE_URL}/store`, data);
                 if (response.data) {
                     // dispatch(createVendor(data))
                     dispatch(fetchStoreList())
@@ -149,6 +157,20 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                     />
                 </div>
                 <div className="flex flex-col gap-y-1">
+                    <label htmlFor={"phone"} className="font-semibold">
+                        Phone
+                    </label>
+                    <TextField
+                        {...register("phone")}
+                        type="text"
+                        id={"phone"}
+                        label={"Phone"}
+                        variant="outlined"
+                        error={!!errors.phone}
+                        helperText={errors.phone?.message}
+                    />
+                </div>
+                <div className="flex flex-col gap-y-1">
                     <label htmlFor={"location"} className="font-semibold">
                         Location
                     </label>
@@ -160,6 +182,20 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                         variant="outlined"
                         error={!!errors.location}
                         helperText={errors.location?.message}
+                    />
+                </div>
+                <div className="flex flex-col gap-y-1">
+                    <label htmlFor={"city"} className="font-semibold">
+                        City
+                    </label>
+                    <TextField
+                        {...register("city")}
+                        type="text"
+                        id={"city"}
+                        label={"City"}
+                        variant="outlined"
+                        error={!!errors.city}
+                        helperText={errors.city?.message}
                     />
                 </div>
                 <div className="flex flex-col gap-y-1">

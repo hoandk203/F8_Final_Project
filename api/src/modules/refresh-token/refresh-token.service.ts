@@ -43,4 +43,11 @@ export class RefreshTokenService {
             .where('userId= :userId', {userId})
             .execute()
     }
+
+    async deleteTokenByUuid(userId: number, uuid: string): Promise<void> {
+        await this.refreshTokenRepository.delete({
+            userId,
+            uuid
+        });
+    }
 }

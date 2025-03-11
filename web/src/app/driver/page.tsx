@@ -1,4 +1,4 @@
-import DriverHome from "@/components/DriverHome";
+import DriverHome from "@/app/driver/components/DriverHome";
 
 const DriverPage = () => {
     return (

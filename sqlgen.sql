@@ -19,24 +19,27 @@ create table vendor
 alter table vendor
     owner to postgres;
 
-drop table if exists store cascade;
-create table store
-(
-    vendor_id   integer,
-    active      boolean   default true not null,
-    id          serial
-        constraint "PK_f3172007d4de5ae8e7692759d79"
-            primary key,
-    created_at  timestamp default ('now'::text)::timestamp(6) with time zone,
-    created_by  integer,
-    modified_at timestamp,
-    modified_by integer,
-    deleted_at  timestamp,
-    deleted_by  integer,
-    name        varchar,
-    location    varchar,
-    email       varchar
+DROP TABLE IF EXISTS store CASCADE;
+CREATE TABLE store (
+    vendor_id        INTEGER,
+    active          BOOLEAN   DEFAULT TRUE NOT NULL,
+    id              SERIAL
+        CONSTRAINT "PK_f3172007d4de5ae8e7692759d79" PRIMARY KEY,
+    created_at      TIMESTAMP DEFAULT ('now'::TEXT)::TIMESTAMP(6) WITH TIME ZONE,
+    created_by      INTEGER,
+    modified_at     TIMESTAMP,
+    modified_by     INTEGER,
+    deleted_at      TIMESTAMP,
+    deleted_by      INTEGER,
+    name            VARCHAR,
+    location        VARCHAR,
+    city            VARCHAR,
+    phone           VARCHAR,
+    email           VARCHAR,
+    cancelled_order INTEGER DEFAULT 0 NOT NULL,
+    completed_order INTEGER DEFAULT 0 NOT NULL
 );
+
 
 alter table store
     owner to postgres;

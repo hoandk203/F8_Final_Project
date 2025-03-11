@@ -27,7 +27,14 @@ import StoreDialog from "@/app/admin/stores/components/StoreDialog";
 import {searchStoreByName, softDeleteStore} from "@/redux/slice/storeSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// Hàm định dạng thời gian
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN'); // Định dạng: DD/MM/YYYY
+};
 
 const columns= [
     {
@@ -47,12 +54,21 @@ const columns= [
         key: "location",
     },
     {
-        name: "Created time",
-        key: "created_at"
+        name: "City",
+        key: "city",
+    },
+    {
+        name: "Phone",
+        key: "phone",
     },
     {
         name: "Email",
         key: "email",
+    },
+    {
+        name: "Created time",
+        key: "created_at",
+        format: formatDate, // Thêm hàm format cho cột created_at
     },
     {
         name: "Action",
@@ -71,6 +87,8 @@ const StoresPage = () => {
         name: "",
         email: "",
         location: "",
+        city: "",
+        phone: "",
         vendorId: ""
     });
 
@@ -84,6 +102,8 @@ const StoresPage = () => {
             name: "",
             email: "",
             location: "",
+            city: "",
+            phone: "",
             vendorId: ""
         })
         setOpen(false);
@@ -96,12 +116,11 @@ const StoresPage = () => {
         if(vendorList.length === 0){
             dispatch(fetchVendorList())
         }
-
-    }, []);
+    }, [dispatch, storeList.length, vendorList.length]);
 
     const softDelete = async (id: number) => {
         try {
-            const response=await axios.delete(`http://localhost:3000/store/${id}`)
+            const response=await axios.delete(`${BASE_URL}/store/${id}`)
             if(response.data){
                 dispatch(softDeleteStore(id))
                 toast.success("Store deleted successfully")
@@ -115,7 +134,7 @@ const StoresPage = () => {
 
     const fetchSearch= async (name: string) => {
         try {
-            const  response= await axios.get(`http://localhost:3000/store/search?name=${name}`)
+            const  response= await axios.get(`${BASE_URL}/store/search?name=${name}`)
             if(response.data){
                 dispatch(searchStoreByName(response.data))
             }
@@ -133,7 +152,6 @@ const StoresPage = () => {
     
     return (
         <div className={"container mx-auto"}>
-
             {storeListStatus === 'pending' && <LoadingOverlay/>}
 
             <h1 className="text-3xl font-bold lg:hidden mb-5">stores</h1>
@@ -158,10 +176,22 @@ const StoresPage = () => {
                     </div>
                     <div>
                         <CustomButton label={"Add store"} variant={"dark"} handleOpenDialog={handleClickOpen}/>
-                        <StoreDialog vendorList={vendorList} open={open} handleClose={handleClose} currentData={currentData} currentId={currentData.id}/>
+                        <StoreDialog 
+                            vendorList={vendorList} 
+                            open={open} 
+                            handleClose={handleClose} 
+                            currentData={currentData} 
+                            currentId={currentData.id}
+                        />
                     </div>
                 </div>
-               <CommonTable columns={columns} rows={storeList} handleOpenDialog={handleClickOpen} setCurrentData={setCurrentData} softDelete={softDelete}/>
+               <CommonTable 
+                    columns={columns} 
+                    rows={storeList} 
+                    handleOpenDialog={handleClickOpen} 
+                    setCurrentData={setCurrentData} 
+                    softDelete={softDelete}
+                />
             </div>
         </div>
     )
