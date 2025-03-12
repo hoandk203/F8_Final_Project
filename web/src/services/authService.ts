@@ -115,3 +115,19 @@ export const createStore = async (storeData: any) => {
         throw error;
     }
 }
+
+export const createVendor = async (vendorData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/vendor`, vendorData, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}

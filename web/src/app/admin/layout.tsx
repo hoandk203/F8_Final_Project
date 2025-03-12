@@ -3,10 +3,20 @@
 import React, {useState} from "react";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "@/app/admin/components/AdminHeader";
+import { usePathname } from "next/navigation";
 
 
 const AdminLayout = ({children}: {children: React.ReactNode}) => {
     const [showSidebar, setShowSidebar]= useState(false);
+    const pathname = usePathname();
+
+    if(pathname === "/admin/verify-admin"){
+        return (
+            <div>
+                {children}
+            </div>
+        )
+    }
 
 
     return (

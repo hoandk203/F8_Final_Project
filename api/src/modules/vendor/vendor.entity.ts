@@ -8,4 +8,7 @@ export class Vendor extends Base{
 
     @Column()
     email: string;
+
+    @Column({name: "user_id", nullable: true})
+    userId: number;
 }

@@ -7,8 +7,8 @@ import CustomButton from "@/components/CustomButton";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
-import {sendVerificationEmail, verifyEmail} from "@/services/authService";
-
+import {createVendor, sendVerificationEmail, verifyEmail} from "@/services/authService";
+import {useRouter} from "next/navigation";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 interface VerifyEmailProps {
@@ -16,6 +16,7 @@ interface VerifyEmailProps {
 }
 
 const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
+    const router= useRouter()
     const dispatch= useDispatch<AppDispatch>()
     const [otp, setOtp] = useState('');
     const [error, setError] = useState("");
@@ -36,8 +37,27 @@ const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
         
         try {
             const response= await verifyEmail({...userData, otp: otp})
+            
+            if(userData.role === "vendor"){
+                try {
+                    const vendorData= {
+                        userId: response.id,
+                        name: userData.name,
+                        email: userData.email
+                    }
+                    await createVendor(vendorData)
+                    localStorage.removeItem("userData")
+                    router.push("/vendor")
+                    setIsLoading(false)
+                } catch (error: any) {
+                    setIsLoading(false)
+                    setError(error.message)
+                }
+            }
+
             // lay userId cho vao verifyIdentity
             localStorage.setItem("userId", JSON.stringify(response.id));
+
             setIsLoading(false)
             if (stepVerifyStore) {
                 stepVerifyStore(1)
