@@ -60,7 +60,7 @@ const VerifyVehicle = () => {
                 }
                 await uploadVehicle(vehicleData)
                 localStorage.removeItem("driverId")
-                router.push("/driver");
+                router.push("/login");
             }else{
                 setError("Please upload vehicle images & RC image")
             }

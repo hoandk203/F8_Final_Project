@@ -11,13 +11,10 @@ import {fetchUserProfile} from "@/redux/middlewares/authMiddleware";
 import {AppDispatch, RootState} from "@/redux/store";
 
 interface User {
-    driver?: {
-        fullname: string;
-    };
+    fullname: string;
 }
 
 const DriverHome = () => {
-    console.log("driver home")
     const router= useRouter()
     const dispatch = useDispatch<AppDispatch>()
     const {user, status, error} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null })
@@ -62,7 +59,7 @@ const DriverHome = () => {
     }, [dispatch, router])
     
     // Hiển thị tên tài xế từ thông tin người dùng trong Redux store
-    const driverName = user?.driver?.fullname || "Tài xế";
+    const driverName = user?.fullname || "Tài xế";
 
     return (
         <div className="container mx-auto pb-20"> {/* Thêm padding-bottom để tránh nội dung bị che bởi thanh điều hướng */}

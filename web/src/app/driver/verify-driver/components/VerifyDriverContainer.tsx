@@ -1,6 +1,6 @@
 "use client"
 
-import VerifyEmail from "./VerifyEmail"
+import VerifyEmail from "../../../../components/VerifyEmail"
 import VerifyIdentity from "./VerifyIdentity";
 import VerifyVehicle from "./VerifyVehicle";
 import {useSelector} from "react-redux";

@@ -12,24 +12,45 @@ export class VendorService extends BaseService{
         super(vendorRepository)
     }
 
-    handleSelect() {
+    async getList() {
         return this.vendorRepository
             .createQueryBuilder("vendor")
             .select([
-                '*'
+                'vendor.*',
             ])
+            .where("vendor.active = :active", {active: true})
+            .orderBy("vendor.id", "DESC")
+            .getRawMany();
+    }
+
+    handleOrder(query) {
+        return query.orderBy("vendor.id", "DESC");
     }
 
     searchByName(name: string) {
         const query = this.vendorRepository
             .createQueryBuilder("vendor")
             .select([
-                '*'
+                'vendor.*',
             ])
             .where("lower(vendor.name) LIKE :name", { name: `%${name.toLowerCase()}%` })
             .andWhere("vendor.active = :active", { active: true })
             .orderBy("vendor.id", "DESC");
 
         return query.getRawMany();
+    }
+
+    async getVendorListForStore() {
+        const vendors: any = await this.vendorRepository
+            .createQueryBuilder("vendor")
+            .select([
+                'vendor.id',
+                'vendor.name',
+            ])
+            .where("vendor.active = :active", { active: true })
+            .orderBy("vendor.name", "ASC")
+            .getMany();
+
+        return vendors;
     }
 }

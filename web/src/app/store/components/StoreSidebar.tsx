@@ -9,10 +9,16 @@ import {
   Logout as LogoutIcon,
   BarChart as ChartBarIcon
 } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "@/redux/middlewares/authMiddleware";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
 
 const StoreSidebar = () => {
   const pathname = usePathname();
-
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  
   const menuItems = [
     {
       name: "Dashboard",
@@ -20,26 +26,39 @@ const StoreSidebar = () => {
       icon: HomeIcon,
     },
     {
-      name: "Đơn hàng",
+      name: "Order",
       href: "/store/orders",
       icon: ShoppingCartIcon,
     },
     {
-      name: "Thống kê",
+      name: "Statistics",
       href: "/store/statistics",
       icon: ChartBarIcon,
     },
     {
-      name: "Hồ sơ",
+      name: "Profile",
       href: "/store/profile",
       icon: UserIcon,
     },
     {
-      name: "Cài đặt",
+      name: "Settings",
       href: "/store/settings",
       icon: CogIcon,
     },
   ];
+
+  const handleLogout = async () => {
+    const accessToken = localStorage.getItem("access_token");
+    const refreshToken = localStorage.getItem("refresh_token");
+    
+    if (accessToken && refreshToken) {
+      await dispatch(logoutUser({ accessToken, refreshToken }));
+    }
+    
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    router.push("/store-login");
+  };
 
   return (
     <div className="h-screen flex flex-col bg-white border-r px-2">
@@ -71,18 +90,18 @@ const StoreSidebar = () => {
           })}
         </ul>
       </div>
-      <div className="p-4 border-t">
-        <div className="flex items-center mb-4">
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-700">Amazon VN</p>
-            <p className="text-xs text-gray-500">Email: store@example.com</p>
-            <p className="text-xs text-gray-500">Hotline: 0972193812</p>
-          </div>
-        </div>
+      <div className="p-4">
         <button className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100">
           <LogoutIcon className="h-5 w-5 text-gray-500" />
-          <span className="ml-3">Đăng xuất</span>
+          <span className="ml-3" onClick={handleLogout}>Logout</span>
         </button>
+        <div className="flex items-center py-4 border-t mt-2">
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-700 py-1">Amazon VN</p>
+            <p className="text-xs text-gray-500 py-1">Email: store@example.com</p>
+            <p className="text-xs text-gray-500 py-1">Hotline: 0972193812</p>
+          </div>
+        </div>
       </div>
     </div>
   );

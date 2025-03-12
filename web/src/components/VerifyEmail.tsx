@@ -11,9 +11,11 @@ import {sendVerificationEmail, verifyEmail} from "@/services/authService";
 
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
+interface VerifyEmailProps {
+    stepVerifyStore?: (step: number) => void;
+}
 
-
-const VerifyEmail = () => {
+const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
     const dispatch= useDispatch<AppDispatch>()
     const [otp, setOtp] = useState('');
     const [error, setError] = useState("");
@@ -26,18 +28,20 @@ const VerifyEmail = () => {
         setOtp(otp)
     }
 
-    // const handleVerifyDriverStep = () => {
-    //     dispatch(setVerifyDriverStep(1))
-    // }
+    
 
     const handleVerifyEmail = async () => {
         setIsLoading(true)
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        
         try {
             const response= await verifyEmail({...userData, otp: otp})
             // lay userId cho vao verifyIdentity
             localStorage.setItem("userId", JSON.stringify(response.id));
             setIsLoading(false)
+            if (stepVerifyStore) {
+                stepVerifyStore(1)
+            }
             dispatch(setVerifyDriverStep(1))
             // xoa localStorage khi verify thanh cong
             localStorage.removeItem("userData")
@@ -75,6 +79,18 @@ const VerifyEmail = () => {
         }
 
     }, [countDown])
+
+    // Xóa localStorage khi đóng trang nếu chưa verify OTP
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            localStorage.removeItem("userData");
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
 
     return (
         <>

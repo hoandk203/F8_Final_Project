@@ -20,7 +20,7 @@ export const fetchUserProfile = createAsyncThunk(
       if (error.message === "Access token expired") {
         return rejectWithValue({ message: "Access token expired" });
       }
-      return rejectWithValue({ message: "Không thể lấy thông tin người dùng" });
+      return rejectWithValue({ message: "Unable to get user profile" });
     }
   }
 );
@@ -34,7 +34,7 @@ export const refreshUserToken = createAsyncThunk(
       });
       return response.data;
     } catch (error: any) {
-      return rejectWithValue({ message: "Không thể làm mới token" });
+      return rejectWithValue({ message: "Unable to refresh token" });
     }
   }
 );
@@ -53,7 +53,7 @@ export const logoutUser = createAsyncThunk(
       );
       return { success: true };
     } catch (error) {
-      return rejectWithValue({ message: "Không thể đăng xuất" });
+      return rejectWithValue({ message: "Unable to logout" });
     }
   }
 ); 

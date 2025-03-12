@@ -45,10 +45,6 @@ const columns= [
         key: "name",
     },
     {
-        name: "Location",
-        key: "location",
-    },
-    {
         name: "Created time",
         key: "created_at",
         format: formatDate,
@@ -72,7 +68,6 @@ const VendorsPage = () => {
         id: null,
         name: "",
         email: "",
-        location: "",
         vendorId: ""
     });
 
@@ -85,7 +80,6 @@ const VendorsPage = () => {
             id: null,
             name: "",
             email: "",
-            location: "",
             vendorId: ""
         })
         setOpen(false);

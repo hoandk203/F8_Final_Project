@@ -9,6 +9,7 @@ import {JwtStrategy} from "../../passport/jwt.strategy";
 import {RefreshTokenModule} from "../refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
 import {DriverModule} from "../driver/driver.module";
+import { StoreModule } from '../store/store.module';
 
 @Module({
   controllers: [AuthController],
@@ -17,6 +18,7 @@ import {DriverModule} from "../driver/driver.module";
       ConfigModule.forRoot(),
       UsersModule,
       DriverModule,
+      StoreModule,
       RefreshTokenModule,
       PassportModule,
       JwtModule.register({

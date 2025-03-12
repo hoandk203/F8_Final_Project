@@ -5,11 +5,14 @@ import {
     Post,
     Controller,
     Put,
-    Delete, Query,
+    Delete,
+    Query,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
-import { CreateStoreDto, UpdateStoreDto } from './store.dto';
+import { CreateStoreDto, UpdateStoreDto } from './dto/create-store.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('store')
 @Controller('store')
 export class StoreController {
     constructor(private readonly storeService: StoreService) {}
@@ -20,15 +23,13 @@ export class StoreController {
     }
 
     @Get('/search')
-
-    searchByName(@Query('name') name:string)
-    {
-        return this.storeService.searchByName(name || "")
+    searchByName(@Query('name') name: string) {
+        return this.storeService.searchByName(name || "");
     }
 
     @Get(':id')
     getOne(@Param('id') id: string) {
-      return this.storeService.getOne(Number(id));
+        return this.storeService.getOne(Number(id));
     }
 
     @Post()

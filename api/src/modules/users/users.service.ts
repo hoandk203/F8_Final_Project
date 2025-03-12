@@ -99,8 +99,8 @@ export class UsersService extends BaseService{
 
   // CREATE USER
   async create(data: any) {
-    const {email, password}= data
-
+    const {email, password, role}= data
+    
     const userExist= await this.userRepository.findOne({where: {email}})
     if(userExist){
       throw new ConflictException('Email already registered')
@@ -109,8 +109,74 @@ export class UsersService extends BaseService{
     const validateOtp= await this.otpService.validateOtp(data.email, data.otp)
 
     if(validateOtp){
+
+      if(role === "store"){
+        const passwordRandom = Math.random().toString(36).slice(-8) + "Aa1@";
+        data.password = passwordRandom;
+        console.log(data.password)
+        await this.mailerService.sendMail({
+          from: "hoanyttv@gmail.com",
+          to: email,
+          subject: "Password for Scrap Plan",
+          html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to Scrap Plan</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                }
+    
+                .wrapper{
+                    margin: 0 auto;
+                    background-color: rgb(33, 36, 41);
+                    padding: 50px;
+                    width: 700px;
+                }
+    
+                .container {
+                    background-color: #ffffff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    font-size: 16px;
+                }
+                p {
+                    color: #555555;
+                    line-height: 1.6;
+                }
+                .otp-code {
+                    font-size: 24px;
+                    margin: 20px 0;
+                }
+                .note {
+                    color: #777;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="wrapper">
+                <div class="container">
+                    <p class="dear">Dear ${email},</p>
+                    <div class="otp-code">Your Password: <b>${passwordRandom}</b></div>
+                    <p class="note">Thank you for registering with us.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+      `
+        })
+
+      }
+      
       //hash password
-      data.password  = await bcrypt.hash(password, 10);
+      data.password  = await bcrypt.hash(data.password, 10);
 
       await this.repository
           .createQueryBuilder()
@@ -141,6 +207,8 @@ export class UsersService extends BaseService{
     }
 
     //compare hash password
+    console.log(password);
+    console.log(user.password);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');
@@ -152,11 +220,17 @@ export class UsersService extends BaseService{
     return this.userRepository.findOne({ where: { email } });
   }
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-  //
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
+  async validateStoreUser(email: string, password: string): Promise<any> {
+    const user = await this.userRepository.findOne({ 
+      where: { 
+        email
+      } 
+    });
+    
+    if (user && await bcrypt.compare(password, user.password)) {
+      const { ...result } = user;
+      return result;
+    }
+    return null;
+  }
 }

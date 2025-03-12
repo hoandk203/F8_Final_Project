@@ -11,6 +11,7 @@ import {storeProviders} from "./store.providers";
     ...storeProviders,
     StoreService
   ],
+  exports: [StoreService]
 })
 
 export class StoreModule {}

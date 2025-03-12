@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { CreateDto, UpdateDto } from './vendor.dto';
 import { VendorService } from './vendor.service';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('vendor')
 @Controller('vendor')
 export class VendorController {
     constructor(private vendorService: VendorService) {}
@@ -17,6 +19,13 @@ export class VendorController {
     @Get()
     getAll() {
         return this.vendorService.getList();
+    }
+
+    @ApiOperation({ summary: 'Lấy danh sách vendor với chỉ id và name' })
+    @ApiResponse({ status: 200, description: 'Trả về danh sách vendor với id và name' })
+    @Get('/list-for-store')
+    getVendorListForStore() {
+        return this.vendorService.getVendorListForStore();
     }
 
     @Get('search')

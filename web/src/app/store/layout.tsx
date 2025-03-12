@@ -4,10 +4,17 @@ import React, {useState} from "react";
 import StoreSidebar from "./components/StoreSidebar";
 import StoreHeader from "./components/StoreHeader";
 import store from "@/redux/store";
+import { usePathname } from "next/navigation";
 
 
 const StoreLayout = ({children}: {children: React.ReactNode}) => {
     const [showSidebar, setShowSidebar] = useState(false);
+    const pathname = usePathname();
+
+    // Bỏ layout nếu là VerifyStorePage
+    if (pathname === "/store/verify-store") {
+        return children;
+    }
 
     return (
         <div>

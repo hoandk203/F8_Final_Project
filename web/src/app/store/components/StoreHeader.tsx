@@ -21,7 +21,7 @@ const StoreHeader = ({ showSidebar, setShowSidebar }: StoreHeaderProps) => {
             <ol className="flex items-center space-x-1 text-sm">
               <li>
                 <a href="/store" className="text-gray-500 hover:text-gray-900">
-                  Trang chủ
+                  Home
                 </a>
               </li>
               <li className="flex items-center">

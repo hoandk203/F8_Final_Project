@@ -12,6 +12,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import HistoryIcon from '@mui/icons-material/History';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
+import {refreshToken} from "@/services/authService";
 
 interface User {
     driver?: {

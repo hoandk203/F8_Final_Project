@@ -66,6 +66,9 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
     }, [currentData, reset, open]);
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
+        console.log(data);
+        
+        
         if(currentData && currentData.name !== ""){
             try {
                 const response = await axios.put(`${BASE_URL}/vendor/${currentId}`, data);
@@ -133,20 +136,6 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
                         variant="outlined"
                         error={!!errors.email}
                         helperText={errors.email?.message}
-                    />
-                </div>
-                <div className="flex flex-col gap-y-1">
-                    <label htmlFor={"location"} className="font-semibold">
-                        Location
-                    </label>
-                    <TextField
-                        {...register("location")}
-                        type="text"
-                        id={"location"}
-                        label={"Location"}
-                        variant="outlined"
-                        error={!!errors.location}
-                        helperText={errors.location?.message}
                     />
                 </div>
                 <div className="grid grid-cols-1 mt-3">

@@ -75,10 +75,10 @@ const OrderList = () => {
   return (
     <Box>
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={5}>
+        <Grid item xs={12} md={4}>
           <TextField
             fullWidth
-            placeholder="Tìm kiếm"
+            placeholder="Search"
             value={searchTerm}
             onChange={handleSearch}
             size="small"
@@ -87,38 +87,38 @@ const OrderList = () => {
             }}
           />
         </Grid>
-        <Grid item xs={12} md={7}>
+        <Grid item xs={12} md={8}>
           <Grid container spacing={2}>
             <Grid item xs={6} md={4}>
               <FormControl fullWidth size="small">
-                <InputLabel>Nhân viên</InputLabel>
+                <InputLabel>Staff</InputLabel>
                 <Select
                   value={staff}
-                  label="Nhân viên"
+                  label="Staff"
                   onChange={(e) => setStaff(e.target.value)}
                 >
-                  <MenuItem value="">Tất cả</MenuItem>
-                  <MenuItem value="staff1">Nhân viên 1</MenuItem>
-                  <MenuItem value="staff2">Nhân viên 2</MenuItem>
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="staff1">Staff 1</MenuItem>
+                  <MenuItem value="staff2">Staff 2</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6} md={4}>
+            <Grid item xs={6} md={3}>
               <FormControl fullWidth size="small">
-                <InputLabel>Trạng thái</InputLabel>
+                <InputLabel>Status</InputLabel>
                 <Select
                   value={status}
-                  label="Trạng thái"
+                  label="Status"
                   onChange={(e) => setStatus(e.target.value)}
                 >
-                  <MenuItem value="">Tất cả</MenuItem>
-                  <MenuItem value="pending">Đang xử lý</MenuItem>
-                  <MenuItem value="completed">Hoàn thành</MenuItem>
-                  <MenuItem value="cancelled">Đã hủy</MenuItem>
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="pending">Processing</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                  <MenuItem value="cancelled">Cancelled</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={4} sx={{ display: "flex", justifyContent: { xs: "center", md: "flex-end" }, mt: { xs: 2, md: 0 } }}>
+            <Grid item xs={12} md={5} sx={{ display: "flex", justifyContent: { xs: "center", md: "flex-end" }, mt: { xs: 2, md: 0 } }}>
               <Button
                 className="px-2 py-1"
                 variant="contained"
@@ -145,15 +145,15 @@ const OrderList = () => {
         <Table sx={{ minWidth: 650 }} aria-label="order table">
           <TableHead>
             <TableRow>
-              <TableCell>Mã đơn hàng</TableCell>
-              <TableCell>Giá trị</TableCell>
-              <TableCell>Tài xế</TableCell>
-              <TableCell>Nhà cung cấp</TableCell>
-              <TableCell>Nhân viên</TableCell>
-              <TableCell>Thời gian tạo</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Xác nhận</TableCell>
-              <TableCell>Thao tác</TableCell>
+              <TableCell>Order ID</TableCell>
+              <TableCell>Value</TableCell>
+              <TableCell>Driver</TableCell>
+              <TableCell>Vendor</TableCell>
+              <TableCell>Staff</TableCell>
+              <TableCell>Created Time</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Confirmation</TableCell>
+              <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -184,7 +184,7 @@ const OrderList = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={9} align="center">
-                  {loading ? "Đang tải..." : "Không có dữ liệu"}
+                  {loading ? "Loading..." : "No data"}
                 </TableCell>
               </TableRow>
             )}

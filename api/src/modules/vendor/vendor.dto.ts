@@ -8,11 +8,6 @@ class CreateDto {
     name: string;
 
     @ApiProperty({
-        example: 'Thai Nguyen',
-    })
-    location: string;
-
-    @ApiProperty({
         default: 'hoan1@gmail.com',
     })
     email: string;

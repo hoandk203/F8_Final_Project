@@ -99,3 +99,19 @@ export const createDriver = async (userData: any) => {
         throw error;
     }
 }
+
+export const createStore = async (storeData: any) => {
+    try {
+        const response= await axios.post(`${API_BASE_URL}/store`,storeData,{
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}

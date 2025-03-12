@@ -1,8 +1,11 @@
-import {Entity} from "typeorm";
-import {Info} from "../base/info.entity";
+import {Column, Entity} from "typeorm";
+import {Base} from "../base/base.entity";
 
+@Entity("vendor")
+export class Vendor extends Base{
+    @Column()
+    name: string
 
-@Entity()
-export class Vendor extends Info{
-
+    @Column()
+    email: string;
 }

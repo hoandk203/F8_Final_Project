@@ -1,30 +1,33 @@
 import { Injectable, Inject } from '@nestjs/common';
-import {Repository} from "typeorm";
-import {Store} from "./store.entity";
-import {BaseService} from "../base/base.service";
-import {Vendor} from "../vendor/vendor.entity";
+import { Repository } from "typeorm";
+import { Store } from "./store.entity";
+import { BaseService } from "../base/base.service";
+import { Vendor } from "../vendor/vendor.entity";
 
 @Injectable()
-export class StoreService extends BaseService{
+export class StoreService extends BaseService {
     constructor(
         @Inject('STORE_REPOSITORY')
         private storeRepository: Repository<Store>,
     ) {
-        super(storeRepository)
+        super(storeRepository);
     }
 
-    handleSelect(){
+    async getList() {
         return this.storeRepository
             .createQueryBuilder("store")
+            .leftJoinAndSelect("vendor", "vendor", "store.vendor_id = vendor.id")
             .select([
                 'store.*',
                 'vendor.name as vendor_name',
             ])
-            .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
+            .where("store.active = :active", {active: true})
+            .orderBy("store.id", "DESC")
+            .getRawMany();
     }
 
-    handleOrder(query){
-        return query.orderBy("store.id", "DESC")
+    handleOrder(query) {
+        return query.orderBy("store.id", "DESC");
     }
 
     searchByName(name: string) {
@@ -42,4 +45,15 @@ export class StoreService extends BaseService{
         return query.getRawMany();
     }
 
+    async getById(email: string) {
+        return this.storeRepository
+            .createQueryBuilder("store")
+            .select([
+                'store.*',
+                'vendor.name as vendor_name',
+            ])
+            .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
+            .where("store.email = :email", {email})
+            .getRawOne();
+    }
 }
