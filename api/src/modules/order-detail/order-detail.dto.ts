@@ -1,25 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 
 class CreateDto {
   @ApiProperty({
     default: 1,
   })
+  @IsNumber()
+  @IsNotEmpty()
   orderId: number;
 
   @ApiProperty({
     default: 1,
   })
+  @IsNumber()
+  @IsNotEmpty()
   materialId: number;
-
 
   @ApiProperty({
     default: 10,
   })
+  @IsNumber()
+  @IsNotEmpty()
   weight: number;
 
   @ApiProperty({
     default: 1000,
   })
+  @IsNumber()
+  @IsNotEmpty()
   amount: number;
 }
 

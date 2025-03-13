@@ -31,11 +31,6 @@ const StoreSidebar = () => {
       icon: ShoppingCartIcon,
     },
     {
-      name: "Statistics",
-      href: "/store/statistics",
-      icon: ChartBarIcon,
-    },
-    {
       name: "Profile",
       href: "/store/profile",
       icon: UserIcon,
@@ -57,7 +52,21 @@ const StoreSidebar = () => {
     
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    router.push("/store-login");
+    if(pathname.startsWith("/store")){
+      router.push("/store-login");
+    }else{
+      router.push("/vendor-login");
+    }
+  };
+
+  // Hàm kiểm tra xem một menu item có đang active hay không
+  const isActive = (href: string) => {
+    if (href === "/store") {
+      // Nếu là trang Dashboard, chỉ active khi đường dẫn chính xác là /store
+      return pathname === "/store";
+    }
+    // Với các trang khác, kiểm tra xem pathname có bắt đầu bằng href không
+    return pathname.startsWith(href);
   };
 
   return (
@@ -71,18 +80,18 @@ const StoreSidebar = () => {
       <div className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-2 px-2">
           {menuItems.map((item) => {
-            const isActive = pathname === item.href;
+            const active = isActive(item.href);
             return (
               <li key={item.name}>
                 <Link
                   href={item.href}
                   className={`flex items-center p-2 rounded-lg ${
-                    isActive
-                      ? "bg-primary text-white"
+                    active
+                      ? "bg-[#555] text-white"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-gray-500"}`} />
+                  <item.icon className={`h-5 w-5 ${active ? "text-white" : "text-gray-500"}`} />
                   <span className="ml-3">{item.name}</span>
                 </Link>
               </li>

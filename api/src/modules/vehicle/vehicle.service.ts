@@ -15,9 +15,9 @@ export class VehicleService extends BaseService{
         super(vehicleRepository);
     }
 
-    async saveBase64Image(vehicleImage: any): Promise<string> {
+    async saveBase64Image(imageBase64: any): Promise<string> {
         try {
-            const payload = vehicleImage.split(',')[1]
+            const payload = imageBase64.split(',')[1]
             const fileName = `${v4()}.png`
             const path = `files/images/vehicle/${fileName}`
 

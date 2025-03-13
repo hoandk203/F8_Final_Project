@@ -53,4 +53,14 @@ export class VendorService extends BaseService{
 
         return vendors;
     }
+
+    async getByEmail(email: string) {
+        return this.vendorRepository
+            .createQueryBuilder("vendor")
+            .select([
+                'vendor.*',
+            ])
+            .where("vendor.email = :email", {email})
+            .getRawOne();
+    }
 }

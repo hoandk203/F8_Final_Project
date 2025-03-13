@@ -37,7 +37,7 @@ const schema = z.object({
 
 type FormInput = z.infer<typeof schema>;
 
-const AdminRegisterForm = () => {
+const VendorRegisterForm = () => {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -81,7 +81,7 @@ const AdminRegisterForm = () => {
             localStorage.setItem("userData", JSON.stringify(userData));
             reset();
             
-            router.push("/admin/verify-admin");
+            router.push("/vendor/verify-vendor");
         } catch (error: any) {
             setError(error.message);
         }
@@ -227,4 +227,4 @@ const AdminRegisterForm = () => {
     );
 };
 
-export default AdminRegisterForm;
+export default VendorRegisterForm;

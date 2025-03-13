@@ -1,13 +1,13 @@
 
-import VerifyAdminContainer from "./components/VerifyAdminContainer";
+import VerifyVendorContainer from "./components/VerifyVendorContainer";
 
 
-const VerifyAdminPage = () => {
+const VerifyVendorPage = () => {
     return (
         <div className="container mx-auto">
             <div className="text-[16px] pt-8 px-4">
                 <div className="text-center py-8">
-                    <VerifyAdminContainer/>
+                    <VerifyVendorContainer/>
                 </div>
             </div>
         </div>
@@ -15,4 +15,4 @@ const VerifyAdminPage = () => {
     )
 }
 
-export default VerifyAdminPage;
+export default VerifyVendorPage;

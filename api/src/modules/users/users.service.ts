@@ -233,4 +233,14 @@ export class UsersService extends BaseService{
     }
     return null;
   }
+
+  async updatePassword(userId: number, hashedPassword: string) {
+    return this.userRepository.update(
+        { id: userId },
+        { 
+            password: hashedPassword,
+            modifiedAt: new Date()
+        }
+    );
+  }
 }

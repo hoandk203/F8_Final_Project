@@ -11,33 +11,42 @@ export class Order extends Base{
     driverId: number
 
     @Column({
-        name: "vendor_id",
-    })
-    vendorId: number
-
-    @Column({
-        name: "image_id",
+        name: "store_id",
         nullable: true
     })
-    imageId: number
+    storeId: number
+
+    @Column({
+        name: "amount",
+    })
+    amount: number
 
     @Column({
         name: "status",
         default: "pending"
     })
-    status: string
+    status: "pending" | "accepted" | "on moving" | "completed" | "cancelled"
 
     @Column({
-        name: "payment_status",
-        default: "unpaid"
+        name: "scrap_image_url",
     })
-    paymentStatus: string
+    scrapImageUrl: string
 
     @Column({
-        name: "total_amount",
-        type: "numeric",
-        precision: 10,
-        scale: 2
+        name: "proof_image_url",
+        nullable: true
     })
-    totalAmount: number
+    proofImageUrl: string
+
+    @Column({
+        name: "declined_driver_id",
+        nullable: true
+    })
+    declinedDriverId: number
+
+    @Column({
+        name: "staff_id",
+        nullable: true
+    })
+    staffId: number
 }

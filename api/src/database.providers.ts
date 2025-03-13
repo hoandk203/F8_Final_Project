@@ -13,6 +13,7 @@ import {RefreshToken} from "./modules/refresh-token/entities/refresh-token.entit
 import {IdentityDocument} from "./modules/identity-document/entities/identity-document.entity";
 import {Driver} from "./modules/driver/entities/driver.entity";
 import {Vehicle} from "./modules/vehicle/entities/vehicle.entity";
+import {StoreLocation} from "./modules/store-location/store-location.entity";
 
 export const databaseProviders = [
     {
@@ -38,7 +39,8 @@ export const databaseProviders = [
                     RefreshToken,
                     IdentityDocument,
                     Driver,
-                    Vehicle
+                    Vehicle,
+                    StoreLocation
                 ],
                 synchronize: true,
             });

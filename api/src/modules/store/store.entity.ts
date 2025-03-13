@@ -4,6 +4,9 @@ import {Info} from "../base/info.entity";
 
 @Entity()
 export class Store extends Info{
+    @Column({name: "user_id", nullable: true})
+    userId: number
+
     @Column({name: "vendor_id", nullable: true})
     vendorId: number
     

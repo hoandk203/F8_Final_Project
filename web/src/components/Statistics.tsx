@@ -8,9 +8,8 @@ import React from "react";
 const Statistics = () => {
     return (
         <div className="grid grid-cols-2 gap-3 text-black">
-            <StatisticsBox label={"Amount to be sent"} data={139.792}/>
-            <StatisticsBox label={"Total orders"} data={375}/>
-            <StatisticsBox label={"rate in each order india"} data={370}/>
+            <StatisticsBox label={"Amount to be sent"} data={139} unit={"dollars"}/>
+            <StatisticsBox label={"Total orders"} data={189} unit={"orders"}/>
         </div>
     )
 }

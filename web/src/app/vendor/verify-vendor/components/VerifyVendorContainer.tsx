@@ -3,7 +3,7 @@
 import VerifyEmail from "@/components/VerifyEmail"
 
 
-const VerifyAdminContainer = () => {
+const VerifyVendorContainer = () => {
     return (
         <div>
             <VerifyEmail/>
@@ -11,4 +11,4 @@ const VerifyAdminContainer = () => {
     )
 }
 
-export default VerifyAdminContainer
+export default VerifyVendorContainer

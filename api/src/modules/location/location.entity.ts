@@ -3,10 +3,10 @@ import {Column, Entity, PrimaryColumn} from "typeorm";
 
 @Entity()
 export class Location{
-    @PrimaryColumn("numeric", {precision: 3, scale: 10} )
+    @PrimaryColumn("decimal", {precision: 10, scale: 7})
     latitude: number
 
-    @PrimaryColumn("numeric", {precision: 3, scale: 10} )
+    @PrimaryColumn("decimal", {precision: 10, scale: 7})
     longitude: number
 
     @Column({

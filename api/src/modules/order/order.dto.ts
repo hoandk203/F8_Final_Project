@@ -1,40 +1,66 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsString, IsOptional, IsArray, ValidateNested, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+
+class OrderDetailDto {
+  @ApiProperty({
+    default: 1,
+  })
+  @IsNumber()
+  materialId: number;
+
+  @ApiProperty({
+    default: 10,
+  })
+  @IsNumber()
+  weight: number;
+
+  @ApiProperty({
+    default: 1000,
+  })
+  @IsNumber()
+  @IsOptional()
+  amount?: number;
+}
 
 class CreateDto {
   @ApiProperty({
     default: 1,
   })
-  driverId: number;
-
-  @ApiProperty({
-    default: 1,
-  })
-  vendorId: number;
-
-
-  @ApiProperty({
-    default: 1,
-  })
-  imageId: number;
+  @IsNumber()
+  @IsOptional()
+  storeId?: number;
 
   @ApiProperty({
     default: "pending",
   })
-  status: string;
+  @IsString()
+  @IsOptional()
+  status?: string;
+  
+  @ApiProperty({
+    default: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  })
+  @IsString()
+  @IsNotEmpty()
+  scrapImage: string;
 
   @ApiProperty({
-    default: "unpaid",
+    type: [OrderDetailDto],
   })
-  paymentStatus: string;
-
-  @ApiProperty({
-    default: 1,
-  })
-  totalAmount: number;
-
-
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderDetailDto)
+  orderDetails: OrderDetailDto[];
 }
 
-class UpdateDto extends CreateDto {}
+class UpdateDto {
+  @ApiProperty({
+    default: "completed",
+  })
+  @IsString()
+  @IsOptional()
+  status?: string;
+}
 
-export { CreateDto, UpdateDto };
+export { CreateDto, UpdateDto, OrderDetailDto };

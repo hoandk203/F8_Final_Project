@@ -5,13 +5,17 @@ import {LocalAuthGuard} from "../../guard/local-auth.guard";
 import {JwtAuthGuard} from "../../guard/jwt-auth.guard";
 import {DriverService} from "../driver/driver.service";
 import {StoreService} from "../store/store.service";
+import { VendorService } from '../vendor/vendor.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(
       private readonly authService: AuthService,
       private readonly userService: UsersService,
       private readonly driverService: DriverService,
-      private readonly storeService: StoreService
+      private readonly storeService: StoreService,
+      private readonly vendorService: VendorService
   ) {}
 
   @Post('/register')
@@ -27,7 +31,7 @@ export class AuthController {
   // -> tra ve access_token + refresh_token
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  login(@Request() request: any){
+  async login(@Request() request: any){
     return this.authService.login(request.user)
   }
 
@@ -43,10 +47,19 @@ export class AuthController {
         user: {...request.user},
       }
     }
+
     if(userData.role === "store"){
-      const store= await this.storeService.getById(userData.email)
+      const store= await this.storeService.getByEmail(userData.email)
       return {
         ...store,
+        user: {...request.user},
+      }
+    }
+
+    if(userData.role === "vendor"){
+      const vendor= await this.vendorService.getByEmail(userData.email)
+      return {
+        ...vendor,
         user: {...request.user},
       }
     }
@@ -63,5 +76,15 @@ export class AuthController {
   async logout(@Request() request, @Body() body: { refresh_token: string }) {
     const userId = request.user.id;
     return this.authService.logout(userId, body.refresh_token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(
+      req.user.userId, 
+      changePasswordDto.oldPassword, 
+      changePasswordDto.newPassword
+    );
   }
 }

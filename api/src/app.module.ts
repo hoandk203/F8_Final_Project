@@ -16,6 +16,7 @@ import {ConfigModule} from "@nestjs/config";
 import { IdentityDocumentModule } from './modules/identity-document/identity-document.module';
 import { DriverModule } from './modules/driver/driver.module';
 import { VehicleModule } from './modules/vehicle/vehicle.module';
+import {StoreLocationModule} from "./modules/store-location/store-location.module";
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { VehicleModule } from './modules/vehicle/vehicle.module';
       RefreshTokenModule,
       IdentityDocumentModule,
       DriverModule,
-      VehicleModule
+      VehicleModule,
+      StoreLocationModule
   ],
   controllers: [AppController],
   providers: [AppService],

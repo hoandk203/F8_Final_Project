@@ -2,6 +2,8 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+
+
 export const loginAPI = async (userData: any) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/auth/login`, userData, {
@@ -49,8 +51,6 @@ export const refreshToken = async (refreshToken: string) => {
         throw error;
     }
 }
-
-
 
 export const sendVerificationEmail = async (userData: any) => {
     try {
@@ -131,3 +131,49 @@ export const createVendor = async (vendorData: any) => {
         throw error;
     }
 }
+
+export const updateUserProfile = async (profileData: any) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.put(`${API_BASE_URL}/auth/profile`, profileData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to update user profile");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
+export const changePassword = async (data: { oldPassword: string; newPassword: string }) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.post(`${API_BASE_URL}/auth/change-password`, data, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to change password");
+    }
+    throw new Error("Server connection error");
+  }
+};

@@ -9,13 +9,22 @@ import CustomButton from "@/components/CustomButton";
 interface NewOrderDialogProps {
     open: boolean
     handleClose: () => void
+    status: string
+    order: any
 }
 
-const NewOrderDialog: React.FC<NewOrderDialogProps> = ({open, handleClose}) => {
+const NewOrderDialog: React.FC<NewOrderDialogProps> = ({open, handleClose, status, order}) => {
 
     return (
     <>
       <Dialog
+        sx={{
+          '& .MuiDialog-paper': {
+            width: '90%',
+            maxWidth: '700px',
+            margin: '0 auto',
+          },
+        }}
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
@@ -34,7 +43,7 @@ const NewOrderDialog: React.FC<NewOrderDialogProps> = ({open, handleClose}) => {
         </DialogTitle>
         <DialogContent className="!p-4">
           <div id="alert-dialog-description" className="text-black text-[14px]">
-            <OrderInfo type={"waiting"} activeDialog={false}/>
+            <OrderInfo status={status} activeDialog={false} order={order}/>
           </div>
         </DialogContent>
         <DialogActions className="grid grid-cols-2 gap-3 font-semibold pt-0 pb-4 px-4">

@@ -1,4 +1,4 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, UnauthorizedException, BadRequestException} from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt'
@@ -110,5 +110,35 @@ export class AuthService {
             console.error('Logout error:', error);
             return { success: false };
         }
+    }
+
+    async changePassword(userId: number, oldPassword: string, newPassword: string) {
+        // Lấy thông tin user từ database
+        const user = await this.userService.getOne(userId);
+        if (!user) {
+            throw new UnauthorizedException('User not found');
+        }
+
+        // Kiểm tra mật khẩu cũ
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+        if (!isPasswordValid) {
+            throw new BadRequestException('Current password is incorrect');
+        }
+
+        // Kiểm tra mật khẩu mới không được trùng với mật khẩu cũ
+        if (oldPassword === newPassword) {
+            throw new BadRequestException('New password must be different from the current password');
+        }
+
+        // Hash mật khẩu mới
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Cập nhật mật khẩu mới vào database
+        await this.userService.updatePassword(userId, hashedPassword);
+
+        return {
+            success: true,
+            message: 'Password changed successfully'
+        };
     }
 }

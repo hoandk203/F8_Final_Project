@@ -26,6 +26,10 @@ export class StoreService extends BaseService {
             .getRawMany();
     }
 
+    async create(store: any) {
+        return this.storeRepository.save(store);
+    }
+
     handleOrder(query) {
         return query.orderBy("store.id", "DESC");
     }
@@ -45,7 +49,7 @@ export class StoreService extends BaseService {
         return query.getRawMany();
     }
 
-    async getById(email: string) {
+    async getByEmail(email: string) {
         return this.storeRepository
             .createQueryBuilder("store")
             .select([
@@ -55,5 +59,19 @@ export class StoreService extends BaseService {
             .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
             .where("store.email = :email", {email})
             .getRawOne();
+    }
+
+    async getStoreIdByUserId(userId: number) {
+        return this.storeRepository
+            .createQueryBuilder("store")
+            .where("store.user_id = :userId", {userId})
+            .getOne();
+    }
+
+    async getStoreById(storeId: number) {
+        return this.storeRepository
+            .createQueryBuilder("store")
+            .where("store.id = :storeId", {storeId})
+            .getOne();
     }
 }

@@ -33,7 +33,7 @@ const schema = z.object({
 
 type FormInput = z.infer<typeof schema>;
 
-const AdminLoginForm = () => {
+const VendorLoginForm = () => {
     const router= useRouter();
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
@@ -60,7 +60,7 @@ const AdminLoginForm = () => {
             const response= await loginAPI(data);
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
-            router.push("/store");
+            router.push("/vendor");
         }catch (e) {
             if (e instanceof Error) {
                 setError(e.message);
@@ -133,4 +133,4 @@ const AdminLoginForm = () => {
     )
 }
 
-export default AdminLoginForm
+export default VendorLoginForm

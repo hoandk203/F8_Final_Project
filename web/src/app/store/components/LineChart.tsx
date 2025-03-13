@@ -39,7 +39,7 @@ const LineChart = ({ data }: LineChartProps) => {
                 beginAtZero: true,
                 ticks: {
                   callback: function (value: any) {
-                    return value.toLocaleString() + "k";
+                    return "$" + value.toLocaleString();
                   },
                 },
                 grid: {
@@ -70,7 +70,7 @@ const LineChart = ({ data }: LineChartProps) => {
                       label += ": ";
                     }
                     if (context.parsed.y !== null) {
-                      label += context.parsed.y + "k";
+                      label += "$" + context.parsed.y;
                     }
                     return label;
                   },
@@ -101,7 +101,7 @@ const LineChart = ({ data }: LineChartProps) => {
     };
   }, [data]);
 
-  return <canvas ref={chartRef} style={{ width: '100%', height: '100%' }} />;
+  return <canvas ref={chartRef} style={{ width: '100%', height: '100%'}} />;
 };
 
 export default LineChart;

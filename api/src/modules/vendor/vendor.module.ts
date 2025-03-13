@@ -11,5 +11,6 @@ import { VendorService } from './vendor.service';
         ...vendorProviders,
         VendorService
     ],
+    exports: [VendorService]
 })
 export class VendorModule {}

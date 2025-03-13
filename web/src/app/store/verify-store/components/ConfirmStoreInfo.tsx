@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TextField, MenuItem, FormControl, InputLabel, Select, FormHelperText, CircularProgress } from "@mui/material";
+import { TextField, MenuItem, FormControl, InputLabel, Select, FormHelperText, CircularProgress, Alert } from "@mui/material";
 import CustomButton from "@/components/CustomButton";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
 import { createStore } from "@/services/authService";
 import { getVendorListForStore } from "@/services/vendorService";
+import { saveStoreLocation } from "@/services/storeService";
 import { useRouter } from "next/navigation";
 
 const schema = z.object({
@@ -29,12 +30,22 @@ interface Vendor {
     name: string;
 }
 
+interface GeolocationPosition {
+    coords: {
+        latitude: number;
+        longitude: number;
+    };
+}
+
 const ConfirmStoreInfo = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [isLoadingVendors, setIsLoadingVendors] = useState(false);
     const [vendorError, setVendorError] = useState("");
+    const [locationError, setLocationError] = useState("");
+    const [currentLocation, setCurrentLocation] = useState<{latitude: number, longitude: number} | null>(null);
+    const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
     const {
         register,
@@ -58,7 +69,6 @@ const ConfirmStoreInfo = () => {
 
     // Fetch vendor list when component mounts
     useEffect(() => {
-        localStorage.removeItem("userId")
         const fetchVendors = async () => {
             setIsLoadingVendors(true);
             setVendorError("");
@@ -74,18 +84,64 @@ const ConfirmStoreInfo = () => {
         };
 
         fetchVendors();
+        getCurrentLocation();
     }, []);
 
+    const getCurrentLocation = () => {
+        setIsLoadingLocation(true);
+        setLocationError("");
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position: GeolocationPosition) => {
+                    setCurrentLocation({
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    });
+                    setIsLoadingLocation(false);
+                },
+                (error) => {
+                    console.error("Error getting location:", error);
+                    setLocationError("Unable to get your current location. Please allow location access.");
+                    setIsLoadingLocation(false);
+                }
+            );
+            
+        } else {
+            setLocationError("Geolocation is not supported by this browser.");
+            setIsLoadingLocation(false);
+        }
+    };
+
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
+        const userId = JSON.parse(localStorage.getItem("userId") || "{}");
         const storeData = {
             ...data,
             vendorId: parseInt(data.vendorId),
+            userId: parseInt(userId),
         };
         
         try {
-            await createStore(storeData);
+            // Create store
+            const storeResponse = await createStore(storeData);
+            // Save store location if available
+            if (currentLocation && storeResponse && storeResponse.id) {
+                try {
+                    
+                    await saveStoreLocation(
+                        storeResponse.id,
+                        currentLocation.latitude,
+                        currentLocation.longitude
+                    );
+                } catch (locationError) {
+                    console.error("Error saving store location:", locationError);
+                    // Continue with registration even if location saving fails
+                }
+            }
+            
             reset();
-            router.push("/store-login")
+            router.push("/store-login");
+            localStorage.removeItem("userId");
         } catch (error: any) {
             console.error("Error creating store:", error);
             throw error;

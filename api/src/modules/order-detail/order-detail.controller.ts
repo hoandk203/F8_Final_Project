@@ -1,41 +1,41 @@
 import {
-    // Body,
+    Body,
     Get,
-    // Param,
-    // Post,
+    Param,
+    Post,
     Controller,
-    // Put,
-    // Delete,
+    Delete,
+    UseGuards,
 } from '@nestjs/common';
-// import { CreateDto, UpdateDto } from './dto';
-import {OrderDetailService} from './order-detail.service';
+import { CreateDto } from './order-detail.dto';
+import { OrderDetailService } from './order-detail.service';
+import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 
 @Controller('order-detail')
-export class orderDetailController {
+export class OrderDetailController {
     constructor(private orderDetailService: OrderDetailService) {}
 
+    @UseGuards(JwtAuthGuard)
     @Get('/')
     getAll() {
         return this.orderDetailService.getList();
     }
 
-    // @Get(':id')
-    // getOne(@Param('id') id: string) {
-    //   return this.vendorService.getOne(Number(id));
-    // }
-    //
-    // @Post()
-    // create(@Body() vendor: CreateDto) {
-    //   return this.vendorService.create(vendor);
-    // }
-    //
-    // @Put(':id')
-    // update(@Param('id') id: string, @Body() vendor: UpdateDto) {
-    //   return this.vendorService.update(Number(id), vendor);
-    // }
-    //
-    // @Delete(':id')
-    // delete(@Param('id') id: string) {
-    //   return this.vendorService.delete(Number(id));
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Get('/order/:orderId')
+    getByOrderId(@Param('orderId') orderId: number) {
+        return this.orderDetailService.getByOrderId(orderId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/')
+    create(@Body() createDto: CreateDto) {
+        return this.orderDetailService.create(createDto);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('/:id')
+    delete(@Param('id') id: number) {
+        return this.orderDetailService.softDelete(id);
+    }
 }

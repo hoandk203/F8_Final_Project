@@ -10,6 +10,7 @@ import {RefreshTokenModule} from "../refresh-token/refresh-token.module";
 import {ConfigModule} from "@nestjs/config";
 import {DriverModule} from "../driver/driver.module";
 import { StoreModule } from '../store/store.module';
+import {VendorModule} from "../vendor/vendor.module";
 
 @Module({
   controllers: [AuthController],
@@ -19,6 +20,7 @@ import { StoreModule } from '../store/store.module';
       UsersModule,
       DriverModule,
       StoreModule,
+      VendorModule,
       RefreshTokenModule,
       PassportModule,
       JwtModule.register({
