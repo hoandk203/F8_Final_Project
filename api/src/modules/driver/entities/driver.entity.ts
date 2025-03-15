@@ -30,4 +30,9 @@ export class Driver extends Base{
 
     @Column({name: "phone_number", nullable: true})
     phoneNumber: string;
+
+    @Column({
+        default: "idle"
+    })
+    status: "idle" | "busy"
 }

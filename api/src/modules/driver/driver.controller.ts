@@ -22,6 +22,17 @@ export class DriverController {
     return this.driverService.searchByName(name || "");
   }
 
+  @Get('payment-result')
+  paymentResult(@Query() query) {
+    // Xử lý logic hiển thị kết quả thanh toán của driver
+    // Bạn có thể lấy các tham số như orderId, status từ query
+    return {
+      orderId: query.orderId,
+      status: query.status,
+      message: 'Payment result page',
+    };
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.driverService.getOne(Number(id));

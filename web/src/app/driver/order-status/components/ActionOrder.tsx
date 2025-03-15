@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import CustomButton from "@/components/CustomButton";
-import ProofSubmitedDialog from "./ProofSubmitedDialog";
 
 const ActionOrder = () => {
 
@@ -18,7 +17,6 @@ const ActionOrder = () => {
 
     return (
         <div className="flex flex-col gap-y-2">
-            <ProofSubmitedDialog open={open} handleClose={handleCloseDialog}/>
             <CustomButton label="Mask as moving" variant="dark" size="medium" handleOpenDialog={handleOpenDialog}/>
             <CustomButton label="Mask as arrived" variant="light" size="medium"/>
             <CustomButton label="Cancel ride" variant="light" size="medium"/>

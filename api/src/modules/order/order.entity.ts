@@ -40,9 +40,12 @@ export class Order extends Base{
 
     @Column({
         name: "declined_driver_id",
-        nullable: true
+        type: "integer",
+        array: true,
+        nullable: true,
+        default: []
     })
-    declinedDriverId: number
+    declinedDriverId: number[]
 
     @Column({
         name: "staff_id",

@@ -77,10 +77,20 @@ export const uploadStoreLogo = async (file: File) => {
 
 export const saveStoreLocation = async (storeId: number, latitude: number, longitude: number) => {
   try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
     const response = await axios.post(`${API_BASE_URL}/store-location`, {
       storeId,
       latitude,
       longitude
+    }, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
     });
     
     return response.data;

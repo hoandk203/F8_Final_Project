@@ -48,15 +48,16 @@ export const getDriverLocation = async (driverId: number) => {
   }
 };
 
-export const getNearbyOrders = async (driverId: number, latitude: number, longitude: number, radius: number = 5) => {
+export const getNearbyOrders = async (driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number = 5) => {
+  
+  
+  
   try {
-    console.log(`Fetching nearby orders for driver ${driverId} at location (${latitude}, ${longitude}) with radius ${radius}km`);
     
     const response = await axios.get(
-      `${API_BASE_URL}/order/nearby/${driverId}?latitude=${latitude}&longitude=${longitude}&radius=${radius}`
+      `${API_BASE_URL}/order/nearby/${driverId}?latitude=${latitude}&longitude=${longitude}&radius=${radius}&driverStatus=${driverStatus}`
     );
     
-    console.log("Nearby orders response:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("Error fetching nearby orders:", error);
@@ -95,6 +96,18 @@ export const declineOrder = async (orderId: number, driverId: number) => {
   } catch (error: any) {
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to decline order");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
+export const updateDriver = async (driverId: number, data: any) => {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/driver/${driverId}`, data);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to update driver status");
     }
     throw new Error("Server connection error");
   }

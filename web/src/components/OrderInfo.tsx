@@ -11,20 +11,22 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 
 interface OrderInfoProps {
     order: any;
-    status: string;
     distance?: number;
     activeDialog?: boolean;
-    onAccept?: (orderId: number) => void;
-    onDecline?: (orderId: number) => void;
+    driverId?: number;
+    setNearbyOrders?: (orders: any) => void;
+    isDetailPage?: boolean;
+    stateOrderStatus?: string;
 }
 
 const OrderInfo: React.FC<OrderInfoProps> = ({
     order,
-    status,
     distance,
     activeDialog = true,
-    onAccept,
-    onDecline
+    driverId,
+    setNearbyOrders,
+    isDetailPage,
+    stateOrderStatus
 }) => {
     const [open, setOpen] = React.useState(false);
 
@@ -38,66 +40,44 @@ const OrderInfo: React.FC<OrderInfoProps> = ({
     };
 
     return (
-        <div className="bg-gray-200 rounded-xl p-4">
-            {status === "pending" && <NewOrderDialog order={order} status={status} open={open} handleClose={handleClose} />}
+        <div className="bg-gray-200 rounded-xl border-t-[16px] border-[#303030]">
+            {order?.status === "pending" && <NewOrderDialog driverId={driverId || 0} order={order} status={order?.status} open={open} handleClose={handleClose} setNearbyOrders={setNearbyOrders} />}
             <div onClick={handleClickOpen}>
-                {status === "pending" ? (
+                {isDetailPage
+                &&
+                <img src={order?.scrapImageUrl} alt="scrapImage" className='w-full h-[280px] object-cover' />
+                }
+                <div className="p-4">
                     <div className="flex justify-between items-center mb-2">
-                        <div className="text-start">
                             <div className="text-[#666] uppercase mb-1">Order #{order?.id || '12941875'}</div>
-                            <span className="inline-block bg-[#303030] px-2 py-1 text-[12px] text-white rounded-md capitalize">{status}</span>
-                            {distance !== undefined && (
-                                <span className="inline-block bg-[#303030] px-2 py-1 text-[12px] text-white rounded-md ml-2">
-                                    {distance} km
-                                </span>
-                            )}
+                            <div className="flex">
+                                {distance !== undefined && (
+                                    <span className="inline-block bg-[#303030] px-2 py-1 text-[12px] text-white rounded-md mr-2">
+                                        {distance.toFixed(2)} km
+                                    </span>
+                                )}
+                                <span className={`inline-block ${order?.status === "accepted" ? "bg-green-500" : "bg-[#303030]"} px-2 py-1 text-[12px] text-white rounded-md capitalize font-bold`}>{stateOrderStatus || order?.status}</span>
+                            </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2 text-start">
+                        <h3 className="capitalize text-[16px] font-bold">{order?.store?.name || "Spice Haven Restaurant"}</h3>
+                        <div className="flex gap-2 items-center">
+                            <LocationOnOutlinedIcon />
+                            <p>{order?.store?.location || "14/2 Connaught Cirus, Block M, Concaught Place, New Delhi, Delhi 110001, India"}</p>
                         </div>
-                    </div>
-                ) : (
-                    <div className="flex justify-between items-center mb-2">
-                        <div className="text-[#666] uppercase mb-1">Order #{order?.id || '12941875'}</div>
-                        <span className="inline-block bg-black px-2 py-1 text-[12px] text-white rounded-md capitalize">{status}</span>
-                    </div>
-                )}
-                
-                <div className="flex flex-col gap-2 text-start">
-                    <h3 className="capitalize text-[16px] font-bold">{order?.store?.name || "Spice Haven Restaurant"}</h3>
-                    <div className="flex gap-2 items-center">
-                        <LocationOnOutlinedIcon />
-                        <p>{order?.store?.location || "14/2 Connaught Cirus, Block M, Concaught Place, New Delhi, Delhi 110001, India"}</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                        <PhoneOutlinedIcon />
-                        <p>{order?.store?.phone || "(+91) 9812345678"}</p>
-                    </div>
-                    <div className="flex gap-2 items-center">
-                        <InboxIcon />
-                        <p>~{order?.orderDetails?.[0]?.weight || 15}kg - {order?.orderDetails?.[0]?.materialname || "Scrap carton"}</p>
+                        <div className="flex gap-2 items-center">
+                            <PhoneOutlinedIcon />
+                            <p>{order?.store?.phone || "(+91) 9812345678"}</p>
+                        </div>
+                        <div className="flex gap-2 items-center">
+                            <InboxIcon />
+                            <p>~{order?.orderDetails?.[0]?.weight || 15}kg - {order?.orderDetails?.[0]?.materialname || "Scrap carton"}</p>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            {/* Nút chấp nhận/từ chối chỉ hiển thị cho đơn hàng đang chờ */}
-            {status === "pending" && onAccept && onDecline && (
-                <div className="flex justify-between mt-4">
-                    <Button
-                        variant="contained"
-                        startIcon={<CheckCircleOutlineIcon />}
-                        onClick={() => onAccept(order.id)}
-                        className="w-[48%] bg-[#303030] text-white"
-                    >
-                        Accept
-                    </Button>
-                    <Button
-                        variant="contained"
-                        startIcon={<CancelOutlinedIcon />}
-                        onClick={() => onDecline(order.id)}
-                        className="w-[48%] bg-[#efeef3] text-[#303030]"
-                    >
-                        Decline
-                    </Button>
-                </div>
-            )}
         </div>
     )
 }

@@ -2,23 +2,19 @@
 
 import React from "react";
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+
 
 const Contact = () => {
     return (
         <div className="flex justify-around items-center">
-            <button className="flex flex-col items-center" onClick={() => {console.log(1)}}>
-                <ChatBubbleOutlineIcon/>
-                <p>Chat</p>
+            <button className="flex flex-col items-center" onClick={() => window.location.href = "/driver"}>
+                <HomeOutlinedIcon/>
+                <p>Home</p>
             </button>
             <button className="flex flex-col items-center">
                 <PhoneOutlinedIcon/>
-                <p>Call</p>
-            </button>
-            <button className="flex flex-col items-center">
-                <HelpOutlineIcon/>
-                <p>Help Center</p>
+                <p>Call Vendor</p>
             </button>
         </div>
     )

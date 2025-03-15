@@ -29,6 +29,18 @@ export class OrderService extends BaseService {
         super(orderRepository);
     }
 
+    async getOrderById(id: number) {
+        const oneOrder= await this.orderRepository.findOne({ where: { id } });
+        const store= await this.storeService.getStoreById(oneOrder.storeId)
+        const orderDetails= await this.orderDetailService.findByOrderId(id)
+        return {
+            ...oneOrder,
+            store,
+            orderDetails
+        }
+
+    }
+
     async getOrdersByStoreId(storeId: number) {
         return this.orderRepository
         .createQueryBuilder("orders")
@@ -43,21 +55,20 @@ export class OrderService extends BaseService {
         .getRawMany();
     }
 
-    async saveBase64Image(imageBase64: string): Promise<string> {
+    async saveBase64Image(imageBase64: string, folder: string): Promise<string> {
         try {
             const payload = imageBase64.split(',')[1];
             const fileName = `${uuidv4()}.png`;
-            const path = `files/images/scrap/${fileName}`;
+            const path = `files/images/${folder}/${fileName}`;
 
-            // Đảm bảo thư mục tồn tại
-            if (!fs.existsSync('files/images/scrap')) {
-                fs.mkdirSync('files/images/scrap', { recursive: true });
+            if (!fs.existsSync(`files/images/${folder}`)) {
+                fs.mkdirSync(`files/images/${folder}`, { recursive: true });
             }
 
             await writeFileAsync(path, payload, 'base64');
             
             const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-            return `${BASE_URL}/image?path=files%2Fimages%2Fscrap%2F${fileName}`;
+            return `${BASE_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
         } catch (error) {
             console.error(error);
             throw new Error('Error saving image');
@@ -68,13 +79,11 @@ export class OrderService extends BaseService {
         const { orderDetails, scrapImage, ...orderData } = createDto;
         
         try {
-            // Lưu ảnh và lấy URL
             let scrapImageUrl = '';
             if (scrapImage) {
-                scrapImageUrl = await this.saveBase64Image(scrapImage);
+                scrapImageUrl = await this.saveBase64Image(scrapImage, 'scrap');
             }
 
-            // Tính tổng amount từ orderDetails
             let totalAmount = 0;
             for (const detail of orderDetails) {
                 const material = await this.materialService.getOne(detail.materialId);
@@ -87,7 +96,7 @@ export class OrderService extends BaseService {
                 detail.amount = detailAmount;
             }
 
-            // Tạo order
+            
             const order = await this.orderRepository.save({
                 ...orderData,
                 storeId,
@@ -98,7 +107,6 @@ export class OrderService extends BaseService {
                 modifiedAt: new Date()
             });
 
-            // Tạo order details
             for (const detail of orderDetails) {
                 await this.orderDetailService.create({
                     ...detail,
@@ -123,11 +131,16 @@ export class OrderService extends BaseService {
             throw new BadRequestException('Order not found');
         }
 
-        // Chỉ cho phép cập nhật một số trường nhất định
-        const { status } = updateDto;
-        
+        const { status, proofImage } = updateDto;
+
+        let proofImageUrl = '';
+        if (proofImage) {
+            proofImageUrl = await this.saveBase64Image(proofImage, 'proof');
+        }
+
         return this.orderRepository.update(id, {
             status,
+            proofImageUrl,
             modifiedAt: new Date()
         });
     }
@@ -138,19 +151,16 @@ export class OrderService extends BaseService {
             throw new BadRequestException('Order not found');
         }
 
-        // Xóa order details trước
         await this.orderDetailService.deleteByOrderId(id);
 
-        // Cập nhật active thành false thay vì xóa
         return this.orderRepository.update(id, {
             active: false,
             deletedAt: new Date()
         });
     }
 
-    // Hàm tính khoảng cách giữa hai điểm dựa trên tọa độ (theo công thức Haversine)
     private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-        const R = 6371; // Bán kính trái đất tính bằng km
+        const R = 6371; 
         const dLat = this.deg2rad(lat2 - lat1);
         const dLon = this.deg2rad(lon2 - lon1);
         const a = 
@@ -158,7 +168,7 @@ export class OrderService extends BaseService {
             Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
             Math.sin(dLon/2) * Math.sin(dLon/2); 
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-        const distance = R * c; // Khoảng cách tính bằng km
+        const distance = R * c;
         return distance;
     }
     
@@ -166,23 +176,29 @@ export class OrderService extends BaseService {
         return deg * (Math.PI/180);
     }
 
-    async getNearbyOrders(driverId: number, latitude: number, longitude: number, radius: number): Promise<any[]> {
+    async getNearbyOrders(driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number): Promise<any[]> {
         try {
-            console.log(`Service: Getting nearby orders for driver ${driverId} at (${latitude}, ${longitude}) with radius ${radius}km`);
+            console.log(driverStatus);
             
-            // Lấy tất cả các đơn hàng đang ở trạng thái pending
-            const pendingOrders = await this.orderRepository
+            let orderList: any[];
+            if(driverStatus === "idle"){
+                orderList = await this.orderRepository
                 .createQueryBuilder('orders')
                 .where('orders.status = :status', { status: 'pending' })
                 .andWhere('orders.active = :active', { active: true })
-                .andWhere('(orders.declinedDriverId IS NULL OR orders.declinedDriverId != :driverId)', { driverId })
+                .andWhere('(orders.declined_driver_id IS NULL OR NOT(:driverId = ANY(orders.declined_driver_id)))', { driverId })
                 .getMany();
-            
+            }else{
+                orderList = await this.orderRepository
+                .createQueryBuilder('orders')
+                .where('orders.status != :status', { status: 'pending' })
+                .andWhere('orders.active = :active', { active: true })
+                .andWhere('orders.driver_id = :driverId', { driverId })
+                .getMany();
+            }
 
-            // Lấy tất cả vị trí của các cửa hàng
             const storeLocations = await this.storeLocationService.findAll();
 
-            // Tạo map để tra cứu nhanh vị trí của cửa hàng
             const storeLocationMap = new Map();
             storeLocations.forEach(location => {
                 storeLocationMap.set(location.storeId, {
@@ -192,10 +208,9 @@ export class OrderService extends BaseService {
             });
             
 
-            // Lọc các đơn hàng trong bán kính cho trước
             const nearbyOrders = [];
             
-            for (const order of pendingOrders) {
+            for (const order of orderList) {
                 const storeLocation = storeLocationMap.get(order.storeId);
                 
                 if (storeLocation) {
@@ -286,9 +301,16 @@ export class OrderService extends BaseService {
             throw new BadRequestException('Order is not in pending status');
         }
         
-        // Cập nhật trường declinedDriverId để đánh dấu tài xế đã từ chối đơn này
+        // Cập nhật mảng declinedDriverId để thêm tài xế đã từ chối đơn này
+        let declinedDriverIds = order.declinedDriverId || [];
+        
+        // Kiểm tra xem tài xế đã từ chối trước đó chưa
+        if (!declinedDriverIds.includes(driverId)) {
+            declinedDriverIds.push(driverId);
+        }
+        
         await this.orderRepository.update(orderId, {
-            declinedDriverId: driverId,
+            declinedDriverId: declinedDriverIds,
             modifiedAt: new Date()
         });
         

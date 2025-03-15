@@ -1,4 +1,3 @@
-
 import { DataSource } from 'typeorm';
 import {Vendor} from "./modules/vendor/vendor.entity";
 import {Image} from "./modules/image/image.entity";
@@ -14,6 +13,7 @@ import {IdentityDocument} from "./modules/identity-document/entities/identity-do
 import {Driver} from "./modules/driver/entities/driver.entity";
 import {Vehicle} from "./modules/vehicle/entities/vehicle.entity";
 import {StoreLocation} from "./modules/store-location/store-location.entity";
+import {Payment} from "./modules/payment/entities/payment.entity";
 
 export const databaseProviders = [
     {
@@ -40,7 +40,8 @@ export const databaseProviders = [
                     IdentityDocument,
                     Driver,
                     Vehicle,
-                    StoreLocation
+                    StoreLocation,
+                    Payment
                 ],
                 synchronize: true,
             });

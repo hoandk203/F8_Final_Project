@@ -17,9 +17,15 @@ interface CustomButtonProps {
     handleVerifyIdStep?: () => void
     handleVerifyEmail?: () => void
     handleUploadIdCard?: () => void
+    handleDeclineOrder?: () => void
+    handleAcceptOrder?: () => void
+    handleStatusOnMoving?: () => void
+    handleStepCompleted?: () => void
+    handleProofSubmit?: () => void
+    handleGoToPayment?: () => void
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", isLoading, handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep, handleVerifyEmail, handleUploadIdCard}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", isLoading, handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep, handleVerifyEmail, handleUploadIdCard, handleDeclineOrder, handleAcceptOrder, handleStatusOnMoving, handleStepCompleted, handleProofSubmit, handleGoToPayment}) => {
     const buttonStyles = {
         dark: {
             backgroundColor: "#303030",
@@ -48,6 +54,24 @@ const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disab
         }
         if (handleUploadIdCard){
             handleUploadIdCard()
+        }
+        if (handleDeclineOrder) {
+            handleDeclineOrder();
+        }
+        if (handleAcceptOrder) {
+            handleAcceptOrder();
+        }
+        if (handleStatusOnMoving) {
+            handleStatusOnMoving();
+        }
+        if (handleStepCompleted) {
+            handleStepCompleted();
+        }
+        if (handleProofSubmit) {
+            handleProofSubmit();
+        }
+        if (handleGoToPayment) {
+            handleGoToPayment();
         }
     }
     if(isLoading){

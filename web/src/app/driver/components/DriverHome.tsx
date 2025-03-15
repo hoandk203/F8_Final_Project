@@ -15,6 +15,7 @@ import { Alert, Snackbar, CircularProgress } from "@mui/material";
 interface User {
     id: number;
     fullname: string;
+    status: "idle" | "busy"
 }
 
 interface Order {
@@ -25,6 +26,8 @@ interface Order {
     // Các trường khác của đơn hàng
 }
 
+let driverStatus = "idle";
+
 const DriverHome = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
@@ -33,7 +36,6 @@ const DriverHome = () => {
     const [showLocationError, setShowLocationError] = useState(false);
     const locationIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [driverId, setDriverId] = useState<number | null>(null);
-    
     // State cho đơn hàng gần đó
     const [nearbyOrders, setNearbyOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
@@ -51,7 +53,8 @@ const DriverHome = () => {
                 // Dispatch action để lấy thông tin profile và lưu vào Redux store
                 if (!user) {
                     const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
-                    console.log("User data fetched:", userData);
+                    
+                    fetchNearbyOrders();
                     
                     // Lưu driverId vào state và localStorage nếu chưa có
                     if (userData && userData.id) {
@@ -129,8 +132,14 @@ const DriverHome = () => {
 
         // Thiết lập interval để cập nhật vị trí mỗi 20 giây
         locationIntervalRef.current = setInterval(() => {
+            console.log("update location");
+            
             updateLocation();
-            fetchNearbyOrders();
+            
+            if(driverStatus === "idle"){
+                fetchNearbyOrders();
+            }
+
         }, 10000); // 20 seconds
     };
 
@@ -207,6 +216,12 @@ const DriverHome = () => {
         });
     };
 
+    useEffect(() => {
+        if (user?.status) {
+            driverStatus = user?.status;
+        }
+    }, [user?.status]);
+
     // Hàm lấy đơn hàng gần đó
     const fetchNearbyOrders = async () => {
         setLoadingOrders(true);
@@ -220,49 +235,28 @@ const DriverHome = () => {
                 throw new Error("Driver ID not found");
             }
             
-            console.log(`DriverHome: Fetching nearby orders for driver ${currentDriverId}`);
-            
             // Lấy vị trí hiện tại
             const position = await getCurrentPosition();
             const { latitude, longitude } = position.coords;
             
-            console.log(`Current position: (${latitude}, ${longitude})`);
+            
             
             // Gọi API để lấy đơn hàng gần đó
             const orders = await getNearbyOrders(
+                driverStatus || "idle",
                 currentDriverId, 
                 latitude, 
                 longitude, 
                 5 // Bán kính 5km
             );
-            
-            console.log(`Received ${orders.length} nearby orders:`, orders);
-            
             setNearbyOrders(orders);
+            
         } catch (err: any) {
             console.error("Error fetching nearby orders:", err);
             setOrdersError(err.message || "Không thể lấy danh sách đơn hàng gần đây");
         } finally {
             setLoadingOrders(false);
         }
-    };
-
-    // Xử lý chấp nhận đơn hàng
-    const handleAcceptOrder = async (orderId: number) => {
-        // Xử lý logic chấp nhận đơn hàng
-        // Sau khi chấp nhận, cập nhật lại danh sách đơn hàng
-        setNearbyOrders(prevOrders => 
-            prevOrders.filter(order => order.id !== orderId)
-        );
-    };
-
-    // Xử lý từ chối đơn hàng
-    const handleDeclineOrder = async (orderId: number) => {
-        // Xử lý logic từ chối đơn hàng
-        // Sau khi từ chối, cập nhật lại danh sách đơn hàng
-        setNearbyOrders(prevOrders => 
-            prevOrders.filter(order => order.id !== orderId)
-        );
     };
 
     // Hiển thị tên tài xế từ thông tin người dùng trong Redux store
@@ -288,12 +282,11 @@ const DriverHome = () => {
                         <CircularProgress size={30} />
                     </div>
                 ) : (
-                    <OrderManager 
+                    <OrderManager
+                        driverId={driverId || 0}
                         nearbyOrders={nearbyOrders} 
+                        setNearbyOrders={setNearbyOrders}
                         ordersError={ordersError}
-                        onRefresh={fetchNearbyOrders}
-                        onAcceptOrder={handleAcceptOrder}
-                        onDeclineOrder={handleDeclineOrder}
                     />
                 )}
             </div>

@@ -1,3 +1,5 @@
+"use client"
+
 import CustomButton from "@/components/CustomButton";
 import Contact from "@/components/Contact";
 import StepperOrder from "./components/StepperOrder";
@@ -12,12 +14,7 @@ const OrderStatusPage = () => {
                     <h1 className="font-bold mb-4">Order status</h1>
                     <StepperOrder/>
                     <div className="flex flex-col gap-y-3 mt-4 overflow-y-auto h-[calc(100%-131px)]"> {/* 2 nút 83px */}
-                        <OrderInfo type="accepted"/>
-                        <OrderInfo type="accepted"/>
-                        <OrderInfo type="accepted"/>
-                        <OrderInfo type="accepted"/>
-                        <OrderInfo type="accepted"/>
-                        <OrderInfo type="accepted"/>
+                        
                     </div>
                 </div>
 

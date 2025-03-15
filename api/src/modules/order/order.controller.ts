@@ -38,7 +38,7 @@ export class OrderController {
     @UseGuards(JwtAuthGuard)
     @Get('/:id')
     getOne(@Param('id') id: number) {
-        return this.orderService.getOne(id);
+        return this.orderService.getOrderById(id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -68,6 +68,7 @@ export class OrderController {
         @Query('latitude') latitude: number,
         @Query('longitude') longitude: number,
         @Query('radius') radius: number = 5, // Mặc định 5km
+        @Query('driverStatus') driverStatus: string
     ) {
         console.log(`Controller: Getting nearby orders for driver ${driverId} at (${latitude}, ${longitude}) with radius ${radius}km`);
         
@@ -86,7 +87,7 @@ export class OrderController {
             throw new BadRequestException('Invalid parameter types. All parameters must be numbers.');
         }
         
-        return this.orderService.getNearbyOrders(driverIdNum, latitudeNum, longitudeNum, radiusNum);
+        return this.orderService.getNearbyOrders(driverStatus, driverIdNum, latitudeNum, longitudeNum, radiusNum);
     }
 
     @Put('/:id/accept/:driverId')

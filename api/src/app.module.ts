@@ -17,6 +17,7 @@ import { IdentityDocumentModule } from './modules/identity-document/identity-doc
 import { DriverModule } from './modules/driver/driver.module';
 import { VehicleModule } from './modules/vehicle/vehicle.module';
 import {StoreLocationModule} from "./modules/store-location/store-location.module";
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import {StoreLocationModule} from "./modules/store-location/store-location.modul
       IdentityDocumentModule,
       DriverModule,
       VehicleModule,
-      StoreLocationModule
+      StoreLocationModule,
+      PaymentModule
   ],
   controllers: [AppController],
   providers: [AppService],

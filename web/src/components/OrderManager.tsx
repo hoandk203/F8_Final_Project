@@ -2,32 +2,23 @@
 import React, { useState } from "react";
 import OrderInfo from "@/components/OrderInfo";
 import { Alert } from "@mui/material";
-
-interface Order {
-    id: number;
-    distance: number;
-    store: any;
-    orderDetails: any[];
-    // Các trường khác của đơn hàng
-}
+import Link from "next/link";
 
 interface OrderManagerProps {
-    nearbyOrders: Order[];
+    nearbyOrders: any[];
     ordersError: string;
-    onRefresh: () => void;
-    onAcceptOrder: (orderId: number) => void;
-    onDeclineOrder: (orderId: number) => void;
+    driverId: number;
+    setNearbyOrders: (orders: any) => void;
 }
 
 const OrderManager: React.FC<OrderManagerProps> = ({ 
     nearbyOrders, 
-    ordersError, 
-    onRefresh,
-    onAcceptOrder,
-    onDeclineOrder
+    ordersError,
+    driverId,
+    setNearbyOrders
 }) => {
     const [step, setStep] = useState(1);
-    console.log(nearbyOrders);
+
     return (
         <div>
             <div className="flex justify-around mb-3">
@@ -83,23 +74,32 @@ const OrderManager: React.FC<OrderManagerProps> = ({
                                 };
                                 
                                 return (
-                                    <OrderInfo 
-                                        key={order.id} 
-                                        order={orderWithDefaults} 
-                                        status="pending" 
-                                        distance={order.distance}
-                                        onAccept={() => onAcceptOrder(order.id)}
-                                        onDecline={() => onDeclineOrder(order.id)}
-                                    />
+                                    <div key={order.id}>
+                                        {order.status === "accepted" || order.status === "on moving"
+                                        ?
+                                        <div>
+                                            <Link href={`/driver/order-status/${order.id}`}>
+                                                <OrderInfo 
+                                                    order={orderWithDefaults}
+                                                    distance={order.distance}
+                                                    driverId={driverId || 0}
+                                                />
+                                            </Link>
+                                        </div>
+                                        :
+                                        <div>
+                                            <OrderInfo 
+                                                order={orderWithDefaults}
+                                                distance={order.distance}
+                                                driverId={driverId || 0}
+                                                setNearbyOrders={setNearbyOrders}
+                                            />
+                                        </div>
+                                        }
+                                    </div>
                                 );
                             })
                         )}
-                        <button 
-                            onClick={onRefresh}
-                            className="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-full"
-                        >
-                            Refresh
-                        </button>
                     </div>
                 )}
                 {step === 2 && <h3>Order History</h3>}
