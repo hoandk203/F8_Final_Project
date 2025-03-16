@@ -1,12 +1,13 @@
-import {Column, Entity, PrimaryColumn} from "typeorm";
+import {Column, Entity} from "typeorm";
+import {Base} from "../base/base.entity";
 
 
 @Entity("store-location")
-export class StoreLocation{
-    @PrimaryColumn("decimal", {precision: 10, scale: 7})
+export class StoreLocation extends Base{
+    @Column("decimal", {precision: 10, scale: 7})
     latitude: number
 
-    @PrimaryColumn("decimal", {precision: 10, scale: 7})
+    @Column("decimal", {precision: 10, scale: 7})
     longitude: number
 
     @Column({
