@@ -29,6 +29,7 @@
     "react-redux": "^9.1.2",
     "react-toastify": "^10.0.6",
     "styled-components": "^6.1.13",
+    "uuid": "^11.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

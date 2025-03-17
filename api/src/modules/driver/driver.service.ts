@@ -5,6 +5,7 @@ import {Driver} from "./entities/driver.entity";
 import {CreateDriverDto} from "./dto/create-driver.dto";
 import {UpdateDriverDto} from "./dto/update-driver.dto";
 import {IdentityDocument} from "../identity-document/entities/identity-document.entity";
+import { Order } from '../order/order.entity';
 
 @Injectable()
 export class DriverService extends BaseService{
@@ -41,6 +42,18 @@ export class DriverService extends BaseService{
             .createQueryBuilder("driver")
             .where("driver.user_id = :userId", {userId})
             .getOne();
+    }
+
+    async getDriverByOrderId(orderId: number) {
+        return this.driverRepository
+            .createQueryBuilder("driver")
+            .select([
+                'driver.id',
+            ])
+            .innerJoin(Order, "order", "order.driver_id = driver.id")
+            .where("order.id = :orderId", {orderId})
+            .andWhere("driver.active = :active", {active: true})
+            .getRawOne();
     }
 
     async getList() {

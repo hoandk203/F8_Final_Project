@@ -39,7 +39,6 @@ export class AuthController {
   @Get('/profile')
   async profile(@Request() request: any){
     const userData= request.user
-    console.log(userData)
     if(userData.role === "driver"){
       const driver= await this.driverService.getByUserId(userData.id)
       return {

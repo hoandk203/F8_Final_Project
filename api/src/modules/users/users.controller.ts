@@ -36,4 +36,14 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.softDelete(+id);
   }
+
+  @Get('admin/list')
+  adminGetList() {
+    return this.usersService.adminGetList();
+  }
+
+  @Post('admin/create')
+  adminCreate(@Body() createUserDto: any) {
+    return this.usersService.adminCreate(createUserDto);
+  }
 }

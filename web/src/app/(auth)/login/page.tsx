@@ -1,6 +1,5 @@
 import Link from "next/link"
 import LoginForm from "./components/LoginForm"
-import PWAInstallPrompt from "@/components/PWAInstallPrompt"
 const LoginPage = () => {
     return (
         <div className="container mx-auto">
@@ -13,7 +12,6 @@ const LoginPage = () => {
             </div>
             <div className="text-center mt-8">
                 <p className="text-[#666]">Don't have account? <Link href={"/register"} className="text-black font-semibold underline">Register here</Link></p>
-                <PWAInstallPrompt />
             </div>
         </div>
     )

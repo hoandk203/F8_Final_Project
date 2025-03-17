@@ -14,6 +14,8 @@ import {Driver} from "./modules/driver/entities/driver.entity";
 import {Vehicle} from "./modules/vehicle/entities/vehicle.entity";
 import {StoreLocation} from "./modules/store-location/store-location.entity";
 import {Payment} from "./modules/payment/entities/payment.entity";
+import { Issue } from './modules/issue/entities/issue.entity';
+import { IssueMessage } from './modules/issue-message/entities/issue-message.entity';
 
 export const databaseProviders = [
     {
@@ -41,7 +43,9 @@ export const databaseProviders = [
                     Driver,
                     Vehicle,
                     StoreLocation,
-                    Payment
+                    Payment,
+                    Issue,
+                    IssueMessage
                 ],
                 synchronize: true,
             });

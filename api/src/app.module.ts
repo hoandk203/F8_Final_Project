@@ -18,6 +18,9 @@ import { DriverModule } from './modules/driver/driver.module';
 import { VehicleModule } from './modules/vehicle/vehicle.module';
 import {StoreLocationModule} from "./modules/store-location/store-location.module";
 import { PaymentModule } from './modules/payment/payment.module';
+import { IssueModule } from './modules/issue/issue.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { IssueMessageModule } from './modules/issue-message/issue-message.module';
 
 @Module({
   imports: [
@@ -37,7 +40,10 @@ import { PaymentModule } from './modules/payment/payment.module';
       DriverModule,
       VehicleModule,
       StoreLocationModule,
-      PaymentModule
+      PaymentModule,
+      IssueModule,
+      AdminModule,
+      IssueMessageModule
   ],
   controllers: [AppController],
   providers: [AppService],

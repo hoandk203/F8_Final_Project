@@ -25,6 +25,29 @@ export const getOrders = async () => {
   }
 };
 
+export const adminGetOrders = async () => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.get(`${API_BASE_URL}/order/admin`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch orders");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
 export const getOrderById = async (id: number) => {
   try {
     const accessToken = localStorage.getItem("access_token");

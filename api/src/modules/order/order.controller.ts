@@ -36,6 +36,12 @@ export class OrderController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get("/admin")
+    async adminGetAll(@Req() req: any){
+        return this.orderService.adminGetAll();
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get('/:id')
     getOne(@Param('id') id: number) {
         return this.orderService.getOrderById(id);

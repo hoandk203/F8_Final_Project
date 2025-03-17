@@ -19,6 +19,9 @@ import CustomButton from "@/components/CustomButton";
 import DriverDialog from "@/app/admin/drivers/components/DriverDialog";
 import {searchDriverByName, softDeleteDriver} from "@/redux/slice/driverSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
+import { refreshToken } from "@/services/authService";
+import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
@@ -85,7 +88,14 @@ const columns= [
     }
 ]
 
+interface User {
+    id: number;
+    email: string;
+    role: string;
+}
+
 const DriversPage = () => {
+    const router= useRouter()
     const dispatch= useDispatch<AppDispatch>()
     const driverList= useSelector((state: RootState) => state.driver.driverList)
     const driverListStatus= useSelector((state: RootState) => state.driver.status)
@@ -101,7 +111,7 @@ const DriversPage = () => {
         phone_number: "",
         document_status: ""
     });
-
+    const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -120,6 +130,44 @@ const DriversPage = () => {
         })
         setOpen(false);
     };
+
+    useEffect(() => {
+        const checkAuth= async () => {
+            const accessToken= localStorage.getItem("access_token")
+            if(!accessToken){
+                router.push("/admin-login")
+                return
+            }
+            if(!user){
+                try {
+                    // Dispatch action to get profile info and save to Redux store
+                    await dispatch(fetchUserProfile(accessToken)).unwrap()
+                }catch (err: any) {
+                    if (err?.message === "Access token expired") {
+                        try {
+                            const oldRefreshToken= localStorage.getItem("refresh_token")
+                            const newTokens= await refreshToken(oldRefreshToken || "")
+                            localStorage.setItem("access_token", newTokens.access_token)
+                            localStorage.setItem("refresh_token", newTokens.refresh_token)
+    
+                            // Retry with new token
+                            await dispatch(fetchUserProfile(newTokens.access_token)).unwrap()
+                        }
+                        catch (refreshError) {
+                            localStorage.removeItem("access_token")
+                            localStorage.removeItem("refresh_token")
+                            router.push("/admin-login")
+                        }
+                    } else {
+                        localStorage.removeItem("access_token")
+                        localStorage.removeItem("refresh_token")
+                        router.push("/admin-login")
+                    }
+                }
+            }
+        }
+        checkAuth()
+      }, [dispatch, router]);
 
     useEffect(() => {
         if(driverList.length === 0){

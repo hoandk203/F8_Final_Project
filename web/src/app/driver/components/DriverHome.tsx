@@ -11,7 +11,6 @@ import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateDriverLocation, getNearbyOrders } from "@/services/driverService";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 interface User {
     id: number;
@@ -141,7 +140,7 @@ const DriverHome = () => {
                 fetchNearbyOrders();
             }
 
-        }, 10000); // 20 seconds
+        }, 20000); // 20 seconds
     };
 
     const stopLocationTracking = () => {

@@ -9,10 +9,11 @@ interface props {
     setVehicleImageCallback?: (value:any) => void
     setVehicleRCImageCallback?: (value:any) => void
     setProofImage?: (value:any) => void
+    setIssueImage?: (value:any) => void
     imageHeight?: string
 }
 
-const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback, setProofImage, imageHeight}:props) => {
+const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback, setProofImage, setIssueImage, imageHeight}:props) => {
     console.log('UploadImages')
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = React.useState("");
@@ -45,6 +46,9 @@ const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCall
                         }
                         if(setProofImage){
                             setProofImage(imageFile)
+                        }
+                        if(setIssueImage){
+                            setIssueImage(imageFile)
                         }
                     } else {
                         alert("Ảnh phải có định dạng PNG, JPG, JPEG");

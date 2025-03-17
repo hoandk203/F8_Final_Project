@@ -1,6 +1,7 @@
 {
-  "name": "PWA App",
-  "short_name": "App",
+  "name": "Scrap Plan",
+  "short_name": "Scrap Plan",
+  "description": "Ứng dụng giao đồ ăn",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -11,11 +12,12 @@
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#FFFFFF",
-  "background_color": "#FFFFFF",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait"

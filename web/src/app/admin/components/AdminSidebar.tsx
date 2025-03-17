@@ -5,8 +5,9 @@ import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -26,7 +27,7 @@ const AdminSidebar = () => {
         
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        router.push("/login");
+        router.push("/admin-login");
     };
 
     return (
@@ -46,6 +47,9 @@ const AdminSidebar = () => {
                 </Link>
                 <Link href={"/admin/vendors"} className={"flex items-center gap-2 p-3 hover:text-white hover:bg-[#555] rounded-md"}>
                     <ApartmentOutlinedIcon/>Vendors
+                </Link>
+                <Link href={"/admin/issues"} className={"flex items-center gap-2 p-3 hover:text-white hover:bg-[#555] rounded-md"}>
+                    <ReportProblemIcon/>Issues
                 </Link>
             </div>
             <div className="p-4">

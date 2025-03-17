@@ -25,6 +25,9 @@ import CustomButton from "@/components/CustomButton";
 import VendorDialog from "@/app/admin/vendors/components/VendorDialog";
 import {searchVendorByName, softDeleteVendor} from "@/redux/slice/vendorSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
+import { refreshToken } from "@/services/authService";
+import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -59,8 +62,15 @@ const columns= [
     }
 ]
 
+interface User {
+    id: number;
+    email: string;
+    role: string;
+}
+
 const VendorsPage = () => {
     const dispatch= useDispatch<AppDispatch>()
+    const router= useRouter()
     const vendorList= useSelector((state: RootState) => state.vendor.vendorList)
     const vendorListStatus= useSelector((state: RootState) => state.vendor.status)
     const [open, setOpen] = React.useState(false);
@@ -70,6 +80,7 @@ const VendorsPage = () => {
         email: "",
         vendorId: ""
     });
+    const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -86,11 +97,49 @@ const VendorsPage = () => {
     };
 
     useEffect(() => {
+        const checkAuth= async () => {
+            const accessToken= localStorage.getItem("access_token")
+            if(!accessToken){
+                router.push("/admin-login")
+                return
+            }
+            if(!user){
+                try {
+                    // Dispatch action to get profile info and save to Redux store
+                    await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    
+                }catch (err: any) {
+                    if (err?.message === "Access token expired") {
+                        try {
+                            const oldRefreshToken= localStorage.getItem("refresh_token")
+                            const newTokens= await refreshToken(oldRefreshToken || "")
+                            localStorage.setItem("access_token", newTokens.access_token)
+                            localStorage.setItem("refresh_token", newTokens.refresh_token)
+    
+                            // Retry with new token
+                            await dispatch(fetchUserProfile(newTokens.access_token)).unwrap()
+                        }
+                        catch (refreshError) {
+                            localStorage.removeItem("access_token")
+                            localStorage.removeItem("refresh_token")
+                            router.push("/admin-login")
+                        }
+                    } else {
+                        localStorage.removeItem("access_token")
+                        localStorage.removeItem("refresh_token")
+                        router.push("/admin-login")
+                    }
+                }
+            }
+        }
+        checkAuth()
+      }, [dispatch, router]);
+
+    useEffect(() => {
         if(vendorList.length === 0){
             dispatch(fetchVendorList())
         }
-
-    }, []);
+    }, [dispatch, vendorList.length]);
 
     const softDelete = async (id: number) => {
         try {

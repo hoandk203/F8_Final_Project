@@ -198,6 +198,27 @@ export class UsersService extends BaseService{
         ])
   }
 
+  async adminCreate(data: any) {
+    const {email, password, role}= data
+
+    const userExist= await this.userRepository.findOne({where: {email}})
+    if(userExist){
+      throw new ConflictException('Email already registered')
+    }
+
+    data.password  = await bcrypt.hash(data.password, 10);
+
+    await this.userRepository.save(data)
+  }
+
+  async adminGetList() {
+    return this.userRepository.find({
+      where: {
+        role: 'admin'
+      }
+    })
+  }
+
   // LOGIN
   async validateUser(email: string, password: string) {
     //check user exist

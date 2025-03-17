@@ -7,7 +7,8 @@ import {
   Person as UserIcon, 
   Settings as CogIcon, 
   Logout as LogoutIcon,
-  BarChart as ChartBarIcon
+  BarChart as ChartBarIcon,
+  ReportProblem as ReportProblemIcon
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
@@ -29,6 +30,11 @@ const StoreSidebar = () => {
       name: "Order",
       href: "/store/orders",
       icon: ShoppingCartIcon,
+    },
+    {
+      name: "Issue",
+      href: "/store/issue",
+      icon: ReportProblemIcon,
     },
     {
       name: "Profile",

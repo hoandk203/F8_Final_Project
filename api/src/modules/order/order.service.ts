@@ -29,6 +29,19 @@ export class OrderService extends BaseService {
         super(orderRepository);
     }
 
+    async adminGetAll(){
+        return this.orderRepository
+        .createQueryBuilder("orders")
+        .select([
+            'orders.*',
+            'orderDetail.weight',
+        ])
+        .innerJoin(OrderDetail, "orderDetail", "orderDetail.order_id = orders.id")
+        .where('orders.active = :active', { active: true })
+        .orderBy('orders.createdAt', 'DESC')
+        .getRawMany();
+    }
+
     async getOrderById(id: number) {
         const oneOrder= await this.orderRepository.findOne({ where: { id } });
         const store= await this.storeService.getStoreById(oneOrder.storeId)

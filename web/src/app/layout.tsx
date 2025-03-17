@@ -5,16 +5,17 @@ import Providers from "@/redux/Providers";
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 
 export const metadata: Metadata = {
-    title: 'Scrap Plan App',
-    description: 'Ứng dụng quản lý rác thải',
+    title: 'Scrap Plan',
+    description: 'Ứng dụng giao đồ ăn',
     manifest: '/manifest.json',
+    themeColor: '#000000',
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
-      title: 'Scrap Plan App'
+      title: 'Scrap Plan'
     },
     icons: {
       icon: [

@@ -13,7 +13,6 @@ import HistoryIcon from '@mui/icons-material/History';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
 import {refreshToken} from "@/services/authService";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 interface User {
     driver?: {
         fullname: string;
@@ -60,7 +59,6 @@ export default function ProfilePage() {
               <p className="text-gray-400">{user?.phone || "0123456789"}</p>
             </div>
           </div>
-          <PWAInstallPrompt />
         </div>
         <div className="space-y-4">
           <div className="p-4 bg-white rounded-lg shadow-sm border">
