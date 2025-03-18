@@ -48,7 +48,7 @@ export class DriverService extends BaseService{
         return this.driverRepository
             .createQueryBuilder("driver")
             .select([
-                'driver.id',
+                'driver.id as id',
             ])
             .innerJoin(Order, "order", "order.driver_id = driver.id")
             .where("order.id = :orderId", {orderId})

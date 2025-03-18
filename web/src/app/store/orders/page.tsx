@@ -286,13 +286,17 @@ const OrdersPage = () => {
       />
       
 
-      <Dialog open={openDeleteDialog} onClose={handleDeleteCancel} PaperProps={{
-        sx: {
-          margin: 'auto',
-          width: { xs: '95%', sm: '80%', md: '70%' },
-          maxWidth: '800px'
-        }
-      }}>
+      <Dialog 
+        open={openDeleteDialog} 
+        onClose={handleDeleteCancel} 
+        PaperProps={{
+          sx: {
+            margin: 'auto',
+            width: { xs: '95%', sm: '80%', md: '50%' },
+            maxWidth: '500px'
+          }
+        }}
+      >
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>

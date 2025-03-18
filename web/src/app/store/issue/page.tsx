@@ -29,7 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import { getIssuesByStore, createIssue } from '@/services/issueService';
+import { getIssuesByStore, createIssue, deleteIssue } from '@/services/issueService';
 import { getOrders } from '@/services/orderService';
 import { Issue } from '@/types/issue';
 import IssueChat from '@/components/issues/IssueChat';
@@ -41,6 +41,7 @@ import router from 'next/router';
 import { fetchUserProfile } from '@/redux/middlewares/authMiddleware';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Order {
   id: number;
@@ -95,6 +96,11 @@ const IssueStorePage = () => {
 
   const [issueImage, setIssueImage] = useState<string | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
+
+  // Thêm state cho dialog xác nhận xóa
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [issueToDelete, setIssueToDelete] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -246,6 +252,40 @@ const IssueStorePage = () => {
     }).format(date);
   };
 
+  // Sửa lại hàm handleDeleteIssue để mở dialog xác nhận
+  const handleDeleteClick = (issueId: number) => {
+    setIssueToDelete(issueId);
+    setOpenDeleteDialog(true);
+  };
+  
+  // Hàm xử lý khi người dùng xác nhận xóa
+  const handleConfirmDelete = async () => {
+    if (issueToDelete === null) return;
+    
+    setDeleteLoading(true);
+    try {
+      await deleteIssue(issueToDelete);
+      setIssues(issues.filter((issue) => issue.id !== issueToDelete));
+      setTotalIssues(prevTotal => prevTotal - 1);
+      setOpenDeleteDialog(false);
+    } catch (error) {
+      console.error('Error deleting issue:', error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+  
+  // Hàm xử lý khi người dùng hủy xóa
+  const handleCancelDelete = () => {
+    setOpenDeleteDialog(false);
+    setIssueToDelete(null);
+  };
+
+  // Thay thế hàm handleDeleteIssue cũ
+  const handleDeleteIssue = (issueId: number) => {
+    handleDeleteClick(issueId);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -279,7 +319,7 @@ const IssueStorePage = () => {
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow className="bg-gray-100">
               <TableCell>ID</TableCell>
               <TableCell>Order ID</TableCell>
               <TableCell>Issue name</TableCell>
@@ -306,8 +346,8 @@ const IssueStorePage = () => {
               issues.map((issue) => (
                 <TableRow key={issue.id}>
                   <TableCell>{issue.id}</TableCell>
-                  <TableCell>{issue.orderId}</TableCell>
-                  <TableCell>{issue.issueName}</TableCell>
+                  <TableCell>{issue.order_id}</TableCell>
+                  <TableCell>{issue.issue_name}</TableCell>
                   <TableCell>
                     <Chip 
                       label={statusLabels[issue.status] || issue.status} 
@@ -315,8 +355,8 @@ const IssueStorePage = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>{issue.driver?.name || 'Not accepted'}</TableCell>
-                  <TableCell>{formatDate(issue.createdAt)}</TableCell>
+                  <TableCell>{issue.driver_fullname || 'Not accepted'}</TableCell>
+                  <TableCell>{formatDate(issue.created_at)}</TableCell>
                   <TableCell align="center">
                     <IconButton 
                       className='text-[#303030]'
@@ -325,7 +365,14 @@ const IssueStorePage = () => {
                     >
                       <QuestionAnswerIcon />
                     </IconButton>
-                      <span>({issue.messageCount})</span>
+                    <span>({issue.message_count})</span>
+                    <IconButton 
+                      className='text-[#303030]'
+                      onClick={() => handleDeleteIssue(issue.id)}
+                      title="Delete"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -419,6 +466,39 @@ const IssueStorePage = () => {
           userId={user?.user?.id || 0}
         />
       )}
+
+      {/* Dialog xác nhận xóa */}
+      <Dialog 
+        open={openDeleteDialog} 
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            margin: 'auto',
+            width: { xs: '95%', sm: '80%', md: '50%' },
+            maxWidth: '500px'
+          }
+        }}
+      >
+        <DialogTitle>Confirm delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this issue? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            disabled={deleteLoading}
+            startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+          >
+            {deleteLoading ? "Deleting..." : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

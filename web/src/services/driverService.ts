@@ -48,6 +48,18 @@ export const getDriverLocation = async (driverId: number) => {
   }
 };
 
+export const getOrderHistory = async (driverId: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/order/history/${driverId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to get order history");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
 export const getNearbyOrders = async (driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number = 5) => {
   
   

@@ -68,6 +68,11 @@ export class OrderController {
         return this.orderService.delete(id);
     }
 
+    @Get('/history/:driverId')
+    async getOrderHistory(@Param('driverId') driverId: number) {
+        return this.orderService.getOrderHistory(driverId);
+    }
+
     @Get('/nearby/:driverId')
     async getNearbyOrders(
         @Param('driverId') driverId: number,

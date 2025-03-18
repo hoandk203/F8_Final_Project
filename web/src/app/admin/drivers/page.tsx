@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
@@ -9,7 +9,14 @@ import {toast} from "react-toastify";
 
 import {
     InputAdornment,
-    TextField
+    TextField,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Typography,
+    CircularProgress
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -111,6 +118,12 @@ const DriversPage = () => {
         phone_number: "",
         document_status: ""
     });
+    
+    // Thêm state cho dialog xác nhận xóa
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [driverToDelete, setDriverToDelete] = useState<number | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    
     const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
     const handleClickOpen = () => {
         setOpen(true);
@@ -141,7 +154,10 @@ const DriversPage = () => {
             if(!user){
                 try {
                     // Dispatch action to get profile info and save to Redux store
-                    await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    if(userData.role !== "admin"){
+                        router.push("/admin-login");
+                    }
                 }catch (err: any) {
                     if (err?.message === "Access token expired") {
                         try {
@@ -175,19 +191,42 @@ const DriversPage = () => {
         }
     }, [dispatch, driverList.length]);
 
-    const softDelete = async (id: number) => {
+    // Hàm mở dialog xác nhận xóa
+    const handleDeleteClick = (id: number) => {
+        setDriverToDelete(id);
+        setOpenDeleteDialog(true);
+    };
+    
+    // Hàm xử lý khi người dùng xác nhận xóa
+    const handleConfirmDelete = async () => {
+        if (driverToDelete === null) return;
+        
+        setDeleteLoading(true);
         try {
-            const response = await axios.delete(`${BASE_URL}/driver/${id}`)
+            const response = await axios.delete(`${BASE_URL}/driver/${driverToDelete}`);
             if(response.data){
-                dispatch(softDeleteDriver(id))
-                toast.success("Driver deleted successfully")
+                dispatch(softDeleteDriver(driverToDelete));
+                toast.success("Driver deleted successfully");
+                setOpenDeleteDialog(false);
             }
-        }catch (e) {
-            toast.error("Delete driver failed")
-            console.log(e)
-            return e
+        } catch (e) {
+            toast.error("Delete driver failed");
+            console.log(e);
+        } finally {
+            setDeleteLoading(false);
         }
-    }
+    };
+    
+    // Hàm xử lý khi người dùng hủy xóa
+    const handleCancelDelete = () => {
+        setOpenDeleteDialog(false);
+        setDriverToDelete(null);
+    };
+
+    // Sửa lại hàm softDelete để sử dụng dialog xác nhận
+    const softDelete = async (id: number) => {
+        handleDeleteClick(id);
+    };
 
     const fetchSearch = async (name: string) => {
         try {
@@ -249,6 +288,39 @@ const DriversPage = () => {
                     softDelete={softDelete}
                 />
             </div>
+            
+            {/* Dialog xác nhận xóa */}
+            <Dialog 
+                open={openDeleteDialog} 
+                onClose={handleCancelDelete}
+                PaperProps={{
+                    sx: {
+                        margin: 'auto',
+                        width: { xs: '95%', sm: '80%', md: '50%' },
+                        maxWidth: '500px'
+                    }
+                }}
+            >
+                <DialogTitle>Confirm delete</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure you want to delete this driver? This action cannot be undone.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} disabled={deleteLoading}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
+                        disabled={deleteLoading}
+                        startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+                    >
+                        {deleteLoading ? "Deleting..." : "Delete"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

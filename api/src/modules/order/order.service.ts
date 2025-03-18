@@ -1,5 +1,5 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
-import { createQueryBuilder, Repository } from 'typeorm';
+import { Brackets, createQueryBuilder, Repository } from 'typeorm';
 import { Order } from './order.entity';
 import { BaseService } from "../base/base.service";
 import { CreateDto, UpdateDto } from './order.dto';
@@ -189,6 +189,29 @@ export class OrderService extends BaseService {
         return deg * (Math.PI/180);
     }
 
+    async getOrderHistory(driverId: number){
+        const ordersList= await this.orderRepository
+        .createQueryBuilder('orders')
+        .where('orders.status = :status', { status: 'completed' })
+        .andWhere('orders.driver_id = :driverId', { driverId })
+        .andWhere('orders.active = :active', { active: true })
+        .getMany();
+
+        const orderNearby= []
+
+        for(const order of ordersList){
+            const store = await this.getStoreInfo(order.storeId);
+            const orderDetails= await this.orderDetailService.findByOrderId(order.id)
+            orderNearby.push({
+                ...order,
+                store,
+                orderDetails
+            })
+        }
+
+        return orderNearby
+    }
+
     async getNearbyOrders(driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number): Promise<any[]> {
         try {
             console.log(driverStatus);
@@ -204,7 +227,10 @@ export class OrderService extends BaseService {
             }else{
                 orderList = await this.orderRepository
                 .createQueryBuilder('orders')
-                .where('orders.status != :status', { status: 'pending' })
+                .where(new Brackets(qb => {
+                    qb.where('orders.status = :accepted', { accepted: 'accepted' })
+                      .orWhere('orders.status = :onMoving', { onMoving: 'on moving' });
+                }))
                 .andWhere('orders.active = :active', { active: true })
                 .andWhere('orders.driver_id = :driverId', { driverId })
                 .getMany();
@@ -315,7 +341,7 @@ export class OrderService extends BaseService {
         }
         
         // Cập nhật mảng declinedDriverId để thêm tài xế đã từ chối đơn này
-        let declinedDriverIds = order.declinedDriverId || [];
+        const declinedDriverIds = order.declinedDriverId || [];
         
         // Kiểm tra xem tài xế đã từ chối trước đó chưa
         if (!declinedDriverIds.includes(driverId)) {

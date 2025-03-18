@@ -8,6 +8,7 @@ import { DriverService } from '../driver/driver.service';
 import {v4 as uuidv4} from "uuid";
 import { writeFile } from "fs";
 import { UsersService } from '../users/users.service';
+import { Driver } from '../driver/entities/driver.entity';
 
 @Injectable()
 export class IssueService extends BaseService {
@@ -53,10 +54,18 @@ export class IssueService extends BaseService {
     }
 
     async findAll() {
-        const query = this.issueRepository.createQueryBuilder('issue')
-            .where('issue.active = :active', { active: true })
-            .orderBy('issue.createdAt', 'DESC');
-        return query.getMany();
+        const query = this.issueRepository
+        .createQueryBuilder('issue')
+        .leftJoin('driver', 'driver', 'driver.id = issue.driver_id')
+        .select([
+            'issue.*',
+            'driver.fullname'
+        ])
+        .where('issue.active = :active', { active: true })
+        .orderBy('issue.created_at', 'DESC')
+        .getRawMany();
+
+        return query;
     }
 
     async findOne(id: number): Promise<Issue> {
@@ -94,13 +103,20 @@ export class IssueService extends BaseService {
         });
     }
 
-    async findByStore(storeId: number): Promise<Issue[]> {
-        return this.issueRepository
+    async findByStore(storeId: number): Promise<any[]> {
+        const issues = await this.issueRepository
         .createQueryBuilder('issue')
+        .leftJoin('driver', 'driver', 'driver.id = issue.driver_id')
+        .select([
+            'issue.*',
+            'driver.fullname'
+        ])
         .where('issue.store_id = :storeId', { storeId })
         .andWhere('issue.active = :active', { active: true })
         .orderBy('issue.created_at', 'DESC')
-        .getMany();
+        .getRawMany();
+
+        return issues;
     }
 
     async findByDriver(driverId: number): Promise<Issue[]> {

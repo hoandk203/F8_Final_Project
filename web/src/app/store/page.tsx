@@ -121,7 +121,10 @@ const StorePage = () => {
         if(!user){
             try {
                 // Dispatch action to get profile info and save to Redux store
-                await dispatch(fetchUserProfile(accessToken)).unwrap()
+                const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                if(userData.user.role !== "store"){
+                    router.push("/store-login");
+                }
             }catch (err: any) {
                 if (err?.message === "Access token expired") {
                     try {

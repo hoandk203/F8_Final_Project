@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
@@ -15,7 +15,9 @@ import {
     DialogContentText,
     DialogTitle,
     InputAdornment,
-    TextField
+    TextField,
+    Typography,
+    CircularProgress
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -78,8 +80,16 @@ const VendorsPage = () => {
         id: null,
         name: "",
         email: "",
-        vendorId: ""
+        location: "",
+        city: "",
+        phone: ""
     });
+    
+    // Thêm state cho dialog xác nhận xóa
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [vendorToDelete, setVendorToDelete] = useState<number | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    
     const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
 
     const handleClickOpen = () => {
@@ -91,7 +101,9 @@ const VendorsPage = () => {
             id: null,
             name: "",
             email: "",
-            vendorId: ""
+            location: "",
+            city: "",
+            phone: ""
         })
         setOpen(false);
     };
@@ -141,19 +153,42 @@ const VendorsPage = () => {
         }
     }, [dispatch, vendorList.length]);
 
-    const softDelete = async (id: number) => {
+    // Hàm mở dialog xác nhận xóa
+    const handleDeleteClick = (id: number) => {
+        setVendorToDelete(id);
+        setOpenDeleteDialog(true);
+    };
+    
+    // Hàm xử lý khi người dùng xác nhận xóa
+    const handleConfirmDelete = async () => {
+        if (vendorToDelete === null) return;
+        
+        setDeleteLoading(true);
         try {
-            const response=await axios.delete(`${BASE_URL}/vendor/${id}`)
+            const response = await axios.delete(`${BASE_URL}/vendor/${vendorToDelete}`);
             if(response.data){
-                dispatch(softDeleteVendor(id))
-                toast.success("Vendor deleted successfully")
+                dispatch(softDeleteVendor(vendorToDelete));
+                toast.success("Vendor deleted successfully");
+                setOpenDeleteDialog(false);
             }
-        }catch (e) {
-            toast.error("Vendor delete failed")
-            console.log(e)
-            return e
+        } catch (e) {
+            toast.error("Vendor delete failed");
+            console.log(e);
+        } finally {
+            setDeleteLoading(false);
         }
-    }
+    };
+    
+    // Hàm xử lý khi người dùng hủy xóa
+    const handleCancelDelete = () => {
+        setOpenDeleteDialog(false);
+        setVendorToDelete(null);
+    };
+
+    // Sửa lại hàm softDelete để sử dụng dialog xác nhận
+    const softDelete = async (id: number) => {
+        handleDeleteClick(id);
+    };
 
     const fetchSearch= async (name: string) => {
         try {
@@ -207,6 +242,39 @@ const VendorsPage = () => {
                     <CommonTable columns={columns} rows={vendorList} handleOpenDialog={handleClickOpen} setCurrentData={setCurrentData} softDelete={softDelete}/>
                </div>
             </div>
+            
+            {/* Dialog xác nhận xóa */}
+            <Dialog 
+                open={openDeleteDialog} 
+                onClose={handleCancelDelete}
+                PaperProps={{
+                    sx: {
+                        margin: 'auto',
+                        width: { xs: '95%', sm: '80%', md: '50%' },
+                        maxWidth: '500px'
+                    }
+                }}
+            >
+                <DialogTitle>Confirm delete</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure you want to delete this vendor? This action cannot be undone.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} disabled={deleteLoading}>
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
+                        disabled={deleteLoading}
+                        startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+                    >
+                        {deleteLoading ? "Deleting..." : "Delete"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     )
 }

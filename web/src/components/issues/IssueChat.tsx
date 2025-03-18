@@ -100,27 +100,50 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
   const handleSendMessage = async () => {
     if (!message.trim() && fileIds.length === 0) return;
     
-    await createIssueMessage({
-      issueId: issue.id,
-      message: message.trim(),
-      senderId: userId
-    });
+    // Lưu nội dung tin nhắn trước khi xóa khỏi input
+    const messageContent = message.trim();
+    
+    // Xóa nội dung tin nhắn trong input ngay lập tức
+    setMessage('');
     
     // Tạo ID tạm thời cho tin nhắn mới
     const newTempId = tempMessageId - 1; // Dùng số âm để tránh trùng với ID từ server
     setTempMessageId(newTempId);
     
-    // Thêm tin nhắn mới vào mảng, đặt lên đầu danh sách
+    // Tạo đối tượng tin nhắn mới
     const newMessage: IssueMessage = {
       id: newTempId,
       issueId: issue.id,
       senderId: userId,
-      message: message.trim(),
+      message: messageContent,
     };
     
     // Thêm tin nhắn mới vào đầu mảng
-    setMessageArray([newMessage, ...messageArray]);
-    setMessage('');
+    const updatedMessages = [newMessage, ...messageArray];
+    setMessageArray(updatedMessages);
+    
+    console.log('Tin nhắn sau khi thêm:', updatedMessages); // Debug
+    
+    // Gọi API để lưu tin nhắn
+    try {
+      const response = await createIssueMessage({
+        issueId: issue.id,
+        message: messageContent,
+        senderId: user?.user?.id || 0
+      });
+      
+      console.log('API response:', response); // Debug
+      
+      // Nếu muốn cập nhật ID thực từ response
+      // const realId = response.id;
+      // setMessageArray(prev => prev.map(msg => 
+      //   msg.id === newTempId ? { ...msg, id: realId } : msg
+      // ));
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Nếu gửi thất bại, xóa tin nhắn khỏi state
+      setMessageArray(prev => prev.filter(msg => msg.id !== newTempId));
+    }
   };
 
   const handleKeyPress = (e: any) => {
@@ -182,17 +205,17 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
                 Issue detail
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Order ID: #{issue.id} | Order: #{issue.orderId}
+                Order ID: #{issue.id} | Order: #{issue.order_id}
               </Typography>
             </Box>
-            {issue?.issueImageUrl && (
+            {issue?.issue_image_url && (
               <Box mt={1}>
                 <Typography className="text-end" variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {new Date(issue.createdAt).toLocaleString('vi-VN')}
+                  {new Date(issue.created_at).toLocaleString('vi-VN')}
                 </Typography>
                 <Box 
                   component="img" 
-                  src={issue?.issueImageUrl} 
+                  src={issue?.issue_image_url} 
                   alt="Issue image"
                   sx={{ 
                     maxWidth: '100%', 
@@ -225,7 +248,7 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
                 <Typography color="error" align="center">
                   An error occurred while loading messages
                 </Typography>
-              ) : messagesData?.messages?.length === 0 ? (
+              ) : messageArray.length === 0 ? (
                 <Box 
                   display="flex" 
                   justifyContent="center" 

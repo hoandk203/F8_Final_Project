@@ -62,7 +62,10 @@ const VendorPage = () => {
         if(!user){
             try {
                 // Dispatch action để lấy thông tin profile và lưu vào Redux store
-                await dispatch(fetchUserProfile(accessToken)).unwrap()
+                const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                if(userData.user.role !== "vendor"){
+                    router.push("/vendor-login");
+                }
             }catch (err: any) {
                 if (err?.message === "Access token expired") {
                     try {

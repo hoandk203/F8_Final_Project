@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import OrderInfo from "@/components/OrderInfo";
 import { Alert } from "@mui/material";
 import Link from "next/link";
+import OrderHistory from "@/app/driver/components/OrderHistory";
 
 interface OrderManagerProps {
     nearbyOrders: any[];
@@ -102,7 +103,7 @@ const OrderManager: React.FC<OrderManagerProps> = ({
                         )}
                     </div>
                 )}
-                {step === 2 && <h3>Order History</h3>}
+                {step === 2 && <OrderHistory ordersError={ordersError} driverId={driverId}/>}
                 {step === 3 && <h3>Cancelled orders</h3>}
             </div>
         </div>

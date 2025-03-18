@@ -29,7 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import { getIssuesByStore, createIssue, getIssues } from '@/services/issueService';
+import { getIssuesByStore, createIssue, getIssues, deleteIssue } from '@/services/issueService';
 import { adminGetOrders } from '@/services/orderService';
 import { Issue } from '@/types/issue';
 import IssueChat from '@/components/issues/IssueChat';
@@ -41,7 +41,7 @@ import router from 'next/router';
 import { fetchUserProfile } from '@/redux/middlewares/authMiddleware';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-
+import DeleteIcon from '@mui/icons-material/Delete';
 interface Order {
   id: number;
   customerName: string;
@@ -75,22 +75,16 @@ const IssueAdminPage = () => {
   const [totalIssues, setTotalIssues] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // State cho dialog tạo issue mới
-  const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [newIssue, setNewIssue] = useState({
-    orderId: '',
-    issueName: '',
-    description: ''
-  });
   const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [creatingIssue, setCreatingIssue] = useState(false);
 
   // State cho IssueChat
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [openChat, setOpenChat] = useState(false);
 
-  const [issueImage, setIssueImage] = useState<string | null>(null);
+  // Thêm state cho dialog xác nhận xóa
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [issueToDelete, setIssueToDelete] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -135,16 +129,6 @@ const IssueAdminPage = () => {
     checkAuth();
   }, []);
 
-  // Fetch orders for create issue dialog
-  const fetchOrders = async () => {
-    try {
-      const response = await adminGetOrders();
-      setOrders(response);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    }
-  };
-
   // Handlers
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -158,49 +142,6 @@ const IssueAdminPage = () => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
     setPage(0);
-  };
-
-  const handleOpenCreateDialog = async () => {
-    await fetchOrders();
-    setOpenCreateDialog(true);
-  };
-
-  const handleCloseCreateDialog = () => {
-    setOpenCreateDialog(false);
-    setNewIssue({
-      orderId: '',
-      issueName: '',
-      description: ''
-    });
-  };
-
-  const handleCreateIssue = async () => {
-    if (!newIssue.orderId || !newIssue.issueName || !newIssue.description) {
-      return;
-    }
-
-    setCreatingIssue(true);
-    try {
-      await createIssue({
-        orderId: parseInt(newIssue.orderId),
-        issueName: newIssue.issueName,
-        description: newIssue.description,
-        storeId: user?.id || 0,
-        creatorRole: 'admin',
-        issueImage
-      });
-      
-      // Refresh issues list
-      const response = await getIssuesByStore(user?.id || 0);
-      setIssues(response);
-      setTotalIssues(response.length);
-      
-      handleCloseCreateDialog();
-    } catch (error) {
-      console.error('Error creating issue:', error);
-    } finally {
-      setCreatingIssue(false);
-    }
   };
 
   const handleOpenChat = (issue: Issue) => {
@@ -224,18 +165,39 @@ const IssueAdminPage = () => {
     }).format(date);
   };
 
+  // Sửa hàm handleDeleteIssue để mở dialog xác nhận
+  const handleDeleteClick = (issueId: number) => {
+    setIssueToDelete(issueId);
+    setOpenDeleteDialog(true);
+  };
+  
+  // Hàm xử lý khi người dùng xác nhận xóa
+  const handleConfirmDelete = async () => {
+    if (issueToDelete === null) return;
+    
+    setDeleteLoading(true);
+    try {
+      await deleteIssue(issueToDelete);
+      setIssues(issues.filter((issue) => issue.id !== issueToDelete));
+      setTotalIssues(prevTotal => prevTotal - 1);
+      setOpenDeleteDialog(false);
+    } catch (error) {
+      console.error('Error deleting issue:', error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+  
+  // Hàm xử lý khi người dùng hủy xóa
+  const handleCancelDelete = () => {
+    setOpenDeleteDialog(false);
+    setIssueToDelete(null);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h1">Issue Management</Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          className='bg-[#303030] text-white'
-          onClick={handleOpenCreateDialog}
-        >
-          Create Issue
-        </Button>
       </Box>
 
       <Paper sx={{ mb: 3, p: 2 }}>
@@ -285,9 +247,9 @@ const IssueAdminPage = () => {
               issues.map((issue) => (
                 <TableRow key={issue.id}>
                   <TableCell>{issue.id}</TableCell>
-                  <TableCell>{issue.storeId}</TableCell>
-                  <TableCell>{issue.orderId}</TableCell>
-                  <TableCell>{issue.issueName}</TableCell>
+                  <TableCell>{issue.store_id}</TableCell>
+                  <TableCell>{issue.order_id}</TableCell>
+                  <TableCell>{issue.issue_name}</TableCell>
                   <TableCell>
                     <Chip 
                       label={statusLabels[issue.status] || issue.status} 
@@ -295,8 +257,8 @@ const IssueAdminPage = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>{issue.driver?.name || 'Not accepted'}</TableCell>
-                  <TableCell>{formatDate(issue.createdAt)}</TableCell>
+                  <TableCell>{issue.driver_fullname || 'Not accepted'}</TableCell>
+                  <TableCell>{formatDate(issue.created_at)}</TableCell>
                   <TableCell align="center">
                     <IconButton 
                       className='text-[#303030]'
@@ -305,7 +267,14 @@ const IssueAdminPage = () => {
                     >
                       <QuestionAnswerIcon />
                     </IconButton>
-                      <span>({issue.messageCount})</span>
+                    <span>({issue.message_count})</span>
+                    <IconButton 
+                      className='text-[#303030]'
+                      onClick={() => handleDeleteClick(issue.id)}
+                      title="Delete"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -325,71 +294,6 @@ const IssueAdminPage = () => {
         />
       </TableContainer>
 
-      {/* Dialog tạo vấn đề mới */}
-      <Dialog 
-      open={openCreateDialog} 
-      onClose={handleCloseCreateDialog} 
-      maxWidth="sm" 
-      fullWidth
-      sx={{
-        '& .MuiDialog-paper': {
-          width: '90%',
-          maxWidth: '700px',
-          margin: '0 auto',
-        },
-      }}
-      >
-        <DialogTitle className='text-center'>Create new issue</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-
-            <FormControl fullWidth>
-              <InputLabel id="order-select-label">Order</InputLabel>
-              <Select
-                labelId="order-select-label"
-                value={newIssue.orderId}
-                label="Order"
-                onChange={(e) => setNewIssue({...newIssue, orderId: e.target.value as string})}
-              >
-                {orders.map((order) => (
-                  <MenuItem key={order.id} value={order.id.toString()}>
-                    #{order.id} - {order.customerName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            
-            <TextField
-              label="Issue name"
-              fullWidth
-              value={newIssue.issueName}
-              onChange={(e) => setNewIssue({...newIssue, issueName: e.target.value})}
-            />
-            
-            <TextField
-              label="Description"
-              fullWidth
-              multiline
-              rows={4}
-              value={newIssue.description}
-              onChange={(e) => setNewIssue({...newIssue, description: e.target.value})}
-            />
-
-            <UploadImages setIssueImage={setIssueImage} />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseCreateDialog}>Cancel</Button>
-          <Button 
-            onClick={handleCreateIssue} 
-            variant="contained" 
-            disabled={!newIssue.orderId || !newIssue.issueName || !newIssue.description || creatingIssue}
-          >
-            {creatingIssue ? <CircularProgress size={24} /> : 'Create issue'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Issue Chat Dialog */}
       {selectedIssue && (
         <IssueChat 
@@ -399,6 +303,39 @@ const IssueAdminPage = () => {
           userId={user?.id || 0}
         />
       )}
+
+      {/* Dialog xác nhận xóa */}
+      <Dialog 
+        open={openDeleteDialog} 
+        onClose={handleCancelDelete}
+        PaperProps={{
+          sx: {
+            margin: 'auto',
+            width: { xs: '95%', sm: '80%', md: '50%' },
+            maxWidth: '500px'
+          }
+        }}
+      >
+        <DialogTitle>Confirm delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this issue? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            disabled={deleteLoading}
+            startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+          >
+            {deleteLoading ? "Deleting..." : "Delete"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

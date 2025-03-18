@@ -19,21 +19,22 @@ export enum SenderRole {
 
 export interface Issue {
   id: number;
-  userId: number;
-  orderId: number;
-  storeId: number;
-  driverId?: number;
-  issueName: string;
+  user_id: number;
+  order_id: number;
+  store_id: number;
+  driver_id?: number;
+  driver_fullname?: string;
+  issue_name: string;
   description: string;
   status: IssueStatus;
-  creatorRole: CreatorRole;
-  resolvedAt?: string;
-  issueImageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-  lastMessageAt?: string;
-  lastMessageId?: number;
-  messageCount: number;
+  creator_role: CreatorRole;
+  resolved_at?: string;
+  issue_image_url?: string;
+  created_at: string;
+  updated_at: string;
+  last_message_at?: string;
+  last_message_id?: number;
+  message_count: number;
   store?: {
     id: number;
     name: string;

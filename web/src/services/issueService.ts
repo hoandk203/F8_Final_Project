@@ -47,6 +47,16 @@ export const updateIssue = async ({ id, data }: { id: number, data: any }): Prom
   return response.data;
 };
 
+// Xóa issue
+export const deleteIssue = async (id: number): Promise<void> => {
+  const accessToken = localStorage.getItem("access_token");
+  await axios.delete(`${API_URL}/issues/${id}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+};
+
 // Lấy issues theo cửa hàng
 export const getIssuesByStore = async (storeId: number): Promise<Issue[]> => {
   const accessToken = localStorage.getItem("access_token");

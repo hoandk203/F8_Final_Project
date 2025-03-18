@@ -53,7 +53,9 @@ const DriverHome = () => {
                 // Dispatch action để lấy thông tin profile và lưu vào Redux store
                 if (!user) {
                     const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
-                    
+                    if(userData.user.role !== "driver"){
+                        router.push("/login");
+                    }
                     fetchNearbyOrders();
                     
                     // Lưu driverId vào state và localStorage nếu chưa có
@@ -100,6 +102,11 @@ const DriverHome = () => {
         
         checkAuth();
     }, [dispatch, router, user]);
+
+    // sang component khac roi quay lai thi fetch lai
+    useEffect(() => {
+        fetchNearbyOrders();
+    }, []);
 
     // Thiết lập cập nhật vị trí định kỳ
     useEffect(() => {
