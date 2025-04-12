@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Dialog, DialogActions, DialogTitle } from '@mui/material';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
@@ -15,36 +14,23 @@ interface ProofSubmitedDialogProps {
     handleClose: () => void
     order: any
     stateOrderStatus: string
+    paymentUrl: string
 }
 
-const ProofSubmitedDialog = ({ open, handleClose, order, stateOrderStatus }: ProofSubmitedDialogProps) => {
-  const router = useRouter();
+const ProofSubmitedDialog = ({ open, handleClose, order, stateOrderStatus, paymentUrl }: ProofSubmitedDialogProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleGoHome = () => {
     handleClose();
-    router.push('/driver');
+    window.location.href = "/driver";
   };
   
   const handleGoToPayment = async () => {
     try {
       setIsProcessing(true);
       
-      // Tạo yêu cầu thanh toán
-      const paymentResponse = await createPayment({
-        orderId: order.id,
-        amount: order.amount || 0,
-        method: 'vnpay',
-        returnUrl: `/driver/payment-result?orderId=${order.id}`,
-      });
-      
       // Nếu có payment URL, chuyển hướng người dùng đến trang thanh toán
-      if (paymentResponse.paymentUrl) {
-        window.location.href = paymentResponse.paymentUrl;
-      } else {
-        toast.error('Cannot create payment URL');
-        setIsProcessing(false);
-      }
+      window.location.href = paymentUrl || "";
     } catch (error) {
       console.error('Error initiating payment:', error);
       toast.error('Something went wrong when creating payment');

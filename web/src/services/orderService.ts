@@ -25,6 +25,56 @@ export const getOrders = async () => {
   }
 };
 
+export const getOrderByDriverId = async (driverId: number) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.get(`${API_BASE_URL}/order/driver/${driverId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch orders by driver ID");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
+export const cancelOrder = async (orderId: number, driverId: number) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.put(`${API_BASE_URL}/order/${orderId}/cancel/${driverId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to cancel order");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
+
+
+
+
 export const adminGetOrders = async () => {
   try {
     const accessToken = localStorage.getItem("access_token");
@@ -136,6 +186,29 @@ export const deleteOrder = async (id: number) => {
   } catch (error: any) {
     if (error.response) {
       throw new Error(error.response.data.message || "Failed to delete order");
+    }
+    throw new Error("Server connection error");
+  }
+};
+
+export const getVendorOrders = async (vendorId: number) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+    
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+    
+    const response = await axios.get(`${API_BASE_URL}/order/vendor/${vendorId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch vendor orders");
     }
     throw new Error("Server connection error");
   }

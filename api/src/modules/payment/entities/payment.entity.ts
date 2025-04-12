@@ -57,4 +57,10 @@ export class Payment {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @Column({default: true})
+    active: boolean
+
+    @Column({ nullable: true })
+    paymentUrl: string
 } 

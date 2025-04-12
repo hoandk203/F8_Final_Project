@@ -11,9 +11,10 @@ interface props {
     setProofImage?: (value:any) => void
     setIssueImage?: (value:any) => void
     imageHeight?: string
+    initialImage?: string
 }
 
-const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback, setProofImage, setIssueImage, imageHeight}:props) => {
+const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback, setProofImage, setIssueImage, imageHeight, initialImage}:props) => {
     console.log('UploadImages')
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = React.useState("");
@@ -67,11 +68,14 @@ const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCall
             className={`bg-gray-200 ${imageHeight ? "h-[200px]" : "h-[120px]"} rounded-md border-2 border-gray-300 flex items-center justify-center cursor-pointer`}
             onClick={handleClick}
         >
-            {images
-                ? <img src={images} className="w-full h-full object-cover rounded-md" alt=""/>
-                : <AddAPhotoOutlinedIcon className="text-gray-500"/>
-            }
-
+            
+            {images ? (
+                <img src={images} className="w-full h-full object-cover rounded-md" alt=""/>
+            ) : initialImage && (
+                <img src={initialImage} className="w-full h-full object-cover rounded-md" alt=""/>
+            )}
+            {!images && !initialImage && <AddAPhotoOutlinedIcon className="text-gray-500"/>}
+            
             <input
                 type="file"
                 ref={fileInputRef}

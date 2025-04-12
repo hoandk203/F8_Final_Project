@@ -47,4 +47,36 @@ export class VehicleService extends BaseService{
 
         return await this.vehicleRepository.save(vehicle);
     }
+
+    async getVehicleInfo(driverId: number): Promise<Vehicle> {
+        return await this.vehicleRepository.findOne({ where: { driverId } });
+    }
+
+    async updateVehicle(id: number, data: any): Promise<Vehicle> {
+        const vehicle = await this.vehicleRepository.findOne({ where: { id } });
+        if (!vehicle) {
+            throw new Error('Vehicle not found');
+        }
+
+        let vehicleImageUrl:string
+        let vehicleRCImageUrl:string
+        if(vehicle.vehicleImage !== data.vehicleImage){
+            vehicleImageUrl = await this.saveBase64Image(data.vehicleImage);
+        }
+
+        if(vehicle.vehicleRCImage !== data.vehicleRCImage){
+            vehicleRCImageUrl = await this.saveBase64Image(data.vehicleRCImage);
+        }
+
+        
+        await this.vehicleRepository.update(id, {
+            vehicleImage: vehicleImageUrl,
+            vehicleRCImage: vehicleRCImageUrl,
+            vehiclePlateNumber: data.vehiclePlateNumber,
+            vehicleColor: data.vehicleColor,
+            status: "pending",
+            modifiedAt: new Date(),
+        });
+        return await this.vehicleRepository.findOne({ where: { id } });
+    }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -29,7 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import { getIssuesByStore, createIssue, getIssues, deleteIssue } from '@/services/issueService';
+import { getIssuesByStore, createIssue, getIssues, deleteIssue, searchIssueByName } from '@/services/issueService';
 import { adminGetOrders } from '@/services/orderService';
 import { Issue } from '@/types/issue';
 import IssueChat from '@/components/issues/IssueChat';
@@ -42,10 +42,7 @@ import { fetchUserProfile } from '@/redux/middlewares/authMiddleware';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import DeleteIcon from '@mui/icons-material/Delete';
-interface Order {
-  id: number;
-  customerName: string;
-}
+import { debounce } from 'lodash';
 
 interface User {
   id: number;
@@ -59,10 +56,10 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  'pending': 'Chờ xử lý',
-  'processing': 'Đang xử lý',
-  'resolved': 'Đã giải quyết',
-  'cancelled': 'Đã hủy'
+  'pending': 'Pending',
+  'processing': 'Processing',
+  'resolved': 'Resolved',
+  'cancelled': 'Cancelled'
 };
 
 const IssueAdminPage = () => {
@@ -73,7 +70,6 @@ const IssueAdminPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalIssues, setTotalIssues] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
 
   const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
 
@@ -139,11 +135,6 @@ const IssueAdminPage = () => {
     setPage(0);
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    setPage(0);
-  };
-
   const handleOpenChat = (issue: Issue) => {
     setSelectedIssue(issue);
     setOpenChat(true);
@@ -194,6 +185,24 @@ const IssueAdminPage = () => {
     setIssueToDelete(null);
   };
 
+  const fetchSearch = async (name: string) => {
+    try {
+        const response = await searchIssueByName(name)
+        if(response.data){
+            setIssues(response.data)
+        }
+    }catch (e) {
+        console.log(e)
+        return e
+    }
+  }
+
+  const debounceSearch = useCallback(debounce((nextValue) => fetchSearch(nextValue), 1000), [])
+
+  const handleSearch = (name: any) => {
+      debounceSearch(name)
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -203,12 +212,11 @@ const IssueAdminPage = () => {
       <Paper sx={{ mb: 3, p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <TextField
-            placeholder="Search by ID, issue name..."
+            placeholder="Search by issue name..."
             variant="outlined"
             size="small"
             fullWidth
-            value={searchTerm}
-            onChange={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
             }}
@@ -301,6 +309,7 @@ const IssueAdminPage = () => {
           onClose={handleCloseChat} 
           issue={selectedIssue}
           userId={user?.id || 0}
+          issueDescription={selectedIssue.description}
         />
       )}
 

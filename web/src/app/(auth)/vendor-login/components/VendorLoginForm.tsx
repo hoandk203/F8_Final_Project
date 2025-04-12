@@ -11,6 +11,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CustomButton from "@/components/CustomButton";
 import {loginAPI} from "@/services/authService";
 import {useRouter} from "next/navigation";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 
 const schema = z.object({
@@ -74,6 +75,7 @@ const VendorLoginForm = () => {
 
     return (
         <div>
+            {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor={"email"} className="font-semibold">
@@ -87,6 +89,7 @@ const VendorLoginForm = () => {
                         variant="outlined"
                         error={!!errors.email}
                         helperText={errors.email?.message}
+                        inputRef={(input) => input && (input.tabIndex = 1)}
                     />
                 </div>
                 <div className="flex flex-col gap-y-1">
@@ -116,6 +119,7 @@ const VendorLoginForm = () => {
                                 )
                             }
                         }}
+                        inputRef={(input) => input && (input.tabIndex = 2)}
                     />
                 </div>
                 {error && <p className="text-red-500">{error}</p>}

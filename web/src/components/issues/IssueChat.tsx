@@ -48,6 +48,7 @@ interface IssueProps {
   onClose: () => void;
   issue: Issue;
   userId: number;
+  issueDescription: string;
 }
 
 interface Error {
@@ -62,7 +63,7 @@ interface User {
 }
 
 
-const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
+const IssueChat = ({ open, onClose, issue, userId, issueDescription }: IssueProps) => {
   const [message, setMessage] = useState('');
   const [fileIds, setFileIds] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -129,7 +130,7 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
       const response = await createIssueMessage({
         issueId: issue.id,
         message: messageContent,
-        senderId: user?.user?.id || 0
+        senderId: userId || 0
       });
       
       console.log('API response:', response); // Debug
@@ -209,7 +210,7 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
               </Typography>
             </Box>
             {issue?.issue_image_url && (
-              <Box mt={1}>
+              <Box mt={1} mb={1}>
                 <Typography className="text-end" variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   {new Date(issue.created_at).toLocaleString('vi-VN')}
                 </Typography>
@@ -228,6 +229,9 @@ const IssueChat = ({ open, onClose, issue, userId }: IssueProps) => {
                 />
               </Box>
             )}
+            <Typography variant="body2">
+              {issueDescription}
+            </Typography>
           </DialogTitle>
           <Divider />
           <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>

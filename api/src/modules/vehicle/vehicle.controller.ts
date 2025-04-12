@@ -1,4 +1,4 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, Post, Get, Param, Put} from '@nestjs/common';
 import { VehicleService } from './vehicle.service';
 import {CreateVehicleDto} from "./dto/create-vehicle.dto";
 
@@ -9,5 +9,15 @@ export class VehicleController {
   @Post()
   async create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehicleService.createVehicle(createVehicleDto);
+  }
+
+  @Get('driver/:driverId')
+  async getVehicleInfo(@Param('driverId') driverId: number) {
+    return this.vehicleService.getVehicleInfo(driverId);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() updateVehicleDto: any) {
+    return this.vehicleService.updateVehicle(id, updateVehicleDto);
   }
 }

@@ -23,9 +23,10 @@ interface CustomButtonProps {
     handleStepCompleted?: () => void
     handleProofSubmit?: () => void
     handleGoToPayment?: () => void
+    handleCancelRide?: () => void
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", isLoading, handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep, handleVerifyEmail, handleUploadIdCard, handleDeclineOrder, handleAcceptOrder, handleStatusOnMoving, handleStepCompleted, handleProofSubmit, handleGoToPayment}) => {
+const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disabled, variant= "dark", size= "medium", isLoading, handleCloseDialog, handleOpenDialog, handleVerifyDriverStep, handleVerifyIdStep, handleVerifyEmail, handleUploadIdCard, handleDeclineOrder, handleAcceptOrder, handleStatusOnMoving, handleStepCompleted, handleProofSubmit, handleGoToPayment, handleCancelRide}) => {
     const buttonStyles = {
         dark: {
             backgroundColor: "#303030",
@@ -72,6 +73,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({label, type= "button", disab
         }
         if (handleGoToPayment) {
             handleGoToPayment();
+        }
+        if (handleCancelRide) {
+            handleCancelRide();
         }
     }
     if(isLoading){

@@ -41,6 +41,30 @@ export const createPayment = async (
   }
 };
 
+export const updatePayment = async (
+  paymentId: number,
+  paymentUrl: string
+): Promise<PaymentResponse> => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    
+    const response = await axios.put(`${BASE_URL}/payment/${paymentId}`, {
+      paymentUrl: paymentUrl
+    }, { 
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error updating payment:', error);
+    throw error;
+  }
+};
+
+
+
 export const getPaymentsByOrderId = async (
   orderId: number
 ): Promise<PaymentResponse[]> => {

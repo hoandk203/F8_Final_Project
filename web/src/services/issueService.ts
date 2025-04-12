@@ -57,6 +57,26 @@ export const deleteIssue = async (id: number): Promise<void> => {
   });
 };
 
+export const searchIssueByName = async (name: string): Promise<any> => {
+  const accessToken = localStorage.getItem("access_token");
+  const response = await axios.get(`${API_URL}/issues/search?name=${name}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+  return response;
+};
+
+export const storeSearchIssueByName = async (name: string, storeId: number): Promise<any> => {
+  const accessToken = localStorage.getItem("access_token");
+  const response = await axios.get(`${API_URL}/issues/store/search?name=${name}&storeId=${storeId}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  });
+  return response;
+};
+
 // Lấy issues theo cửa hàng
 export const getIssuesByStore = async (storeId: number): Promise<Issue[]> => {
   const accessToken = localStorage.getItem("access_token");

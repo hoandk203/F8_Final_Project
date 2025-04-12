@@ -5,8 +5,27 @@ import Contact from "@/components/Contact";
 import StepperOrder from "./components/StepperOrder";
 import OrderInfo from "@/components/OrderInfo";
 import ActionOrder from "./components/ActionOrder";
+import { RootState } from "@/redux/store";
+import { AppDispatch } from "@/redux/store";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface User {
+}
 
 const OrderStatusPage = () => {
+    const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const { user, isAuthenticated } = useSelector((state: RootState) => state.auth as { user: User | null, isAuthenticated: boolean });
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            router.push("/login");
+        }
+    }, [isAuthenticated, router]);
+
     return (
         <>
             <div className="container mx-auto h-screen">

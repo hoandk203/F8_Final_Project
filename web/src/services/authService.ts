@@ -140,7 +140,7 @@ export const updateUserProfile = async (profileData: any) => {
       throw new Error("Authentication required");
     }
     
-    const response = await axios.put(`${API_BASE_URL}/auth/profile`, profileData, {
+    const response = await axios.put(`${API_BASE_URL}/auth/update-profile`, profileData, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -177,3 +177,19 @@ export const changePassword = async (data: { oldPassword: string; newPassword: s
     throw new Error("Server connection error");
   }
 };
+
+export const resetPassword = async (userData: any) => {
+    try {
+        const response= await axios.post(`${API_BASE_URL}/auth/reset-password`, userData, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        return response.data
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}

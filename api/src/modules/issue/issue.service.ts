@@ -103,6 +103,35 @@ export class IssueService extends BaseService {
         });
     }
 
+    async adminSearchIssueByName(name: string): Promise<any> {
+        const issues = await this.issueRepository
+        .createQueryBuilder('issue')
+        .select([
+            'issue.*',
+        ])
+        .where("lower(issue.issue_name) LIKE :name", {name: `%${name.toLowerCase()}%`})
+        .andWhere('issue.active = :active', { active: true })
+        .orderBy('issue.created_at', 'DESC')
+        .getRawMany();
+
+        return issues;
+    }
+
+    async storeSearchIssueByName(name: string, storeId: number): Promise<any> {
+        const issues = await this.issueRepository
+        .createQueryBuilder('issue')
+        .select([
+            'issue.*',
+        ])
+        .where("lower(issue.issue_name) LIKE :name", {name: `%${name.toLowerCase()}%`})
+        .andWhere('issue.active = :active', { active: true })
+        .andWhere('issue.store_id = :storeId', { storeId })
+        .orderBy('issue.created_at', 'DESC')
+        .getRawMany();
+
+        return issues;
+    }
+
     async findByStore(storeId: number): Promise<any[]> {
         const issues = await this.issueRepository
         .createQueryBuilder('issue')

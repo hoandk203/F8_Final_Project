@@ -22,13 +22,18 @@ export class UsersService extends BaseService{
 
   // SEND MAIL
   async sendMail(data: any) {
-    const {email, resend}= data
-
+    const {email, resend, changePassword}= data
     //check email already exist
-    if(!resend){
+    if(!resend && !changePassword){
       const userExist = await this.userRepository.findOne({ where: { email } });
       if (userExist) {
         throw new ConflictException('Email already registered');
+      }
+    }
+    if(changePassword){
+      const userExist = await this.userRepository.findOne({ where: { email } });
+      if (!userExist) {
+        throw new ConflictException('Email not exist');
       }
     }
 
@@ -111,9 +116,8 @@ export class UsersService extends BaseService{
     if(validateOtp){
 
       if(role === "store"){
-        const passwordRandom = Math.random().toString(36).slice(-8) + "Aa1@";
+        const passwordRandom = Math.random().toString(36).slice(-8) + "@Scrap1";
         data.password = passwordRandom;
-        console.log(data.password)
         await this.mailerService.sendMail({
           from: "hoanyttv@gmail.com",
           to: email,
@@ -263,5 +267,16 @@ export class UsersService extends BaseService{
             modifiedAt: new Date()
         }
     );
+  }
+
+  async resetPassword(userId: number, password: string) {
+    await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({password, modifiedAt: new Date()})
+        .where("id = :userId", {userId})
+        .execute()
+    
+    
   }
 }

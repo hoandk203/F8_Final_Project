@@ -1,16 +1,26 @@
-import {Injectable, UnauthorizedException, BadRequestException} from '@nestjs/common';
+import {Injectable, UnauthorizedException, BadRequestException, ConflictException} from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt'
 import {RefreshTokenService} from "../refresh-token/refresh-token.service";
 import { v4 as uuidv4 } from 'uuid';
-
+import { OtpService } from '../email-verification/otp.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import { userInfo } from 'os';
+import { StoreService } from '../store/store.service';
+import { VendorService } from '../vendor/vendor.service';
+import { DriverService } from '../driver/driver.service';
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UsersService,
+        private readonly storeService: StoreService,
+        private readonly vendorService: VendorService,
+        private readonly driverService: DriverService,
         private readonly jwtService: JwtService,
-        private readonly refreshTokenService: RefreshTokenService
+        private readonly refreshTokenService: RefreshTokenService,
+        private readonly otpService: OtpService,
+        private readonly mailerService: MailerService
     ) {}
 
     async login(user: any){
@@ -115,6 +125,8 @@ export class AuthService {
     async changePassword(userId: number, oldPassword: string, newPassword: string) {
         // Lấy thông tin user từ database
         const user = await this.userService.getOne(userId);
+        console.log(user);
+        
         if (!user) {
             throw new UnauthorizedException('User not found');
         }
@@ -141,4 +153,106 @@ export class AuthService {
             message: 'Password changed successfully'
         };
     }
+
+    async resetPassword(data: any) {
+        const user= await this.userService.getByEmail(data.email)
+        const userId= user.id
+    
+        const validateOtp= await this.otpService.validateOtp(data.email, data.otp)
+    
+        if(validateOtp){
+            const passwordRandom = Math.random().toString(36).slice(-8) + "@Scrap1";
+            await this.mailerService.sendMail({
+              from: "hoanyttv@gmail.com",
+              to: data.email,
+              subject: "Password for Scrap Plan",
+              html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Reset Password</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+        
+                    .wrapper{
+                        margin: 0 auto;
+                        background-color: rgb(33, 36, 41);
+                        padding: 50px;
+                        width: 700px;
+                    }
+        
+                    .container {
+                        background-color: #ffffff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        font-size: 16px;
+                    }
+                    p {
+                        color: #555555;
+                        line-height: 1.6;
+                    }
+                    .otp-code {
+                        font-size: 24px;
+                        margin: 20px 0;
+                    }
+                    .note {
+                        color: #777;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="wrapper">
+                    <div class="container">
+                        <p class="dear">Dear ${data.email},</p>
+                        <div class="otp-code">Your Password: <b>${passwordRandom}</b></div>
+                        <p class="note">Thank you for using our service.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+          `
+            })
+    
+          
+          
+          //hash password
+          data.password  = await bcrypt.hash(passwordRandom, 10);
+          await this.userService.resetPassword(userId, data.password)
+    
+          return {...data, role: user.role}
+        }
+    
+        throw new UnauthorizedException('Invalid OTP code');
+      }
+
+      async updateProfile(user: any, data: any) {
+        const userInfo= await this.userService.getOne(user.id)
+        if(userInfo.role === 'store'){
+            const store= await this.storeService.getStoreIdByUserId(userInfo.id)
+            if(store){
+                await this.storeService.updateOne(store.id, {...data, modifiedAt: new Date()})
+            }
+        }
+        if(userInfo.role === 'vendor'){
+            const vendor= await this.vendorService.getVendorbyUserId(userInfo.id)
+            if(vendor){
+                await this.vendorService.updateOne(vendor.id, {...data, modifiedAt: new Date()})
+            }
+        }
+        if(userInfo.role === 'driver'){
+            const driver= await this.driverService.getByUserId(userInfo.id)
+            if(driver){
+                await this.driverService.updateOne(driver.id, {...data, modifiedAt: new Date()})
+            }
+        }
+        
+      }
 }

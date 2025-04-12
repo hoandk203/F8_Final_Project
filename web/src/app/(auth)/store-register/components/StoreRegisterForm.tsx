@@ -8,6 +8,7 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import { sendVerificationEmail } from "@/services/authService";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const schema = z.object({
     email: z
@@ -53,6 +54,7 @@ const StoreRegisterForm = () => {
 
     return (
         <div>
+            {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor="email" className="font-semibold">

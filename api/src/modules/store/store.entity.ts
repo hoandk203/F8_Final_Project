@@ -21,4 +21,7 @@ export class Store extends Info{
     
     @Column({name: "completed_order", default: 0})
     completedOrder: number
+
+    @Column({name: "status", default: "pending"})
+    status: "pending" | "approved"
 }

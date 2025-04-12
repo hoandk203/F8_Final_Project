@@ -11,11 +11,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useRouter, useParams } from "next/navigation";
 import { refreshToken } from "@/services/authService";
-import { getOrderById, updateOrder } from "@/services/orderService";
+import { getOrderById, updateOrder, cancelOrder } from "@/services/orderService";
 import { stepOrderSlice } from '@/redux/slice/stepOrderSlice';
 import UploadImages from "@/components/UploadImages";
 import ProofSubmitedDialog from "../components/ProofSubmitedDialog";
 import { updateDriver } from "@/services/driverService";
+import axios from "axios";
+import { createPayment, updatePayment } from "@/services/paymentService";
 
 
 interface Order {
@@ -25,6 +27,7 @@ interface Order {
     orderDetails: any[];
     status: string;
     driverId: number;
+    amount: number;
 }
 
 const OrderDetailPage = () => {
@@ -37,6 +40,7 @@ const OrderDetailPage = () => {
     const [proofImage, setProofImage] = useState<string | null>(null)
     const [openProofSubmitedDialog, setOpenProofSubmitedDialog] = useState(false)
     const [stateOrderStatus, setStateOrderStatus] = useState("")
+    const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
     useEffect(() => {
         const checkAuth= async () => {
             const accessToken= localStorage.getItem("access_token")
@@ -111,6 +115,19 @@ const OrderDetailPage = () => {
         try {
             await updateOrder(Number(id), {status: "completed", proofImage: proofImage})
             await updateDriver(order?.driverId || 0, {status: "idle"})
+            // Tạo yêu cầu thanh toán
+            const paymentResponse = await createPayment({
+                orderId: order?.id || 0,
+                amount: order?.amount || 0,
+                method: 'vnpay',
+                returnUrl: `/driver/payment-result?orderId=${order?.id}`,
+            });
+            setPaymentUrl(paymentResponse.paymentUrl || "")
+            try {
+                await updatePayment(paymentResponse.id, paymentResponse.paymentUrl || "")
+            } catch (error) {
+                console.log(error)
+            }
             dispatch(stepOrderSlice.actions.setStep(3))
             setOpenProofSubmitedDialog(true)
             setStateOrderStatus("completed")
@@ -123,10 +140,24 @@ const OrderDetailPage = () => {
         setOpenProofSubmitedDialog(false)
     }
 
+    const handleCancelRide = async () => {
+        try {
+            if (!order?.driverId) {
+                console.error("Driver ID not found");
+                return;
+            }
+            
+            await cancelOrder(Number(id), Number(order.driverId));
+            router.push("/driver");
+        } catch (error) {
+            console.error("Error canceling ride:", error);
+        }
+    }
+
     if(step === 3){
         return (
             <div className="container">
-                <ProofSubmitedDialog order={order} stateOrderStatus={stateOrderStatus} open={openProofSubmitedDialog} handleClose={handleCloseProofSubmitedDialog}/>
+                <ProofSubmitedDialog paymentUrl={paymentUrl || ""} order={order} stateOrderStatus={stateOrderStatus} open={openProofSubmitedDialog} handleClose={handleCloseProofSubmitedDialog}/>
             </div>
         )
     }
@@ -155,7 +186,7 @@ const OrderDetailPage = () => {
                             {step === 0 && <CustomButton label="Mask as moving" variant="dark" size="medium" handleStatusOnMoving={handleStatusOnMoving}/>}
                             {step === 1 && <CustomButton label="Completed" variant="dark" size="medium" handleStepCompleted={handleStepCompleted}/>}
                             {step === 2 && <CustomButton label="Proof Submit" variant="dark" size="medium" handleProofSubmit={handleProofSubmit}/>}
-                            <CustomButton label="Cancel ride" variant="light" size="medium"/>
+                            <CustomButton handleCancelRide={handleCancelRide} label="Cancel ride" variant="light" size="medium"/>
                         </div>
                         <Contact/>
                     </div>

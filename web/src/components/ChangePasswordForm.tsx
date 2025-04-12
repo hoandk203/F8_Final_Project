@@ -26,8 +26,8 @@ const schema = z
       .string()
       .min(1, { message: "New password is required" })
       .min(8, { message: "Password must be at least 8 characters" })
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, {
-        message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/, {
+        message: "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character",
       }),
     confirmPassword: z.string().min(1, { message: "Confirm password is required" }),
   })
@@ -108,6 +108,7 @@ const ChangePasswordForm = () => {
               fullWidth
               error={!!errors.currentPassword}
               helperText={errors.currentPassword?.message}
+              inputRef={(input) => input && (input.tabIndex = 1)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -131,6 +132,7 @@ const ChangePasswordForm = () => {
               fullWidth
               error={!!errors.newPassword}
               helperText={errors.newPassword?.message}
+              inputRef={(input) => input && (input.tabIndex = 2)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -154,6 +156,7 @@ const ChangePasswordForm = () => {
               fullWidth
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              inputRef={(input) => input && (input.tabIndex = 3)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -173,6 +176,7 @@ const ChangePasswordForm = () => {
             type="submit"
             variant="contained"
             color="primary"
+            className="bg-[#303030] text-white"
             disabled={isSubmitting}
             startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
           >

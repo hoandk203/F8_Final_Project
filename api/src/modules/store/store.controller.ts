@@ -7,10 +7,12 @@ import {
     Put,
     Delete,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto, UpdateStoreDto } from './dto/create-store.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 
 @ApiTags('store')
 @Controller('store')
@@ -45,5 +47,10 @@ export class StoreController {
     @Delete(':id')
     delete(@Param('id') id: number) {
         return this.storeService.softDelete(Number(id));
+    }
+
+    @Get('vendor/:vendorId')
+    async getStoresByVendorId(@Param('vendorId') vendorId: number) {
+        return this.storeService.getStoresByVendorId(vendorId);
     }
 }

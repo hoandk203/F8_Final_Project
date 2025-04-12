@@ -3,6 +3,7 @@ import { Repository } from "typeorm";
 import { Store } from "./store.entity";
 import { BaseService } from "../base/base.service";
 import { Vendor } from "../vendor/vendor.entity";
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class StoreService extends BaseService {
@@ -28,6 +29,30 @@ export class StoreService extends BaseService {
 
     async create(store: any) {
         return this.storeRepository.save(store);
+    }
+
+    async updateOne(id: number, data: any) {
+        try {
+            // Cập nhật dữ liệu
+            await this.storeRepository.update(id, {
+                ...data,
+                modifiedAt: new Date()
+            });
+            
+            // Trả về kết quả cập nhật
+            const updatedStore = await this.storeRepository
+            .createQueryBuilder("store")
+            .select([
+                "store.*"
+            ])
+            .where("store.id = :id", { id })
+            .getRawOne();
+
+            return updatedStore;
+        } catch (error) {
+            console.error('Error updating store:', error);
+            throw new BadRequestException('Failed to update store');
+        }
     }
 
     handleOrder(query) {
@@ -73,5 +98,21 @@ export class StoreService extends BaseService {
             .createQueryBuilder("store")
             .where("store.id = :storeId", {storeId})
             .getOne();
+    }
+
+    async getStoresByVendorId(vendorId: number) {
+        try {
+            return this.storeRepository
+            .createQueryBuilder("store")
+            .select([
+                "store.*",
+            ])
+            .where("store.vendor_id = :vendorId", {vendorId})
+            .andWhere("store.active = :active", {active: true})
+            .getRawMany();
+        } catch (error) {
+            console.error('Error getting stores by vendor ID:', error);
+            throw new BadRequestException('Failed to get stores by vendor ID');
+        }
     }
 }

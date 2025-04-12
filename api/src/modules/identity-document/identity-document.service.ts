@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {BaseService} from "../base/base.service";
-import {Repository} from "typeorm";
+import {Repository, UpdateResult} from "typeorm";
 import {IdentityDocument} from "./entities/identity-document.entity";
 import {v4} from "uuid";
 import {writeFile} from "fs";
@@ -44,5 +44,31 @@ export class IdentityDocumentService extends BaseService{
         });
 
         return await this.identityDocumentRepository.save(identityDocument);
+    }
+
+    async getIdentityDocument(userId: number): Promise<IdentityDocument> {
+        return await this.identityDocumentRepository.findOne({ where: { userId } });
+    }
+    
+    async updateIdentityDocument(id: number, data: any): Promise<IdentityDocument> {
+        const identityDocument= await this.identityDocumentRepository.findOne({ where: { id } });
+        
+        let frontImageUrl:string
+        let backImageUrl:string
+        if(identityDocument.frontImageUrl !==data.frontImageUrl){
+            frontImageUrl = await this.saveBase64Image(data.frontImageUrl);
+        }
+        if(identityDocument.backImageUrl !==data.backImageUrl){
+            backImageUrl = await this.saveBase64Image(data.backImageUrl);
+        }
+
+        await this.identityDocumentRepository.update(id, {
+            frontImageUrl,
+            backImageUrl,
+            status: "pending",
+            modifiedAt: new Date(),
+        });
+
+        return await this.identityDocumentRepository.findOne({ where: { id } });
     }
 }

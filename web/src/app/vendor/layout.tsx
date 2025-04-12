@@ -3,12 +3,20 @@
 import React, {useState} from "react";
 import StoreSidebar from "../store/components/StoreSidebar";
 import StoreHeader from "../store/components/StoreHeader";
-import store from "@/redux/store";
 import { usePathname } from "next/navigation";
 
 
-const StoreLayout = ({children}: {children: React.ReactNode}) => {
+const VendorLayout = ({children}: {children: React.ReactNode}) => {
     const [showSidebar, setShowSidebar] = useState(false);
+    const pathname = usePathname();
+    if (pathname.includes("/vendor/verify-vendor")) {
+        return (
+            <div>
+                {children}
+            </div>
+        )
+    }
+
 
     return (
         <div>
@@ -30,4 +38,4 @@ const StoreLayout = ({children}: {children: React.ReactNode}) => {
     )
 }
 
-export default StoreLayout
+export default VendorLayout

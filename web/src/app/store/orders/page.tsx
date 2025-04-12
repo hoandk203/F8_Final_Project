@@ -28,7 +28,7 @@ import { refreshToken } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-
+import LoadingOverlay from "@/components/LoadingOverlay";
 interface Order {
   id: number;
   store_id: number;
@@ -203,9 +203,7 @@ const OrdersPage = () => {
       )}
 
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <CircularProgress />
-        </Box>
+        <LoadingOverlay/>
       ) : orders.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="body1">No orders found</Typography>

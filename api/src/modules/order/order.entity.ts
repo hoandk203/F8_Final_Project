@@ -25,7 +25,7 @@ export class Order extends Base{
         name: "status",
         default: "pending"
     })
-    status: "pending" | "accepted" | "on moving" | "completed" | "cancelled"
+    status: "pending" | "accepted" | "on moving" | "completed" | "canceled"
 
     @Column({
         name: "scrap_image_url",
@@ -46,6 +46,15 @@ export class Order extends Base{
         default: []
     })
     declinedDriverId: number[]
+
+    @Column({
+        name: "canceled_driver_id",
+        type: "integer",
+        array: true,
+        nullable: true,
+        default: []
+    })
+    canceledDriverId: number[]
 
     @Column({
         name: "staff_id",

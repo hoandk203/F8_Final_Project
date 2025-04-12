@@ -7,15 +7,18 @@ import CustomButton from "@/components/CustomButton";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
-import {createVendor, sendVerificationEmail, verifyEmail} from "@/services/authService";
+import {createVendor, resetPassword, sendVerificationEmail, verifyEmail} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import LoadingOverlay from "./LoadingOverlay";
 
 interface VerifyEmailProps {
     stepVerifyStore?: (step: number) => void;
+    email?: string;
+    changePassword?: boolean;
 }
 
-const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
+const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps) => {
     const router= useRouter()
     const dispatch= useDispatch<AppDispatch>()
     const [otp, setOtp] = useState('');
@@ -29,45 +32,65 @@ const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
         setOtp(otp)
     }
 
-    
-
     const handleVerifyEmail = async () => {
-        setIsLoading(true)
-        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-        
-        try {
-            const response= await verifyEmail({...userData, otp: otp})
-            
-            if(userData.role === "vendor"){
-                try {
-                    const vendorData= {
-                        userId: response.id,
-                        name: userData.name,
-                        email: userData.email
+        if(!changePassword){
+            setIsLoading(true)
+            const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+
+            try {
+                const response= await verifyEmail({...userData, otp: otp})
+                
+                if(userData.role === "vendor"){
+                    try {
+                        const vendorData= {
+                            userId: response.id,
+                            name: userData.name,
+                            email: userData.email
+                        }
+                        await createVendor(vendorData)
+                        localStorage.removeItem("userData")
+                        router.push("/vendor-login")
+                        setIsLoading(false)
+                    } catch (error: any) {
+                        setIsLoading(false)
+                        console.log(1);
+                        
+                        setError(error.message)
                     }
-                    await createVendor(vendorData)
-                    localStorage.removeItem("userData")
-                    router.push("/vendor")
-                    setIsLoading(false)
-                } catch (error: any) {
-                    setIsLoading(false)
-                    setError(error.message)
                 }
-            }
 
-            // lay userId cho vao verifyIdentity
-            localStorage.setItem("userId", JSON.stringify(response.id));
+                // lay userId cho vao verifyIdentity
+                localStorage.setItem("userId", JSON.stringify(response.id));
 
-            setIsLoading(false)
-            if (stepVerifyStore) {
-                stepVerifyStore(1)
+                setIsLoading(false)
+                if (stepVerifyStore) {
+                    stepVerifyStore(1)
+                }
+                dispatch(setVerifyDriverStep(1))
+                // xoa localStorage khi verify thanh cong
+                localStorage.removeItem("userData")
+            } catch (error: any) {
+                setIsLoading(false)
+                setError(error.message)
             }
-            dispatch(setVerifyDriverStep(1))
-            // xoa localStorage khi verify thanh cong
-            localStorage.removeItem("userData")
-        } catch (error: any) {
-            setIsLoading(false)
-            setError(error.message)
+        }else{
+            try {
+                setIsLoading(true)
+                const response= await resetPassword({email, otp})
+                if(response.role === "vendor"){
+                    router.push("/vendor-login")
+                }else if(response.role === "store"){
+                    router.push("/store-login")
+                }else if(response.role === "admin"){
+                    router.push("/admin-login")
+                }else {
+                    router.push("/login")
+                }
+                localStorage.removeItem("userData")
+            } catch (error: any) {
+                setIsLoading(false)
+                setError(error.message)
+            }
         }
     }
 
@@ -114,8 +137,22 @@ const VerifyEmail = ({stepVerifyStore}: VerifyEmailProps) => {
 
     return (
         <>
+            {isResending && <LoadingOverlay/>}
             <h1 className="text-3xl font-bold mb-1">Verify your email</h1>
-            <p className="text-[#666]">Enter the 6-digit code we sent to h*******@gmail.com</p>
+            <p className="text-[#666]">Enter the 6-digit code we sent to {
+                (() => {
+                    const emailValue = email || JSON.parse(localStorage.getItem("userData") || "{}").email || "";
+                    if (!emailValue) return "";
+                    const atIndex = emailValue.indexOf('@');
+                    if (atIndex <= 0) return emailValue;
+                    const username = emailValue.substring(0, atIndex);
+                    const domain = emailValue.substring(atIndex);
+                    const maskedUsername = username.length <= 4 
+                        ? "****" 
+                        : username.substring(0, username.length - 4) + "****";
+                    return maskedUsername + domain;
+                })()
+            }</p>
 
             <div className={"flex justify-center gap-2 mt-8"}><OTPInput changeOtp={changeOtp}/></div>
             {error && <p className="text-red-500 mt-4">{error}</p>}

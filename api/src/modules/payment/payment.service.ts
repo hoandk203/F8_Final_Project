@@ -7,7 +7,7 @@ import { VnpayCallbackDto } from './dto/vnpay-callback.dto';
 import * as crypto from 'crypto';
 import * as moment from 'moment';
 import * as querystring from 'querystring';
-
+import { OrderService } from '../order/order.service';
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
@@ -16,6 +16,7 @@ export class PaymentService {
     @Inject('PAYMENT_REPOSITORY')
     private paymentRepository: Repository<Payment>,
     private configService: ConfigService,
+    private orderService: OrderService,
   ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
@@ -259,5 +260,31 @@ export class PaymentService {
     }
     
     return sorted;
+  }
+
+  async getUnpaidPaymentsByDriver(driverId: number) {
+    const orders = await this.orderService.getByDriverId(driverId);
+
+    let payment: any;
+
+    for (const order of orders) {
+      payment = await this.paymentRepository.findOne({
+        where: { status: PaymentStatus.PENDING, orderId: order.id, active: true }
+      });
+      if (payment) {
+        break;
+      }
+    }
+    
+    return payment;
+  }
+
+  async update(id: number, paymentUrl: string) {
+    return this.paymentRepository
+    .createQueryBuilder()
+    .update(Payment)
+    .set({paymentUrl: paymentUrl})
+    .where("id = :id", { id })
+    .execute();
   }
 }

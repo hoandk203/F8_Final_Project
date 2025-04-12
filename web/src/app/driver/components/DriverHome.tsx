@@ -3,14 +3,17 @@
 import Statistics from "@/components/Statistics";
 import OrderManager from "@/components/OrderManager";
 import DriverBottomNav from "./DriverBottomNav";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { refreshToken } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { AppDispatch, RootState } from "@/redux/store";
-import { updateDriverLocation, getNearbyOrders } from "@/services/driverService";
-import { Alert, Snackbar, CircularProgress } from "@mui/material";
+import { updateDriverLocation, getNearbyOrders, getUnpaidPayments } from "@/services/driverService";
+import { createPayment } from "@/services/paymentService";
+import { Alert, Snackbar, CircularProgress, Button } from "@mui/material";
+import PaymentIcon from '@mui/icons-material/Payment';
+import { toast } from 'react-toastify';
 
 interface User {
     id: number;
@@ -40,7 +43,13 @@ const DriverHome = () => {
     const [nearbyOrders, setNearbyOrders] = useState<Order[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
     const [ordersError, setOrdersError] = useState("");
-
+    
+    // Thêm state cho thanh toán chưa hoàn thành
+    const [unpaidAmount, setUnpaidAmount] = useState(0);
+    const [hasUnpaidOrders, setHasUnpaidOrders] = useState(false);
+    const [loadingPayment, setLoadingPayment] = useState(false);
+    const [orderUnpaidId, setOrderUnpaidId] = useState(0);
+    const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
     useEffect(() => {
         const checkAuth = async () => {
             const accessToken = localStorage.getItem("access_token");
@@ -54,19 +63,28 @@ const DriverHome = () => {
                 if (!user) {
                     const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
                     if(userData.user.role !== "driver"){
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("refresh_token");
+                        localStorage.removeItem("driverId");
                         router.push("/login");
                     }
-                    fetchNearbyOrders();
                     
                     // Lưu driverId vào state và localStorage nếu chưa có
                     if (userData && userData.id) {
                         setDriverId(userData.id);
                         localStorage.setItem("driverId", userData.id.toString());
+                        
+                        // Gọi API để lấy thông tin thanh toán chưa hoàn thành
+                        fetchUnpaidPayments();
+                        fetchNearbyOrders();
                     }
                 } else if (user.id) {
                     // Nếu đã có user trong Redux store, lấy ID từ đó
                     setDriverId(user.id);
                     localStorage.setItem("driverId", user.id.toString());
+                    
+                    // Gọi API để lấy thông tin thanh toán chưa hoàn thành
+                    fetchUnpaidPayments();
                 }
             } catch (err: any) {
                 
@@ -106,6 +124,7 @@ const DriverHome = () => {
     // sang component khac roi quay lai thi fetch lai
     useEffect(() => {
         fetchNearbyOrders();
+        fetchUnpaidPayments();
     }, []);
 
     // Thiết lập cập nhật vị trí định kỳ
@@ -191,7 +210,7 @@ const DriverHome = () => {
                     }
                 },
                 (error) => {
-                    console.error("Error getting current position:", error);
+                    console.log("Error getting current position:", error);
                     setLocationUpdateError(`Error getting position: ${error.message}`);
                     setShowLocationError(true);
                 },
@@ -259,10 +278,55 @@ const DriverHome = () => {
             setNearbyOrders(orders);
             
         } catch (err: any) {
-            console.error("Error fetching nearby orders:", err);
+            console.log("Error fetching nearby orders:", err);
             setOrdersError(err.message || "Không thể lấy danh sách đơn hàng gần đây");
         } finally {
             setLoadingOrders(false);
+        }
+    };
+
+    // Thêm hàm để lấy thông tin thanh toán chưa hoàn thành
+    const fetchUnpaidPayments = async () => {
+        try {
+            if (!driverId) return;
+            
+            const payment = await getUnpaidPayments(driverId);
+            
+            if (payment) {
+                const amount = payment.amount;
+                setOrderUnpaidId(payment.orderId);
+                setUnpaidAmount(amount);
+                setPaymentUrl(payment.paymentUrl);
+                setHasUnpaidOrders(true);
+            } else {
+                setUnpaidAmount(0);
+                setHasUnpaidOrders(false);
+            }
+        } catch (error) {
+            console.error("Error fetching unpaid payments:", error);
+        }
+    };
+
+    const handlePayment = async () => {
+        try {
+            setLoadingPayment(true);
+            
+            if (!driverId) {
+                toast.error("Không thể xác định ID tài xế");
+                return;
+            }
+            
+            // Nếu có payment URL, chuyển hướng người dùng đến trang thanh toán
+            if (paymentUrl) {
+                window.location.href = paymentUrl;
+            } else {
+                toast.error('Không thể tạo URL thanh toán');
+            }
+        } catch (error) {
+            console.error('Error initiating payment:', error);
+            toast.error('Đã xảy ra lỗi khi tạo thanh toán');
+        } finally {
+            setLoadingPayment(false);
         }
     };
 
@@ -276,17 +340,29 @@ const DriverHome = () => {
                 <div>
                     <h1 className="text-2xl mb-1">Welcome, {driverName}</h1>
                 </div>
-                <Statistics />
-                <div className="text-[14px]">
-                    <span>2.894 dollars</span>
-                    <span className="text-[#666] mx-2">can be</span>
-                    <button>Withdraw</button>
-                </div>
+                <Statistics driverId={driverId || 0}/>
+                
+                
             </div>
             <div className="px-4 text-[14px] font-medium pt-6 pb-4">
                 {loadingOrders ? (
                     <div className="flex justify-center py-4">
                         <CircularProgress size={30} />
+                    </div>
+                ) : hasUnpaidOrders ? (
+                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-center">
+                        <p className="text-yellow-700 mb-2">You have a pending <span className="text-[16px]font-bold">${unpaidAmount.toLocaleString()}</span> payment.</p>
+                        <p className="text-gray-600 text-sm mb-4">Please pay to continue receiving new orders</p>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<PaymentIcon />}
+                            onClick={handlePayment}
+                            disabled={loadingPayment}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {loadingPayment ? <CircularProgress size={24} /> : "Payment"}
+                        </Button>
                     </div>
                 ) : (
                     <OrderManager

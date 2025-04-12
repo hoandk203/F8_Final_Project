@@ -23,7 +23,7 @@ const DriverBottomNav = () => {
           }`}
         >
           <HomeIcon className="mb-1" fontSize="medium" />
-          <span className="text-xs">Trang chủ</span>
+          <span className="text-xs">Home</span>
         </button>
         
         <button 
@@ -33,7 +33,7 @@ const DriverBottomNav = () => {
           }`}
         >
           <NotificationsIcon className="mb-1" fontSize="medium" />
-          <span className="text-xs">Thông báo</span>
+          <span className="text-xs">Notifications</span>
         </button>
         
         <button 
@@ -43,7 +43,7 @@ const DriverBottomNav = () => {
           }`}
         >
           <PersonIcon className="mb-1" fontSize="medium" />
-          <span className="text-xs">Hồ sơ</span>
+          <span className="text-xs">Profile</span>
         </button>
       </div>
     </div>

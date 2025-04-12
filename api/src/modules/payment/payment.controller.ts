@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, Res, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Res, Logger, BadRequestException, NotFoundException, Put } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { VnpayCallbackDto } from './dto/vnpay-callback.dto';
@@ -17,6 +17,11 @@ export class PaymentController {
   @Post()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.create(createPaymentDto);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updatePaymentDto: any) {
+    return this.paymentService.update(Number(id), updatePaymentDto.paymentUrl);
   }
 
   @Get()
@@ -66,7 +71,7 @@ export class PaymentController {
         errorRedirectUrl = `${frontendUrl}${errorRedirectUrl}`;
       }
       
-      const encodedMessage = encodeURIComponent(error.message || 'Có lỗi xảy ra khi xử lý thanh toán');
+      const encodedMessage = encodeURIComponent(error.message || 'error while processing payment');
       
       let finalErrorUrl = errorRedirectUrl;
       if (finalErrorUrl.includes('?')) {
@@ -97,5 +102,16 @@ export class PaymentController {
       throw new BadRequestException(`Invalid order ID: ${orderId}`);
     }
     return this.paymentService.findByOrderId(orderIdNum);
+  }
+
+  @Get('driver/:driverId/unpaid')
+  async getUnpaidPaymentsByDriver(@Param('driverId') driverId: string) {
+    const driverIdNum = Number(driverId);
+    
+    if (!driverId || isNaN(driverIdNum) || driverIdNum <= 0) {
+      this.logger.error(`Invalid driver ID received: ${driverId}`);
+      throw new BadRequestException(`Invalid driver ID: ${driverId}`);
+    }
+    return this.paymentService.getUnpaidPaymentsByDriver(driverIdNum);
   }
 }

@@ -7,13 +7,15 @@ import { OrderDetailModule } from '../order-detail/order-detail.module';
 import { MaterialModule } from '../material/material.module';
 import { StoreModule } from '../store/store.module';
 import { StoreLocationModule } from '../store-location/store-location.module';
+import { DriverModule } from '../driver/driver.module';
 @Module({
   imports: [
     DatabaseModule,
     OrderDetailModule,
     MaterialModule,
     StoreLocationModule,
-    StoreModule
+    StoreModule,
+    DriverModule
   ],
   controllers: [OrderController],
   providers: [

@@ -57,7 +57,7 @@ const StorePage = () => {
       setOrders(response || []);
       processOrderData(response);
     } catch (err) {
-      console.error("Failed to fetch orders:", err);
+      console.log("Failed to fetch orders:", err);
     } finally {
       setLoading(false);
     }
@@ -124,6 +124,8 @@ const StorePage = () => {
                 const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
                 if(userData.user.role !== "store"){
                     router.push("/store-login");
+                    localStorage.removeItem("access_token")
+                    localStorage.removeItem("refresh_token")
                 }
             }catch (err: any) {
                 if (err?.message === "Access token expired") {

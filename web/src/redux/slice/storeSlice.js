@@ -10,17 +10,6 @@ export const storeSlice= createSlice({
     name: "store",
     initialState,
     reducers: {
-        // createStore: (state, action) => {
-        //     state.storeList= [action.payload, ...state.storeList]
-        // },
-        // updateStore: (state, action) => {
-        //     state.storeList= state.storeList.map(store => {
-        //         if(store.id === action.payload[0]){
-        //             return action.payload[1]
-        //         }
-        //         return store
-        //     })
-        // },
         softDeleteStore: (state, action) => {
             state.storeList= state.storeList.filter(store => store.id !== action.payload)
         },

@@ -9,7 +9,6 @@ import {
   Grid, 
   Typography, 
   Avatar, 
-  Divider, 
   Button,
   TextField,
   CircularProgress,
@@ -20,12 +19,16 @@ import {
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon, PhotoCamera as PhotoCameraIcon } from "@mui/icons-material";
 import { uploadStoreLogo } from "@/services/storeService";
 import { updateUserProfile } from "@/services/authService";
-import ChangePasswordForm from "./components/ChangePasswordForm";
+import ChangePasswordForm from "@/components/ChangePasswordForm";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateUserProfile as updateUserProfileSlice } from "@/redux/slice/authSlice";
 import { refreshToken } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 interface User {
   email: string;
@@ -37,17 +40,20 @@ interface User {
   created_at: string;
 }
 
-interface StoreProfile {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  city: string;
-  vendorName: string;
-  createdAt: string;
-  logo?: string;
-}
+// Định nghĩa schema validation
+const profileSchema = z.object({
+  name: z.string().min(1, { message: "Store name is required" }),
+  email: z.string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email format" }),
+  phone: z.string()
+    .min(1, { message: "Phone number is required" })
+    .regex(/^[0-9]{10,11}$/, { message: "Phone number must be 10-11 digits" }),
+  city: z.string().min(1, { message: "City is required" }),
+  location: z.string().min(1, { message: "Address is required" }),
+});
+
+type ProfileFormInput = z.infer<typeof profileSchema>;
 
 const StoreProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -55,11 +61,22 @@ const StoreProfilePage = () => {
   const {user, status} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null })
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<User>>(user || {});
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // React Hook Form với Zod resolver
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormInput>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: user || {
+      name: "",
+      email: "",
+      phone: "",
+      city: "",
+      location: ""
+    }
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -100,32 +117,41 @@ const StoreProfilePage = () => {
     checkAuth();
   }, [dispatch, router, user]);
 
-  // Cập nhật formData khi user thay đổi
+  // Cập nhật form khi user thay đổi
   useEffect(() => {
     if (user) {
-      setFormData(user);
+      reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        city: user.city || "",
+        location: user.location || ""
+      });
     }
-  }, [user]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, [user, reset]);
 
   const handleEdit = () => {
     setEditing(true);
   };
 
   const handleCancel = () => {
-    setFormData(user || {});
+    if (user) {
+      reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        city: user.city || "",
+        location: user.location || ""
+      });
+    }
     setEditing(false);
   };
 
-  const handleSave = async () => {
+  const onSubmit = async (data: ProfileFormInput) => {
     try {
       setSaving(true);
-      await updateUserProfile(formData);
-      dispatch(updateUserProfileSlice({ ...user, ...formData }));
+      await updateUserProfile(data);
+      dispatch(updateUserProfileSlice({ ...user, ...data }));
       setEditing(false);
       setSuccessMessage("Profile updated successfully");
       setOpenSnackbar(true);
@@ -177,9 +203,7 @@ const StoreProfilePage = () => {
 
   if (!user) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Alert severity="error">Profile data not found. Please go back to dashboard.</Alert>
-      </Box>
+      <LoadingOverlay/>
     );
   }
 
@@ -196,45 +220,51 @@ const StoreProfilePage = () => {
               <Box sx={{ position: "relative" }}>
                 <Avatar
                   src={"../../user-avatar.jpg"}
-                  sx={{ width: 120, height: 120, mb: 2 }}
+                  sx={{ width: 120, height: 120, mb: 2}}
                 />
                 <input
                   accept="image/*"
-                  style={{ display: "none" }}
-                  id="logo-upload"
+                  style={{ display: "none"}}
+                  id="icon-button-file"
                   type="file"
                   onChange={handleLogoUpload}
-                  disabled={uploadingLogo}
                 />
-                <label htmlFor="logo-upload">
+                <label htmlFor="icon-button-file">
                   <IconButton
+                    color="primary"
+                    aria-label="upload picture"
                     component="span"
                     sx={{
                       position: "absolute",
                       bottom: 10,
                       right: 0,
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.9)" },
+                      color: "black",
+                      backgroundColor: "white",
+                      "&:hover": { backgroundColor: "#f5f5f5" },
                     }}
-                    disabled={uploadingLogo}
                   >
-                    {uploadingLogo ? <CircularProgress size={24} /> : <PhotoCameraIcon />}
+                    {uploadingLogo ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <PhotoCameraIcon />
+                    )}
                   </IconButton>
                 </label>
               </Box>
-              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+
+              <Typography variant="h6" sx={{ mt: 2, fontWeight: "bold" }}>
                 {user?.name}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {user?.vendor_name}
-              </Typography>
               <Typography variant="body2" color="text.secondary">
-                Member since {new Date(user?.created_at || "").toLocaleDateString()}
+                {user?.email}
               </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Joined on {new Date(user?.created_at).toLocaleDateString()}
+              </Typography>
+
+              <ChangePasswordForm />
             </CardContent>
           </Card>
-          
-          <ChangePasswordForm />
         </Grid>
 
         <Grid item xs={12} md={8}>
@@ -246,6 +276,7 @@ const StoreProfilePage = () => {
                 </Typography>
                 {!editing ? (
                   <Button
+                    className="border-[#303030] text-black"
                     startIcon={<EditIcon />}
                     variant="outlined"
                     onClick={handleEdit}
@@ -258,7 +289,8 @@ const StoreProfilePage = () => {
                       startIcon={<SaveIcon />}
                       variant="contained"
                       color="primary"
-                      onClick={handleSave}
+                      className="bg-[#303030] text-white"
+                      onClick={handleSubmit(onSubmit)}
                       disabled={saving}
                       sx={{ mr: 1 }}
                     >
@@ -267,6 +299,7 @@ const StoreProfilePage = () => {
                     <Button
                       startIcon={<CancelIcon />}
                       variant="outlined"
+                      className="border-[#303030] text-black"
                       onClick={handleCancel}
                       disabled={saving}
                     >
@@ -276,116 +309,148 @@ const StoreProfilePage = () => {
                 )}
               </Box>
 
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Store Name
-                  </Typography>
-                  {editing ? (
-                    <TextField
-                      fullWidth
-                      name="name"
-                      value={formData.name || ""}
-                      onChange={handleInputChange}
-                      margin="dense"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {user?.name}
+              <form>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Store Name
                     </Typography>
-                  )}
-                </Grid>
+                    {editing ? (
+                      <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {user?.name}
+                      </Typography>
+                    )}
+                  </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Email
-                  </Typography>
-                  {editing ? (
-                    <TextField
-                      fullWidth
-                      name="email"
-                      value={formData.email || ""}
-                      onChange={handleInputChange}
-                      margin="dense"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {user?.email}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Email
                     </Typography>
-                  )}
-                </Grid>
+                    {editing ? (
+                      <Controller
+                        name="email"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {user?.email}
+                      </Typography>
+                    )}
+                  </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Phone Number
-                  </Typography>
-                  {editing ? (
-                    <TextField
-                      fullWidth
-                      name="phone"
-                      value={formData.phone || ""}
-                      onChange={handleInputChange}
-                      margin="dense"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {user?.phone}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Phone Number
                     </Typography>
-                  )}
-                </Grid>
+                    {editing ? (
+                      <Controller
+                        name="phone"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            error={!!errors.phone}
+                            helperText={errors.phone?.message}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {user?.phone}
+                      </Typography>
+                    )}
+                  </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    City
-                  </Typography>
-                  {editing ? (
-                    <TextField
-                      fullWidth
-                      name="city"
-                      value={formData.city || ""}
-                      onChange={handleInputChange}
-                      margin="dense"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {user?.city}
+                  <Grid item xs={12} sm={6}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      City
                     </Typography>
-                  )}
-                </Grid>
+                    {editing ? (
+                      <Controller
+                        name="city"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            error={!!errors.city}
+                            helperText={errors.city?.message}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {user?.city}
+                      </Typography>
+                    )}
+                  </Grid>
 
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Address
-                  </Typography>
-                  {editing ? (
-                    <TextField
-                      fullWidth
-                      name="location"
-                      value={formData.location || ""}
-                      onChange={handleInputChange}
-                      margin="dense"
-                      size="small"
-                    />
-                  ) : (
-                    <Typography variant="body1" sx={{ mb: 2 }}>
-                      {user?.location}
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Address
                     </Typography>
-                  )}
-                </Grid>
+                    {editing ? (
+                      <Controller
+                        name="location"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            error={!!errors.location}
+                            helperText={errors.location?.message}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {user?.location}
+                      </Typography>
+                    )}
+                  </Grid>
 
-                <Grid item xs={12}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Vendor
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    {user?.vendor_name}
-                  </Typography>
+                  <Grid item xs={12}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Vendor
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      {user?.vendor_name}
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
+              </form>
             </CardContent>
           </Card>
         </Grid>

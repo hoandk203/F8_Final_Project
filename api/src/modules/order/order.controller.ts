@@ -12,6 +12,7 @@ import {
     UseGuards,
     Query,
     BadRequestException,
+    Request,
 } from '@nestjs/common';
 import { CreateDto, UpdateDto } from './order.dto';
 import { OrderService } from './order.service';
@@ -25,6 +26,12 @@ export class OrderController {
         private orderService: OrderService, 
         private storeService: StoreService,
     ) {}
+
+    @Get('vendor/:vendorId')
+    @UseGuards(JwtAuthGuard)
+    async getVendorOrders(@Param('vendorId') vendorId: number) {
+        return this.orderService.findAllByVendorId(vendorId);
+    }
 
     @UseGuards(JwtAuthGuard)
     @Get('/')
@@ -115,5 +122,18 @@ export class OrderController {
         @Param('driverId') driverId: number,
     ) {
         return this.orderService.declineOrder(orderId, driverId);
+    }
+
+    @Put('/:id/cancel/:driverId')
+    async cancelOrder(
+        @Param('id') orderId: number,
+        @Param('driverId') driverId: number,
+    ) {
+        return this.orderService.cancelOrder(orderId, driverId);
+    }
+
+    @Get('/driver/:driverId')
+    async getOrderByDriverId(@Param('driverId') driverId: number) {
+        return this.orderService.getByDriverId(driverId);
     }
 }

@@ -9,6 +9,17 @@ import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 export class IssueController {
     constructor(private readonly issueService: IssueService) {}
 
+
+    @Get('search')
+    search(@Query('name') name: string) {
+        return this.issueService.adminSearchIssueByName(name);
+    }
+
+    @Get('store/search')
+    storeSearch(@Query('name') name: string, @Query('storeId') storeId: string) {
+        return this.issueService.storeSearchIssueByName(name, +storeId);
+    }
+
     @Post()
     create(@Body() createIssueDto: CreateIssueDto) {
         return this.issueService.create(createIssueDto);
@@ -48,4 +59,5 @@ export class IssueController {
     remove(@Param('id') id: string) {
         return this.issueService.remove(+id);
     }
+
 }

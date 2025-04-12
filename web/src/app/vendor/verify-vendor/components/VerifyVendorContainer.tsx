@@ -4,6 +4,7 @@ import VerifyEmail from "@/components/VerifyEmail"
 
 
 const VerifyVendorContainer = () => {
+    
     return (
         <div>
             <VerifyEmail/>

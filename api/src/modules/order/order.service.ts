@@ -13,6 +13,8 @@ import { StoreLocationService } from '../store-location/store-location.service';
 import { Store } from '../store/store.entity';
 import { DataSource } from 'typeorm';
 import { StoreService } from '../store/store.service';
+import { In } from 'typeorm';
+import { DriverService } from '../driver/driver.service';
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -24,9 +26,48 @@ export class OrderService extends BaseService {
         private storeLocationService: StoreLocationService,
         private orderDetailService: OrderDetailService,
         private materialService: MaterialService,
-        private storeService: StoreService
+        private storeService: StoreService,
+        private driverService: DriverService,
     ) {
         super(orderRepository);
+    }
+
+    async findAllByVendorId(vendorId: number) {
+        
+        try {
+            // Lấy tất cả các cửa hàng thuộc vendor bằng storeService
+            const stores = await this.storeService.getStoresByVendorId(vendorId);
+            if (!stores || stores.length === 0) {
+                return [];
+            }
+            
+            const storeIds = stores.map(store => store.id);
+            
+            // Lấy tất cả đơn hàng của các cửa hàng này
+            const orders = await this.orderRepository.find({
+                where: { 
+                    storeId: In(storeIds),
+                    active: true
+                },
+                order: { createdAt: 'DESC' }
+            });
+            
+            // Lấy chi tiết đơn hàng song song
+            const ordersWithDetails = await Promise.all(
+                orders.map(async (order) => {
+                    const orderDetail = await this.orderDetailService.findByOrderId(order.id);
+                    return {
+                        ...order,
+                        orderDetail
+                    };
+                })
+            );
+            
+            return ordersWithDetails;
+        } catch (error) {
+            console.error('Error getting vendor orders:', error);
+            throw new BadRequestException('Failed to get vendor orders');
+        }
     }
 
     async adminGetAll(){
@@ -214,88 +255,106 @@ export class OrderService extends BaseService {
 
     async getNearbyOrders(driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number): Promise<any[]> {
         try {
-            console.log(driverStatus);
+            console.log("Driver status:", driverStatus);
             
             let orderList: any[];
-            if(driverStatus === "idle"){
-                orderList = await this.orderRepository
-                .createQueryBuilder('orders')
-                .where('orders.status = :status', { status: 'pending' })
-                .andWhere('orders.active = :active', { active: true })
-                .andWhere('(orders.declined_driver_id IS NULL OR NOT(:driverId = ANY(orders.declined_driver_id)))', { driverId })
-                .getMany();
-            }else{
-                orderList = await this.orderRepository
-                .createQueryBuilder('orders')
-                .where(new Brackets(qb => {
-                    qb.where('orders.status = :accepted', { accepted: 'accepted' })
-                      .orWhere('orders.status = :onMoving', { onMoving: 'on moving' });
-                }))
-                .andWhere('orders.active = :active', { active: true })
-                .andWhere('orders.driver_id = :driverId', { driverId })
-                .getMany();
-            }
-
-            const storeLocations = await this.storeLocationService.findAll();
-
-            const storeLocationMap = new Map();
-            storeLocations.forEach(location => {
-                storeLocationMap.set(location.storeId, {
-                    latitude: location.latitude,
-                    longitude: location.longitude
-                });
-            });
             
-
-            const nearbyOrders = [];
-            
-            for (const order of orderList) {
-                const storeLocation = storeLocationMap.get(order.storeId);
-                
-                if (storeLocation) {
-                    const distance = this.calculateDistance(
-                        latitude, 
-                        longitude, 
-                        storeLocation.latitude, 
-                        storeLocation.longitude
-                    );
+            // Nếu tài xế đang rảnh (idle), lấy các đơn hàng đang chờ và kiểm tra khoảng cách
+            if (driverStatus === "idle") {
+                orderList = await this.orderRepository
+                    .createQueryBuilder('orders')
+                    .where('orders.status = :status', { status: 'pending' })
+                    .andWhere('orders.active = :active', { active: true })
+                    .andWhere('(orders.declined_driver_id IS NULL OR NOT(:driverId = ANY(orders.declined_driver_id)))', { driverId })
+                    .getMany();
                     
-
-                    if (distance <= radius) {
-                        // Lấy thông tin cửa hàng
+                const storeLocations = await this.storeLocationService.findAll();
+                const storeLocationMap = new Map();
+                storeLocations.forEach(location => {
+                    storeLocationMap.set(location.storeId, {
+                        latitude: location.latitude,
+                        longitude: location.longitude
+                    });
+                });
+                
+                const nearbyOrders = [];
+                
+                for (const order of orderList) {
+                    const storeLocation = storeLocationMap.get(order.storeId);
+                    
+                    if (storeLocation) {
+                        const distance = this.calculateDistance(
+                            latitude, 
+                            longitude, 
+                            storeLocation.latitude, 
+                            storeLocation.longitude
+                        );
+                        
+                        if (distance <= radius) {
+                            // Lấy thông tin cửa hàng
+                            const store = await this.getStoreInfo(order.storeId);
+                            
+                            // Lấy chi tiết đơn hàng
+                            const orderDetails = await this.orderDetailService.findByOrderId(order.id);
+                            
+                            nearbyOrders.push({
+                                ...order,
+                                store,
+                                distance: parseFloat(distance.toFixed(2)), // Làm tròn đến 2 chữ số thập phân
+                                orderDetails
+                            });
+                        }
+                    } else {
+                        console.log(`No location found for store ${order.storeId}`);
+                    }
+                }
+                
+                // Sắp xếp theo khoảng cách, gần nhất lên đầu
+                return nearbyOrders.sort((a, b) => a.distance - b.distance);
+            } 
+            // Nếu tài xế đang bận (không idle), lấy các đơn hàng đã được chấp nhận hoặc đang di chuyển
+            else {
+                orderList = await this.orderRepository
+                    .createQueryBuilder('orders')
+                    .where(new Brackets(qb => {
+                        qb.where('orders.status = :accepted', { accepted: 'accepted' })
+                          .orWhere('orders.status = :onMoving', { onMoving: 'on moving' });
+                    }))
+                    .andWhere('orders.active = :active', { active: true })
+                    .andWhere('orders.driver_id = :driverId', { driverId })
+                    .getMany();
+                
+                // Không cần kiểm tra khoảng cách, chỉ lấy thông tin cửa hàng và chi tiết đơn hàng
+                const ordersWithDetails = await Promise.all(
+                    orderList.map(async (order) => {
                         const store = await this.getStoreInfo(order.storeId);
-
-                        // Lấy chi tiết đơn hàng
+                        console.log(store);
+                        
                         const orderDetails = await this.orderDetailService.findByOrderId(order.id);
-
-
-                        nearbyOrders.push({
+                        
+                        return {
                             ...order,
                             store,
-                            distance: parseFloat(distance.toFixed(2)), // Làm tròn đến 2 chữ số thập phân
                             orderDetails
-                        });
-                    } else {
-                    }
-                } else {
-                    console.log(`No location found for store ${order.storeId}`);
-                }
+                        };
+                    })
+                );
+                
+                return ordersWithDetails;
             }
-            
-
-            // Sắp xếp theo khoảng cách, gần nhất lên đầu
-            return nearbyOrders.sort((a, b) => a.distance - b.distance);
-            
         } catch (error) {
-            console.error('Error getting nearby orders:', error);
-            throw new BadRequestException('Failed to get nearby orders: ' + error.message);
+            console.error('Error getting orders:', error);
+            throw new BadRequestException('Failed to get orders: ' + error.message);
         }
     }
 
     // Hàm lấy thông tin cửa hàng
     async getStoreInfo(storeId: number) {
+        console.log("1: ", storeId);
+        
         try {
             const store = await this.storeService.getStoreById(storeId);
+            console.log("2: ", store);
             return store;
         } catch (error) {
             console.error(`Error getting store info for store ${storeId}:`, error);
@@ -354,5 +413,48 @@ export class OrderService extends BaseService {
         });
         
         return { success: true, message: 'Order declined successfully' };
+    }
+
+    async cancelOrder(orderId: number, driverId: number) {
+        const order = await this.orderRepository.findOne({ where: { id: orderId } });
+        console.log(order.driverId);
+        console.log(driverId);
+        
+        if (!order) {
+            throw new BadRequestException('Order not found');
+        }
+        
+        if (Number(order.driverId) !== Number(driverId)) {
+            throw new BadRequestException('This order is not assigned to you');
+        }
+        
+        if (order.status === 'completed' || order.status === 'canceled') {
+            throw new BadRequestException('Cannot cancel a completed or already canceled order');
+        }
+        
+        // Cập nhật mảng canceledDriverId để thêm tài xế đã hủy đơn này
+        const canceledDriverIds = order.canceledDriverId || [];
+        
+        // Kiểm tra xem tài xế đã hủy trước đó chưa
+        if (!canceledDriverIds.includes(driverId)) {
+            canceledDriverIds.push(driverId);
+        }
+        
+        // Cập nhật trạng thái tài xế thành idle
+        await this.driverService.update(driverId, { status: 'idle' });
+        
+        // Cập nhật đơn hàng
+        await this.orderRepository.update(orderId, {
+            status: 'canceled',
+            driverId: null,
+            canceledDriverId: canceledDriverIds,
+            modifiedAt: new Date()
+        });
+        
+        return { success: true, message: 'Order canceled successfully' };
+    }
+
+    async getByDriverId(driverId: number) {
+        return this.orderRepository.find({ where: { driverId } });
     }
 }

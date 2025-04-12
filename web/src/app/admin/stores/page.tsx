@@ -84,7 +84,7 @@ const columns= [
 interface User {
     id: number;
     email: string;
-    role: string;
+    role: string
 }
 
 const StoresPage = () => {
@@ -137,7 +137,12 @@ const StoresPage = () => {
             if(!user){
                 try {
                     // Dispatch action to get profile info and save to Redux store
-                    await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    if(userData?.role !== "admin"){
+                        router.push("/admin-login");
+                        localStorage.removeItem("access_token")
+                        localStorage.removeItem("refresh_token")
+                    }
                 }catch (err: any) {
                     if (err?.message === "Access token expired") {
                         try {

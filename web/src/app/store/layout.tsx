@@ -1,19 +1,103 @@
 "use client"
 
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import StoreSidebar from "./components/StoreSidebar";
 import StoreHeader from "./components/StoreHeader";
-import store from "@/redux/store";
+import store, { AppDispatch } from "@/redux/store";
 import { usePathname } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { Box, Card, CardContent, Typography, Button, CircularProgress } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "@/redux/middlewares/authMiddleware";
 
 
 const StoreLayout = ({children}: {children: React.ReactNode}) => {
+    const dispatch = useDispatch<AppDispatch>();    
     const [showSidebar, setShowSidebar] = useState(false);
+    const [checkedStatus, setCheckedStatus] = useState(false);
     const pathname = usePathname();
+    const {user, status} = useSelector((state: RootState) => state.auth as { 
+        user: {status: string, vendor_name: string, email: string, phone: string} | null, 
+        status: string 
+    });
+    const router = useRouter();
+
+    // Thêm useEffect để theo dõi việc kiểm tra status chỉ một lần
+    useEffect(() => {
+        if (user) {
+            setCheckedStatus(true);
+        }
+    }, [user]);
 
     // Bỏ layout nếu là VerifyStorePage
     if (pathname === "/store/verify-store") {
         return children;
+    }
+
+    // Hiển thị loading khi đang fetch dữ liệu và chưa kiểm tra status
+    if (status === 'loading' && !checkedStatus) {
+        return (
+            <Box className="flex justify-center items-center h-screen">
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    const handleLogout = async () => {
+        const accessToken = localStorage.getItem("access_token");
+        const refreshToken = localStorage.getItem("refresh_token");
+        
+        if (accessToken && refreshToken) {
+          await dispatch(logoutUser({ accessToken, refreshToken }));
+        }
+        
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        router.push("/store-login");
+      };
+
+    // Kiểm tra trạng thái cửa hàng sau khi đã load dữ liệu
+    if (checkedStatus && user && user.status !== "approved" && pathname !== "/store/profile") {
+        return (
+            <Box className="p-8">
+                <Card>
+                    <CardContent>
+                        <Box className="text-center py-8">
+                            <Typography variant="h4" color="error" gutterBottom>
+                                Cửa hàng chưa được phê duyệt
+                            </Typography>
+                            <Typography variant="body1" paragraph>
+                                Cửa hàng của bạn hiện đang trong trạng thái chờ phê duyệt. Vui lòng liên hệ với nhà cung cấp ({user.vendor_name}) để được kích hoạt tài khoản.
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Thông tin liên hệ của bạn:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                Email: {user.email} | Số điện thoại: {user.phone}
+                            </Typography>
+                            <Box className="mt-4 flex justify-center gap-4">
+                                <Button
+                                    className={"text-black border-black"}
+                                    variant="outlined"
+                                    onClick={() => router.push("/store/profile")}
+                                >
+                                    Xem thông tin cửa hàng
+                                </Button>
+                                <Button
+                                    className={"bg-[#303030] text-white"}
+                                    variant="contained" 
+                                    color="primary" 
+                                    onClick={handleLogout}
+                                >
+                                    Đăng xuất
+                                </Button>
+                            </Box>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Box>
+        );
     }
 
     return (

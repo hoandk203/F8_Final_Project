@@ -11,6 +11,7 @@ import {ConfigModule} from "@nestjs/config";
 import {DriverModule} from "../driver/driver.module";
 import { StoreModule } from '../store/store.module';
 import {VendorModule} from "../vendor/vendor.module";
+import { OtpModule } from '../email-verification/otp.module';
 
 @Module({
   controllers: [AuthController],
@@ -21,6 +22,7 @@ import {VendorModule} from "../vendor/vendor.module";
       DriverModule,
       StoreModule,
       VendorModule,
+      OtpModule,
       RefreshTokenModule,
       PassportModule,
       JwtModule.register({

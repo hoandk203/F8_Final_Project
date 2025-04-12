@@ -18,8 +18,8 @@ export class UsersController {
   }
 
   @Post(`/send-mail`)
-  sendMail(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.sendMail(createUserDto)
+  sendMail(@Body() userData: any) {
+    return this.usersService.sendMail(userData)
   }
 
   @Post()

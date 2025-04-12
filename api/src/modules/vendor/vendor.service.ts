@@ -63,4 +63,11 @@ export class VendorService extends BaseService{
             .where("vendor.email = :email", {email})
             .getRawOne();
     }
+
+    async getVendorbyUserId(userId: number) {
+        return this.vendorRepository
+            .createQueryBuilder("vendor")
+            .where("vendor.user_id = :userId", {userId})
+            .getOne();
+    }
 }

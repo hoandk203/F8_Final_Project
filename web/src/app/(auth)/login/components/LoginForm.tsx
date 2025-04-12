@@ -1,5 +1,5 @@
 "use client"
-
+import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CustomButton from "@/components/CustomButton";
 import {loginAPI} from "@/services/authService";
 import {useRouter} from "next/navigation";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 
 const schema = z.object({
@@ -74,6 +75,7 @@ const LoginForm = () => {
 
     return (
         <div>
+            {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor={"email"} className="font-semibold">
@@ -87,6 +89,7 @@ const LoginForm = () => {
                         variant="outlined"
                         error={!!errors.email}
                         helperText={errors.email?.message}
+                        inputRef={(input) => input && (input.tabIndex = 1)}
                     />
                 </div>
                 <div className="flex flex-col gap-y-1">
@@ -101,6 +104,7 @@ const LoginForm = () => {
                         variant="outlined"
                         error={!!errors.password}
                         helperText={errors.password?.message}
+                        inputRef={(input) => input && (input.tabIndex = 2)}
                         slotProps={{
                             input: {
                                 endAdornment: (
@@ -117,6 +121,9 @@ const LoginForm = () => {
                             }
                         }}
                     />
+                </div>
+                <div className="flex justify-end font-semibold underline cursor-pointer">
+                    <Link href="/forgot-password">Forgot Password?</Link>
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <div className="grid grid-cols-1 mt-3">

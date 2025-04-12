@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -29,7 +29,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
-import { getIssuesByStore, createIssue, deleteIssue } from '@/services/issueService';
+import { getIssuesByStore, createIssue, deleteIssue, searchIssueByName, storeSearchIssueByName } from '@/services/issueService';
 import { getOrders } from '@/services/orderService';
 import { Issue } from '@/types/issue';
 import IssueChat from '@/components/issues/IssueChat';
@@ -42,6 +42,7 @@ import { fetchUserProfile } from '@/redux/middlewares/authMiddleware';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { debounce } from 'lodash';
 
 interface Order {
   id: number;
@@ -182,11 +183,6 @@ const IssueStorePage = () => {
     setPage(0);
   };
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    setPage(0);
-  };
-
   const handleOpenCreateDialog = async () => {
     await fetchOrders();
     setOpenCreateDialog(true);
@@ -286,6 +282,24 @@ const IssueStorePage = () => {
     handleDeleteClick(issueId);
   };
 
+  const fetchSearch = async (name: string) => {
+    try {
+        const response = await storeSearchIssueByName(name, user?.id || 0)
+        if(response.data){
+            setIssues(response.data)
+        }
+    }catch (e) {
+        console.log(e)
+        return e
+    }
+  }
+
+  const debounceSearch = useCallback(debounce((nextValue) => fetchSearch(nextValue), 1000), [])
+
+  const handleSearch = (name: any) => {
+      debounceSearch(name)
+  }
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -303,12 +317,11 @@ const IssueStorePage = () => {
       <Paper sx={{ mb: 3, p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <TextField
-            placeholder="Search by ID, issue name..."
+            placeholder="Search by issue name..."
             variant="outlined"
             size="small"
             fullWidth
-            value={searchTerm}
-            onChange={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
             InputProps={{
               startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
             }}
@@ -464,6 +477,7 @@ const IssueStorePage = () => {
           onClose={handleCloseChat} 
           issue={selectedIssue} 
           userId={user?.user?.id || 0}
+          issueDescription={selectedIssue.description}
         />
       )}
 

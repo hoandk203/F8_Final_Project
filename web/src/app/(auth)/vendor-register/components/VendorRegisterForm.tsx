@@ -10,6 +10,7 @@ import CustomButton from "@/components/CustomButton";
 import { sendVerificationEmail } from "@/services/authService";
 import { FormControl, InputLabel, MenuItem, Select, FormHelperText, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const schema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -89,6 +90,7 @@ const VendorRegisterForm = () => {
 
     return (
         <div>
+            {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor="name" className="font-semibold">

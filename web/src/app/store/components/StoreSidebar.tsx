@@ -8,7 +8,8 @@ import {
   Settings as CogIcon, 
   Logout as LogoutIcon,
   BarChart as ChartBarIcon,
-  ReportProblem as ReportProblemIcon
+  ReportProblem as ReportProblemIcon,
+  StoreOutlined as StoreOutlinedIcon
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
@@ -19,34 +20,55 @@ const StoreSidebar = () => {
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  
-  const menuItems = [
-    {
-      name: "Dashboard",
-      href: "/store",
-      icon: HomeIcon,
-    },
-    {
-      name: "Order",
-      href: "/store/orders",
-      icon: ShoppingCartIcon,
-    },
-    {
-      name: "Issue",
-      href: "/store/issue",
-      icon: ReportProblemIcon,
-    },
-    {
-      name: "Profile",
-      href: "/store/profile",
-      icon: UserIcon,
-    },
-    {
-      name: "Settings",
-      href: "/store/settings",
-      icon: CogIcon,
-    },
-  ];
+
+  let menuItems = [];
+  if(pathname.startsWith("/vendor")){
+    menuItems = [
+      {
+        name: "Dashboard",
+        href: "/vendor",
+        icon: HomeIcon,
+      },
+      {
+        name: "Store",
+        href: "/vendor/stores",
+        icon: StoreOutlinedIcon,
+      },
+      {
+        name: "Order",
+        href: "/vendor/orders",
+        icon: ShoppingCartIcon,
+      },
+      {
+        name: "Profile",
+        href: "/vendor/profile",
+        icon: UserIcon,
+      },
+    ];
+  }else{
+    menuItems = [
+      {
+        name: "Dashboard",
+        href: "/store",
+        icon: HomeIcon,
+      },
+      {
+        name: "Order",
+        href: "/store/orders",
+        icon: ShoppingCartIcon,
+      },
+      {
+        name: "Issue",
+        href: "/store/issue",
+        icon: ReportProblemIcon,
+      },
+      {
+        name: "Profile",
+        href: "/store/profile",
+        icon: UserIcon,
+      },
+    ];
+  }
 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem("access_token");
@@ -56,30 +78,34 @@ const StoreSidebar = () => {
       await dispatch(logoutUser({ accessToken, refreshToken }));
     }
     
+    if(pathname.startsWith("/vendor")){
+      router.push("/vendor-login");
+    }else{
+      router.push("/store-login");
+    }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    if(pathname.startsWith("/store")){
-      router.push("/store-login");
-    }else{
-      router.push("/vendor-login");
-    }
   };
 
-  // Hàm kiểm tra xem một menu item có đang active hay không
   const isActive = (href: string) => {
-    if (href === "/store") {
-      // Nếu là trang Dashboard, chỉ active khi đường dẫn chính xác là /store
-      return pathname === "/store";
+    if (pathname.startsWith("/vendor")) {
+      if (href === "/vendor") {
+        return pathname === "/vendor";
+      }
+      return pathname.startsWith(href);
+    } else {
+      if (href === "/store") {
+        return pathname === "/store";
+      }
+      return pathname.startsWith(href);
     }
-    // Với các trang khác, kiểm tra xem pathname có bắt đầu bằng href không
-    return pathname.startsWith(href);
   };
 
   return (
     <div className="h-screen flex flex-col bg-white border-r px-2">
       <div className="p-4">
-        <Link href="/store" className="flex items-center py-3">
-          <img src="../../logo.png" alt="Logo" className="h-8 w-auto" />
+        <Link href={pathname.startsWith("/vendor") ? "/vendor" : "/store"} className="flex items-center py-3">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
           <span className="ml-2 text-xl font-bold">Scraplan</span>
         </Link>
       </div>
@@ -106,9 +132,12 @@ const StoreSidebar = () => {
         </ul>
       </div>
       <div className="p-4">
-        <button className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100">
+        <button 
+          onClick={handleLogout}
+          className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100"
+        >
           <LogoutIcon className="h-5 w-5 text-gray-500" />
-          <span className="ml-3" onClick={handleLogout}>Logout</span>
+          <span className="ml-3">Logout</span>
         </button>
         <div className="flex items-center py-4 border-t mt-2">
           <div className="ml-3">

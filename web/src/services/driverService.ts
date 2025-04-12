@@ -124,3 +124,89 @@ export const updateDriver = async (driverId: number, data: any) => {
     throw new Error("Server connection error");
   }
 };
+
+export const getVehicleInfo = async (driverId: number) => {
+  try {
+      const response = await axios.get(`${API_BASE_URL}/vehicle/driver/${driverId}`, {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+          }
+      });
+      return response.data;
+  } catch (error: any) {
+      if(error.response){
+          throw new Error(error.response.data.message);
+      }
+      throw error;
+  }
+};
+
+export const updateVehicleInfo = async (vehicleId: number, vehicleData: any) => {
+  try {
+      const response = await axios.put(`${API_BASE_URL}/vehicle/${vehicleId}`, vehicleData, {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+          }
+      });
+      return response.data;
+  } catch (error: any) {
+      if(error.response){
+          throw new Error(error.response.data.message);
+      }
+      throw error;
+  }
+};
+
+export const getIdentityDocument = async (userId: number) => {
+  try {
+      const response = await axios.get(`${API_BASE_URL}/identity-document/user/${userId}`, {
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+          }
+      });
+      return response.data;
+  } catch (error: any) {
+      if(error.response){
+          throw new Error(error.response.data.message);
+      }
+      throw error;
+  }
+};
+
+export const updateIdentityDocument = async (documentId: number, documentData: any) => {
+  try {
+        const response = await axios.put(`${API_BASE_URL}/identity-document/${documentId}`, documentData, {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
+      
+      return response.data;
+  } catch (error: any) {
+      if(error.response){
+          throw new Error(error.response.data.message);
+      }
+      throw error;
+  }
+};
+
+export const getUnpaidPayments = async (driverId: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/payment/driver/${driverId}/unpaid`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+      }
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Không thể lấy thông tin thanh toán");
+    }
+    throw new Error("Lỗi kết nối server");
+  }
+};

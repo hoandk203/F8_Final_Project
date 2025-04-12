@@ -125,7 +125,11 @@ const ConfirmStoreInfo = () => {
             // Create store
             const storeResponse = await createStore(storeData);
             // Save store location if available
+            
             if (currentLocation && storeResponse && storeResponse.id) {
+                console.log(currentLocation);
+                console.log(storeResponse);
+                
                 try {
                     
                     await saveStoreLocation(
@@ -133,15 +137,16 @@ const ConfirmStoreInfo = () => {
                         currentLocation.latitude,
                         currentLocation.longitude
                     );
+
+                    reset();
+                    router.push("/store-login");
+                    localStorage.removeItem("userId");
                 } catch (locationError) {
-                    console.error("Error saving store location:", locationError);
+                    console.log("Error saving store location:", locationError);
                     // Continue with registration even if location saving fails
                 }
             }
             
-            reset();
-            router.push("/store-login");
-            localStorage.removeItem("userId");
         } catch (error: any) {
             console.error("Error creating store:", error);
             throw error;
