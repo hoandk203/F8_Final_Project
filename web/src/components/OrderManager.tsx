@@ -43,7 +43,7 @@ const OrderManager: React.FC<OrderManagerProps> = ({
                         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[2px] rounded-full bg-black">
                     </div>}
                 </button>
-                <button
+                {/* <button
                     className="relative pb-2 px-1"
                     onClick={() => {
                         setStep(3)
@@ -52,7 +52,7 @@ const OrderManager: React.FC<OrderManagerProps> = ({
                     {step === 3 && <div
                         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[2px] rounded-full bg-black">
                     </div>}
-                </button>
+                </button> */}
             </div>
             <div className="">
                 {step === 1 && (

@@ -4,9 +4,9 @@ import { IdentityDocumentController } from './identity-document.controller';
 import {DatabaseModule} from "../../database.module";
 import {identityDocumentProviders} from "./identity-document.providers";
 import {IdentityDocumentService} from "./identity-document.service";
-
+import { DriverModule } from '../driver/driver.module';
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, DriverModule],
   controllers: [IdentityDocumentController],
   providers: [
     ...identityDocumentProviders,

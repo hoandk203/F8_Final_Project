@@ -11,6 +11,7 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import RecyclingIcon from '@mui/icons-material/Recycling';
 
 const AdminSidebar = () => {
     const dispatch = useDispatch();
@@ -33,10 +34,10 @@ const AdminSidebar = () => {
     return (
         <div className="h-screen flex flex-col gap-y-10 p-4">
             <div className={"flex items-center gap-2"}>
-                <span
-                    className={"bg-[#d3f9d9] p-2 border border-green-900 rounded-xl inline-block"}><LocalShippingIcon
-                    className={"text-[#075822]"}/></span>
-                <p className="text-[24px] font-[900] uppercase inline-block">Scrapplan</p>
+                <Link href={"/admin/drivers"} className="flex items-center py-3">
+                    <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+                    <span className="ml-2 text-xl font-bold">Scraplan</span>
+                </Link>
             </div>
             <div className={"flex flex-col gap-y-2 flex-1"}>
                 <Link href={"/admin/drivers"} className={"flex items-center gap-2 p-3 hover:text-white hover:bg-[#555] rounded-md"}>
@@ -51,17 +52,20 @@ const AdminSidebar = () => {
                 <Link href={"/admin/issues"} className={"flex items-center gap-2 p-3 hover:text-white hover:bg-[#555] rounded-md"}>
                     <ReportProblemIcon/>Issues
                 </Link>
+                <Link href={"/admin/material"} className={"flex items-center gap-2 p-3 hover:text-white hover:bg-[#555] rounded-md"}>
+                    <RecyclingIcon/>Material
+                </Link>
             </div>
             <div className="p-4">
-                <button className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100">
+                <button className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-200">
                     <LogoutIcon className="h-5 w-5 text-gray-500" />
                     <span className="ml-3" onClick={handleLogout}>Logout</span>
                 </button>
                 <div className="flex items-center py-4 border-t mt-2">
                     <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-700 py-1">Amazon VN</p>
-                        <p className="text-xs text-gray-500 py-1">Email: store@example.com</p>
-                        <p className="text-xs text-gray-500 py-1">Hotline: 0972193812</p>
+                        <p className="text-sm font-medium text-gray-700 py-1">Scraplan</p>
+                        <p className="text-xs text-gray-500 py-1">Email: hoanyttv@gmail.com</p>
+                        <p className="text-xs text-gray-500 py-1">Hotline: 0842500199</p>
                     </div>
                 </div>
             </div>

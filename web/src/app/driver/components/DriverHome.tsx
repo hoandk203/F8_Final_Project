@@ -14,6 +14,8 @@ import { createPayment } from "@/services/paymentService";
 import { Alert, Snackbar, CircularProgress, Button } from "@mui/material";
 import PaymentIcon from '@mui/icons-material/Payment';
 import { toast } from 'react-toastify';
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import MaterialPriceDialog from "./MaterialPriceDialog";
 
 interface User {
     id: number;
@@ -50,6 +52,8 @@ const DriverHome = () => {
     const [loadingPayment, setLoadingPayment] = useState(false);
     const [orderUnpaidId, setOrderUnpaidId] = useState(0);
     const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+    const [materialPriceDialogOpen, setMaterialPriceDialogOpen] = useState(false);
+
     useEffect(() => {
         const checkAuth = async () => {
             const accessToken = localStorage.getItem("access_token");
@@ -330,6 +334,16 @@ const DriverHome = () => {
         }
     };
 
+    // Hàm mở dialog Material Price
+    const handleOpenMaterialPriceDialog = () => {
+        setMaterialPriceDialogOpen(true);
+    };
+    
+    // Hàm đóng dialog Material Price
+    const handleCloseMaterialPriceDialog = () => {
+        setMaterialPriceDialogOpen(false);
+    };
+
     // Hiển thị tên tài xế từ thông tin người dùng trong Redux store
     const driverName = user?.fullname || "Tài xế";
 
@@ -341,7 +355,13 @@ const DriverHome = () => {
                     <h1 className="text-2xl mb-1">Welcome, {driverName}</h1>
                 </div>
                 <Statistics driverId={driverId || 0}/>
-                
+                <div 
+                    className="bg-gray-200 p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-300 transition-colors"
+                    onClick={handleOpenMaterialPriceDialog}
+                >
+                    <div className="uppercase text-[#666]">Material Price</div>
+                    <div className=" text-[#666]"><SubdirectoryArrowRightIcon/></div>
+                </div>
                 
             </div>
             <div className="px-4 text-[14px] font-medium pt-6 pb-4">
@@ -389,6 +409,12 @@ const DriverHome = () => {
                     {locationUpdateError}
                 </Alert>
             </Snackbar>
+            
+            {/* Dialog hiển thị danh sách Material Price */}
+            <MaterialPriceDialog 
+                open={materialPriceDialogOpen} 
+                onClose={handleCloseMaterialPriceDialog} 
+            />
             
             {/* Thêm thanh điều hướng dưới cùng */}
             <DriverBottomNav />

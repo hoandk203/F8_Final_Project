@@ -7,6 +7,7 @@ import {
     Put,
     Delete,
     UseGuards,
+    Query,
 } from '@nestjs/common';
 import { CreateDto, UpdateDto } from './material.dto';
 import { MaterialService } from './material.service';
@@ -20,6 +21,12 @@ export class MaterialController {
     @Get('/')
     getAll() {
         return this.materialService.getList();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('/search')
+    search(@Query('name') name: string) {
+        return this.materialService.searchByName(name);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -45,4 +52,6 @@ export class MaterialController {
     delete(@Param('id') id: number) {
         return this.materialService.delete(id);
     }
+
+    
 }

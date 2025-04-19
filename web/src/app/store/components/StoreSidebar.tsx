@@ -134,16 +134,16 @@ const StoreSidebar = () => {
       <div className="p-4">
         <button 
           onClick={handleLogout}
-          className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-100"
+          className="flex items-center w-full p-2 text-gray-700 rounded-lg hover:bg-gray-200"
         >
           <LogoutIcon className="h-5 w-5 text-gray-500" />
           <span className="ml-3">Logout</span>
         </button>
         <div className="flex items-center py-4 border-t mt-2">
           <div className="ml-3">
-            <p className="text-sm font-medium text-gray-700 py-1">Amazon VN</p>
-            <p className="text-xs text-gray-500 py-1">Email: store@example.com</p>
-            <p className="text-xs text-gray-500 py-1">Hotline: 0972193812</p>
+            <p className="text-sm font-medium text-gray-700 py-1">Scraplan</p>
+            <p className="text-xs text-gray-500 py-1">Email: hoanyttv@gmail.com</p>
+            <p className="text-xs text-gray-500 py-1">Hotline: 0842500199</p>
           </div>
         </div>
       </div>

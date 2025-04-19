@@ -285,15 +285,9 @@ const VehicleInfo = () => {
                                 startIcon={<EditIcon />}
                                 onClick={startEditing}
                                 className="mt-3 bg-[#303030] text-white"
-                                disabled={vehicle.status === 'approved'}
                             >
                                 Update
                             </Button>
-                            {vehicle.status === 'approved' && (
-                                <p className="text-sm text-gray-500 mt-2">
-                                    Information has been approved and cannot be edited
-                                </p>
-                            )}
                         </>
                     ) : (
                         <div className="text-center py-4">

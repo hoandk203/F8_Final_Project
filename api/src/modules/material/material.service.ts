@@ -63,4 +63,17 @@ export class MaterialService extends BaseService {
                 '*'
             ])
     }
+
+    searchByName(name: string) {
+        const query = this.materialRepository
+            .createQueryBuilder("material")
+            .select([
+                'material.*'
+            ])
+            .where("lower(material.name) LIKE :name", { name: `%${name.toLowerCase()}%` })
+            .andWhere("material.active = :active", { active: true })
+            .orderBy("material.id", "DESC");
+
+        return query.getRawMany();
+    }
 }

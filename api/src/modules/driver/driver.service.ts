@@ -6,6 +6,7 @@ import {CreateDriverDto} from "./dto/create-driver.dto";
 import {UpdateDriverDto} from "./dto/update-driver.dto";
 import {IdentityDocument} from "../identity-document/entities/identity-document.entity";
 import { Order } from '../order/order.entity';
+import {Vehicle} from "../vehicle/entities/vehicle.entity";
 
 @Injectable()
 export class DriverService extends BaseService{
@@ -71,8 +72,12 @@ export class DriverService extends BaseService{
                 'driver.country as country',
                 'driver.phone_number as phone_number',
                 'driver.created_at as created_at',
-                'doc.status as document_status'
+                'driver.identity_document_id as identity_document_id',
+                'doc.status as document_status',
+                'vehicle.id as vehicle_id',
+                'vehicle.status as vehicle_status'
             ])
+            .innerJoin(Vehicle, 'vehicle', 'vehicle.driver_id = driver.id')
             .where("driver.active = :active", {active: true})
             .orderBy("driver.id", "DESC")
             .getRawMany();
@@ -113,5 +118,13 @@ export class DriverService extends BaseService{
             .orderBy("driver.id", "DESC");
 
         return query.getRawMany();
+    }
+
+    async getDriverById(id: number) {
+        return this.driverRepository
+            .createQueryBuilder("driver")
+            .where("driver.id = :id", {id})
+            .andWhere("driver.active = :active", {active: true})
+            .getRawOne();
     }
 }

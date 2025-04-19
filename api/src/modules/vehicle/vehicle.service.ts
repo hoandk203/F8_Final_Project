@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
 import {BaseService} from "../base/base.service";
 import {v4} from "uuid";
 import {writeFile} from "fs";
@@ -13,6 +13,10 @@ export class VehicleService extends BaseService{
         private readonly vehicleRepository: Repository<Vehicle>,
     ) {
         super(vehicleRepository);
+    }
+
+    async getVehicleById(id: number): Promise<Vehicle> {
+        return await this.vehicleRepository.findOne({ where: { id } });
     }
 
     async saveBase64Image(imageBase64: any): Promise<string> {
@@ -78,5 +82,29 @@ export class VehicleService extends BaseService{
             modifiedAt: new Date(),
         });
         return await this.vehicleRepository.findOne({ where: { id } });
+    }
+
+    async updateVehicleStatus(id: number, updateVehicleDto: any) {
+        const vehicle = await this.vehicleRepository.findOne({
+            where: { id },
+        });
+
+        if (!vehicle) {
+            throw new NotFoundException(`Vehicle with ID ${id} not found`);
+        }
+        try {
+            await this.vehicleRepository.update(id, {
+                ...updateVehicleDto,
+                modifiedAt: new Date(),
+            })
+            return {
+                success: true,
+                message: 'Vehicle updated successfully',
+            };
+        }catch (e) {
+            console.log("update vehicle",e)
+            throw new BadRequestException('Failed to update vehicle');
+        }
+
     }
 }

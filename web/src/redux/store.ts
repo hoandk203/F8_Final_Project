@@ -5,6 +5,7 @@ import {stepOrderSlice} from "./slice/stepOrderSlice";
 import {verifyDriverStepSlice} from "@/redux/slice/verifyDriverStepSlice";
 import authReducer from "./slice/authSlice";
 import driverReducer from './slice/driverSlice';
+import materialReducer from "./slice/materialSlice";
 
 const store= configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store= configureStore({
         verifyDriverStep: verifyDriverStepSlice.reducer,
         auth: authReducer,
         driver: driverReducer,
+        material: materialReducer,
     }
 })
 

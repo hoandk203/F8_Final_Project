@@ -29,6 +29,10 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { refreshToken } from "@/services/authService";
 import { useRouter } from "next/navigation";
+import IdentityDocumentDialog from "./components/IdentityDocumentDialog";
+import { getIdentityDocument } from "@/services/identityDocumentService";
+import {getVehicleById} from "@/services/vehicleService";
+import VehicleDialog from "@/app/admin/drivers/components/VehicleDialog";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
@@ -72,8 +76,8 @@ const columns= [
         key: "address",
     },
     {
-        name: "City",
-        key: "city",
+        name: "Vehicle status",
+        key: "vehicle_status",
     },
     {
         name: "Phone number",
@@ -123,6 +127,27 @@ const DriversPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [driverToDelete, setDriverToDelete] = useState<number | null>(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
+    
+    // Thêm state cho Identity Document Dialog
+    const [identityDocumentDialogOpen, setIdentityDocumentDialogOpen] = useState(false);
+    const [vehicleDialogOpen, setVehicleDialogOpen] = useState(false);
+    const [documentData, setDocumentData] = useState({
+        id: null as number | null,
+        frontImageUrl: "",
+        backImageUrl: "",
+        status: "",
+        driverId: null as number | null
+    });
+    const [vehicleData, setVehicleData] = useState({
+        id: null as number | null,
+        vehiclePlateNumber: "",
+        vehicleColor: "",
+        vehicleImage: "",
+        vehicleRCImage: "",
+        status: "",
+    })
+    const [documentLoading, setDocumentLoading] = useState(false);
+    const [vehicleLoading, setVehicleLoading] = useState(false);
     
     const {user} = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
     const handleClickOpen = () => {
@@ -230,6 +255,72 @@ const DriversPage = () => {
         handleDeleteClick(id);
     };
 
+    const handleViewDocument = async (row: any) => {
+        if (!row.identity_document_id) {
+            toast.error("No identity document found for this driver");
+            return;
+        }
+        
+        setDocumentLoading(true);
+        
+        try {
+            const document:any = await getIdentityDocument(row.identity_document_id);
+            
+            setDocumentData({
+                id: row.identity_document_id,
+                frontImageUrl: document.frontImageUrl,
+                backImageUrl: document.backImageUrl,
+                status: document.status,
+                driverId: row.id
+            });
+            setIdentityDocumentDialogOpen(true);
+        } catch (error) {
+            console.log("Error fetching identity document:", error);
+            toast.error("Failed to load identity document");
+        } finally {
+            setDocumentLoading(false);
+        }
+    };
+
+    const handleViewVehicle = async (row: any) => {
+        if (!row.vehicle_id) {
+            toast.error("No vehicle found for this driver");
+            return;
+        }
+        setVehicleLoading(true);
+
+        try {
+            const vehicle:any = await getVehicleById(row.vehicle_id);
+
+            setVehicleData({
+                id: row.vehicle_id,
+                vehiclePlateNumber: vehicle.vehiclePlateNumber,
+                vehicleColor: vehicle.vehicleColor,
+                vehicleImage: vehicle.vehicleImage,
+                vehicleRCImage: vehicle.vehicleRCImage,
+                status: vehicle.status
+            });
+            setVehicleDialogOpen(true);
+
+        }catch (error) {
+            console.log("Error fetching vehicle:", error);
+            toast.error("Failed to load vehicle");
+        } finally {
+            setVehicleLoading(false);
+        }
+
+
+
+    };
+
+    const handleCloseIdentityDocumentDialog = () => {
+        setIdentityDocumentDialogOpen(false);
+    };
+
+    const handleCloseVehicleDialog = () => {
+        setVehicleDialogOpen(false);
+    };
+
     const fetchSearch = async (name: string) => {
         try {
             const response = await axios.get(`${BASE_URL}/driver/search?name=${name}`)
@@ -251,8 +342,11 @@ const DriversPage = () => {
     return (
         <div className={"container mx-auto"}>
             {driverListStatus === 'pending' && <LoadingOverlay/>}
+            {documentLoading && <LoadingOverlay />}
+            {vehicleLoading && <LoadingOverlay />}
 
             <h1 className="text-3xl font-bold lg:hidden mb-5">Driver management</h1>
+
             <div>
                 <div className={"mb-5 flex justify-between"}>
                     <div>
@@ -288,6 +382,8 @@ const DriversPage = () => {
                     handleOpenDialog={handleClickOpen} 
                     setCurrentData={setCurrentData} 
                     softDelete={softDelete}
+                    onViewDocument={handleViewDocument}
+                    onViewVehicle={handleViewVehicle}
                 />
             </div>
             
@@ -323,8 +419,16 @@ const DriversPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <IdentityDocumentDialog
+                open={identityDocumentDialogOpen}
+                onClose={handleCloseIdentityDocumentDialog}
+                documentData={documentData}
+            />
+
+            <VehicleDialog open={vehicleDialogOpen} onClose={handleCloseVehicleDialog} vehicleData={vehicleData}/>
         </div>
     )
 }
 
-export default DriversPage
+export default DriversPage;

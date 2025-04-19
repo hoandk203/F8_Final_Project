@@ -196,7 +196,7 @@ const IdentityDocumentInfo = () => {
                                         <p className="font-medium">Not updated</p>
                                     )}
                                 </div>
-                            </div>
+                            </div> 
 
                             <div>
                                 <p className="text-sm text-gray-500 mb-2">Status</p>
@@ -212,20 +212,14 @@ const IdentityDocumentInfo = () => {
                             </div>
 
                             <Button
-                                variant="outlined"
+                                variant="contained"
                                 color="primary"
                                 startIcon={<EditIcon />}
                                 onClick={startEditing}
                                 className="mt-3 bg-[#303030] text-white"
-                                disabled={identityDocument.status === 'approved'}
                             >
                                 Update
                             </Button>
-                            {identityDocument.status === 'approved' && (
-                                <p className="text-sm text-gray-500 mt-2">
-                                    Information has been approved and cannot be edited
-                                </p>
-                            )}
                         </>
                     )}
                 </div>

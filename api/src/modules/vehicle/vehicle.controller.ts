@@ -20,4 +20,14 @@ export class VehicleController {
   async update(@Param('id') id: number, @Body() updateVehicleDto: any) {
     return this.vehicleService.updateVehicle(id, updateVehicleDto);
   }
+
+  @Put('admin/:id')
+  async updateVehicleStatus(@Param('id') id: number, @Body() updateVehicleDto: any) {
+    return this.vehicleService.updateVehicleStatus(id, updateVehicleDto);
+  }
+
+  @Get(':id')
+  async getVehicleById(@Param('id') id: number) {
+    return this.vehicleService.getVehicleById(id);
+  }
 }

@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { TableContainer, Table, Paper, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 interface Column {
     name: string;
@@ -15,9 +16,11 @@ interface Props {
     handleOpenDialog: () => void;
     setCurrentData: (data: any) => void;
     softDelete: (id: number) => void;
+    onViewDocument?: (row: any) => void;
+    onViewVehicle?: (row: any) => void;
 }
 
-const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog, setCurrentData, softDelete }: Props) {
+const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog, setCurrentData, softDelete, onViewDocument, onViewVehicle }: Props) {
     console.log(rows);
     return (
         <div className="overflow-x-auto">
@@ -40,11 +43,7 @@ const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog,
                                         return (
                                             <TableCell className="border" key={`${ridx}${column.key}`}>
                                                 <EditIcon onClick={() => {
-                                                    // Log dữ liệu row trước khi truyền
-                                                    console.log("Row data before edit:", row);
-                                                    
                                                     // Đảm bảo tất cả các trường dữ liệu được truyền đúng
-                                                    // Tạo một đối tượng mới với các trường cần thiết
                                                     const dataToEdit = {
                                                         id: row.id,
                                                         fullname: row.fullname || "",
@@ -56,20 +55,67 @@ const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog,
                                                         phone_number: row.phone_number || "",
                                                         phone: row.phone || "",
                                                         document_status: row.document_status || "",
+                                                        vehicle_status: row.vehicle_status || "",
                                                         user_id: row.user_id,
+                                                        vehicle_id: row.vehicle_id,
                                                         identity_document_id: row.identity_document_id,
                                                         vendor_id: row.vendor_id,
                                                         name: row.name || "",
+                                                        unitPrice: row.unitPrice || 0,
                                                         email: row.email || "",
-                                                        location: row.location || "",
-                                                        vendorId: row.vendor_id
+                                                        description: row.description || "",
                                                     };
                                                     
-                                                    console.log("Data to edit:", dataToEdit);
                                                     setCurrentData(dataToEdit);
                                                     handleOpenDialog();
-                                                }} className={"cursor-pointer me-2 hover:text-yellow-400"} />
-                                                <DeleteOutlineIcon onClick={() => softDelete(row.id)} className={"cursor-pointer hover:text-red-500"} />
+                                                }} className={"cursor-pointer text-black hover:text-blue-700"} fontSize="small"/>
+                                                <DeleteOutlineIcon onClick={() => softDelete(row.id)} className={"cursor-pointer text-black hover:text-red-700 ml-2"} fontSize="small"/>
+                                            </TableCell>
+                                        );
+                                    }
+                                    if (column.key === "document_status") {
+                                        return (
+                                            <TableCell className="border" key={`${ridx}${column.key}`}>
+                                                <div className="flex items-center">
+                                                    <span className={`mr-2 ${
+                                                        row[column.key] === 'approved' ? 'text-green-600' : 
+                                                        row[column.key] === 'rejected' ? 'text-red-600' : 
+                                                        'text-yellow-600'
+                                                    }`}>
+                                                        {column.format ? column.format(row[column.key]) : row[column.key]}
+                                                    </span>
+                                                        <VisibilityIcon 
+                                                            className="cursor-pointer text-black hover:text-blue-700"
+                                                            onClick={() => onViewDocument && onViewDocument({
+                                                                ...row,
+                                                                identity_document_id: row.identity_document_id
+                                                            })}
+                                                            fontSize="small"
+                                                        />
+                                                </div>
+                                            </TableCell>
+                                        );
+                                    }
+                                    if (column.key === "vehicle_status") {
+                                        return (
+                                            <TableCell className="border" key={`${ridx}${column.key}`}>
+                                                <div className="flex items-center">
+                                                    <span className={`mr-2 ${
+                                                        row[column.key] === 'approved' ? 'text-green-600' :
+                                                            row[column.key] === 'rejected' ? 'text-red-600' :
+                                                                'text-yellow-600'
+                                                    }`}>
+                                                        {column.format ? column.format(row[column.key]) : row[column.key]}
+                                                    </span>
+                                                    <VisibilityIcon
+                                                        className="cursor-pointer text-black hover:text-blue-700"
+                                                        onClick={() => onViewVehicle && onViewVehicle({
+                                                            ...row,
+                                                            vehicle_id: row.vehicle_id
+                                                        })}
+                                                        fontSize="small"
+                                                    />
+                                                </div>
                                             </TableCell>
                                         );
                                     }

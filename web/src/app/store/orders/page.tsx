@@ -226,6 +226,7 @@ const OrdersPage = () => {
                 <TableCell>Amount</TableCell>
                 <TableCell>Weight</TableCell>
                 <TableCell>Status</TableCell>
+
                 <TableCell>Image</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
@@ -255,13 +256,6 @@ const OrdersPage = () => {
                     )}
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton
-                      size="small"
-                      onClick={() => handleViewDetails(order.id)}
-                      sx={{ mr: 1 }}
-                    >
-                      <VisibilityIcon fontSize="small" />
-                    </IconButton>
                     <IconButton
                       size="small"
                       color="error"

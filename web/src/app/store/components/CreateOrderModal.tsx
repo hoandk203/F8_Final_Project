@@ -60,7 +60,7 @@ const CreateOrderModal = ({ open, onClose, onSuccess }: CreateOrderModalProps) =
     const fetchMaterials = async () => {
       try {
         const response = await getMaterials();
-        setMaterials(response.data);
+        setMaterials(response);
       } catch (err: any) {
         if (err?.response?.data?.message === "Access token expired") {
           try {
@@ -70,7 +70,7 @@ const CreateOrderModal = ({ open, onClose, onSuccess }: CreateOrderModalProps) =
             localStorage.setItem("refresh_token", newTokens.refresh_token);
             
             const response = await getMaterials();
-            setMaterials(response.data);
+            setMaterials(response);
           } catch (refreshError) {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
