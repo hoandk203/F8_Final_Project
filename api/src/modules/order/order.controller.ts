@@ -34,12 +34,18 @@ export class OrderController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('/')
+    @Get('/byStore')
     async getAll(@Req() req) {
         const userId = req.user.id;
         const store = await this.storeService.getStoreIdByUserId(userId);
         console.log(store);
         return this.orderService.getOrdersByStoreId(store.id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('unpaid/byStore/:storeId')
+    async getOrdersUnpaidByStore(@Param ('storeId') storeId: number) {
+        return this.orderService.getOrdersUnpaidByStore(storeId);
     }
 
     @UseGuards(JwtAuthGuard)

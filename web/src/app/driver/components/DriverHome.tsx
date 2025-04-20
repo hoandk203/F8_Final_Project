@@ -3,24 +3,26 @@
 import Statistics from "@/components/Statistics";
 import OrderManager from "@/components/OrderManager";
 import DriverBottomNav from "./DriverBottomNav";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { refreshToken } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateDriverLocation, getNearbyOrders, getUnpaidPayments } from "@/services/driverService";
-import { createPayment } from "@/services/paymentService";
 import { Alert, Snackbar, CircularProgress, Button } from "@mui/material";
 import PaymentIcon from '@mui/icons-material/Payment';
 import { toast } from 'react-toastify';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import MaterialPriceDialog from "./MaterialPriceDialog";
+import Link from "next/link";
 
 interface User {
     id: number;
     fullname: string;
-    status: "idle" | "busy"
+    status: "idle" | "busy",
+    document_status: string;
+    vehicle_status: string;
 }
 
 interface Order {
@@ -36,7 +38,7 @@ let driverStatus = "idle";
 const DriverHome = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-    const { user, status, error } = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
+    const { user } = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
     const [locationUpdateError, setLocationUpdateError] = useState("");
     const [showLocationError, setShowLocationError] = useState(false);
     const locationIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,9 +52,10 @@ const DriverHome = () => {
     const [unpaidAmount, setUnpaidAmount] = useState(0);
     const [hasUnpaidOrders, setHasUnpaidOrders] = useState(false);
     const [loadingPayment, setLoadingPayment] = useState(false);
-    const [orderUnpaidId, setOrderUnpaidId] = useState(0);
     const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
     const [materialPriceDialogOpen, setMaterialPriceDialogOpen] = useState(false);
+    const [pendingIdDocument, setPendingIdDocument] = useState("");
+    const [pendingVehicle, setPendingVehicle] = useState("");
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -63,7 +66,6 @@ const DriverHome = () => {
             }
             
             try {
-                // Dispatch action để lấy thông tin profile và lưu vào Redux store
                 if (!user) {
                     const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
                     if(userData.user.role !== "driver"){
@@ -72,23 +74,25 @@ const DriverHome = () => {
                         localStorage.removeItem("driverId");
                         router.push("/login");
                     }
-                    
-                    // Lưu driverId vào state và localStorage nếu chưa có
+
                     if (userData && userData.id) {
                         setDriverId(userData.id);
                         localStorage.setItem("driverId", userData.id.toString());
-                        
-                        // Gọi API để lấy thông tin thanh toán chưa hoàn thành
-                        fetchUnpaidPayments();
-                        fetchNearbyOrders();
+
+                        await fetchUnpaidPayments();
+                        await fetchNearbyOrders();
                     }
                 } else if (user.id) {
-                    // Nếu đã có user trong Redux store, lấy ID từ đó
+                    if(user.document_status){
+                        setPendingIdDocument(user.document_status)
+                    }
+                    if(user.vehicle_status){
+                        setPendingVehicle(user.vehicle_status)
+                    }
                     setDriverId(user.id);
                     localStorage.setItem("driverId", user.id.toString());
-                    
-                    // Gọi API để lấy thông tin thanh toán chưa hoàn thành
-                    fetchUnpaidPayments();
+
+                    await fetchUnpaidPayments();
                 }
             } catch (err: any) {
                 
@@ -122,13 +126,13 @@ const DriverHome = () => {
             }
         };
         
-        checkAuth();
+        checkAuth().catch(console.error);
     }, [dispatch, router, user]);
 
     // sang component khac roi quay lai thi fetch lai
     useEffect(() => {
-        fetchNearbyOrders();
-        fetchUnpaidPayments();
+        fetchNearbyOrders().catch(console.error);
+        fetchUnpaidPayments().catch(console.error);
     }, []);
 
     // Thiết lập cập nhật vị trí định kỳ
@@ -162,12 +166,11 @@ const DriverHome = () => {
 
         // Thiết lập interval để cập nhật vị trí mỗi 20 giây
         locationIntervalRef.current = setInterval(() => {
-            console.log("update location");
             
             updateLocation();
             
             if(driverStatus === "idle"){
-                fetchNearbyOrders();
+                fetchNearbyOrders().catch(console.error);
             }
 
         }, 20000); // 20 seconds
@@ -262,7 +265,8 @@ const DriverHome = () => {
             const currentDriverId = driverId || parseInt(localStorage.getItem("driverId") || "0");
             
             if (!currentDriverId) {
-                throw new Error("Driver ID not found");
+                toast.error("Driver ID not found");
+                return;
             }
             
             // Lấy vị trí hiện tại
@@ -298,7 +302,6 @@ const DriverHome = () => {
             
             if (payment) {
                 const amount = payment.amount;
-                setOrderUnpaidId(payment.orderId);
                 setUnpaidAmount(amount);
                 setPaymentUrl(payment.paymentUrl);
                 setHasUnpaidOrders(true);
@@ -383,6 +386,13 @@ const DriverHome = () => {
                         >
                             {loadingPayment ? <CircularProgress size={24} /> : "Payment"}
                         </Button>
+                    </div>
+                ) : pendingIdDocument === "pending" || pendingIdDocument === "rejected" || pendingVehicle === "pending" || pendingVehicle === "rejected" ?(
+                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-center">
+                        <p className="text-red-600 mb-2">Identity verification or vehicle verification is unapproved</p>
+                        <p className="text-red-900 text-sm mb-5">Wait admin approval</p>
+                        <Link href="/driver/profile" className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg">View profile</Link>
+
                     </div>
                 ) : (
                     <OrderManager

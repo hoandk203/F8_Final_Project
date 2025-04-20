@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const getOrders = async () => {
+export const getOrdersByStore = async () => {
   try {
     const accessToken = localStorage.getItem("access_token");
     
@@ -10,7 +10,7 @@ export const getOrders = async () => {
       throw new Error("Authentication required");
     }
     
-    const response = await axios.get(`${API_BASE_URL}/order`, {
+    const response = await axios.get(`${API_BASE_URL}/order/byStore`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
@@ -24,6 +24,29 @@ export const getOrders = async () => {
     throw new Error("Server connection error");
   }
 };
+
+export const getOrdersUnpaidByStore = async (storeId: number) => {
+  try {
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+      throw new Error("Authentication required");
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/order/unpaid/byStore/${storeId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to fetch unpaid orders");
+    }
+    throw new Error("Server connection error");
+  }
+}
 
 export const getOrderByDriverId = async (driverId: number) => {
   try {

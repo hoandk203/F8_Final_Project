@@ -21,14 +21,16 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import { Add as AddIcon, Visibility as VisibilityIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { getOrders, deleteOrder } from "@/services/orderService";
+import { getOrdersByStore, deleteOrder } from "@/services/orderService";
 import CreateOrderModal from "../components/CreateOrderModal";
 import { refreshToken } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "@/redux/store";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import FilterDialog from "@/app/store/orders/components/FilterDialog";
 interface Order {
   id: number;
   store_id: number;
@@ -39,9 +41,14 @@ interface Order {
   orderDetail_weight: number;
 }
 
+interface User {
+  id: number;
+}
+
 const OrdersPage = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
+  const {user} = useSelector((state: RootState) => state.auth as { user: User | null, isAuthenticated: boolean });
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -51,11 +58,17 @@ const OrdersPage = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [viewImageUrl, setViewImageUrl] = useState<string | null>(null);
 
+  const [openFilterDialog, setOpenFilterDialog] = useState(false);
+
+  const handleCloseFilterDialog = () => {
+    setOpenFilterDialog(false);
+  };
+
   const fetchOrders = async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await getOrders();
+      const response = await getOrdersByStore();
       setOrders(response || []);
       
     } catch (err: any) {
@@ -64,7 +77,6 @@ const OrdersPage = () => {
       setLoading(false);
     }
   };
-  console.log(orders);
   
   useEffect(() => {
     const checkAuth = async () => {
@@ -185,6 +197,7 @@ const OrdersPage = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Typography variant="h5" component="h1">
           Orders
+          <span onClick={()=>{setOpenFilterDialog(true)}} className={"ms-4 p-1 rounded-md bg-gray-200 cursor-pointer"}><FilterListOutlinedIcon/></span>
         </Typography>
         <Button
           variant="contained"
@@ -220,13 +233,12 @@ const OrdersPage = () => {
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow>
+              <TableRow className={"bg-gray-100"}>
                 <TableCell>ID</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Amount</TableCell>
                 <TableCell>Weight</TableCell>
                 <TableCell>Status</TableCell>
-
                 <TableCell>Image</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
@@ -331,6 +343,14 @@ const OrdersPage = () => {
           <Button onClick={handleCloseImage}>Close</Button>
         </DialogActions>
       </Dialog>
+
+      <FilterDialog
+          title={"Filter Order"}
+          open={openFilterDialog}
+          handleClose={handleCloseFilterDialog}
+          setOrders={setOrders}
+          storeId={user?.id}
+      />
     </Box>
   );
 };

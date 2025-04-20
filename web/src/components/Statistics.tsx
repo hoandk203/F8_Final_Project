@@ -15,8 +15,6 @@ const Statistics = ({driverId}: Props) => {
         if (!driverId) return;
         try {
             const response = await getOrderByDriverId(driverId);
-            console.log(response);
-            
             setOrders(response);
         } catch (error) {
             console.log("Error fetching order history:", error);
@@ -35,19 +33,15 @@ const Statistics = ({driverId}: Props) => {
         
         // Chỉ tính tổng cho các đơn hàng trong tháng hiện tại
         if (orderMonth === currentMonth && orderYear === currentYear) {
-            console.log(order.amount);
-            
             return total + order.amount;
         }
         return total;
     }, 0);
 
     const totalOrders = orders.length;
-    
-    console.log(totalAmountDelivered);
 
     useEffect(() => {
-        fetchOrderByDriverId();
+        fetchOrderByDriverId().catch();
     }, [driverId]);
     
     

@@ -235,24 +235,37 @@ export class AuthService {
 
       async updateProfile(user: any, data: any) {
         const userInfo= await this.userService.getOne(user.id)
-        if(userInfo.role === 'store'){
-            const store= await this.storeService.getStoreIdByUserId(userInfo.id)
-            if(store){
-                await this.storeService.updateOne(store.id, {...data, modifiedAt: new Date()})
-            }
-        }
-        if(userInfo.role === 'vendor'){
-            const vendor= await this.vendorService.getVendorbyUserId(userInfo.id)
-            if(vendor){
-                await this.vendorService.updateOne(vendor.id, {...data, modifiedAt: new Date()})
-            }
-        }
-        if(userInfo.role === 'driver'){
-            const driver= await this.driverService.getByUserId(userInfo.id)
-            if(driver){
-                await this.driverService.updateOne(driver.id, {...data, modifiedAt: new Date()})
-            }
-        }
+          try {
+              if(userInfo.role === 'store'){
+                  const store= await this.storeService.getStoreIdByUserId(userInfo.id)
+                  if(store){
+                      await this.storeService.updateOne(store.id, {...data, modifiedAt: new Date()})
+                  }
+              }
+              if(userInfo.role === 'vendor'){
+                  const vendor= await this.vendorService.getVendorbyUserId(userInfo.id)
+                  if(vendor){
+                      await this.vendorService.updateOne(vendor.id, {...data, modifiedAt: new Date()})
+                  }
+              }
+              if(userInfo.role === 'driver'){
+                  const driver= await this.driverService.getByUserId(userInfo.id)
+                  if(driver){
+                      await this.driverService.update(driver.id, {
+                          fullname: data.fullname,
+                          phoneNumber: data.phone_number,
+                          dateOfBirth: data.date_of_birth,
+                          gstNumber: data.gst_number,
+                          address: data.address,
+                          city: data.city,
+                          country: data.country
+                      })
+                  }
+              }
+          }catch (e) {
+              throw new BadRequestException(e.message)
+          }
+
         
       }
 }

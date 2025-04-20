@@ -41,8 +41,15 @@ export class DriverService extends BaseService{
     async getByUserId(userId: number) {
         return this.driverRepository
             .createQueryBuilder("driver")
+            .select([
+                'driver.*',
+                'identity_document.status as document_status',
+                'vehicle.status as vehicle_status'
+            ])
+            .innerJoin(IdentityDocument, "identity_document", "identity_document.id = driver.identity_document_id")
+            .innerJoin(Vehicle, 'vehicle', 'vehicle.driver_id = driver.id')
             .where("driver.user_id = :userId", {userId})
-            .getOne();
+            .getRawOne();
     }
 
     async getDriverByOrderId(orderId: number) {

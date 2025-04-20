@@ -72,14 +72,14 @@ export class AuthController {
   
   @UseGuards(JwtAuthGuard)
   @Post('/logout')
-  async logout(@Request() request, @Body() body: { refresh_token: string }) {
+  async logout(@Request() request:any, @Body() body: { refresh_token: string }) {
     const userId = request.user.id;
     return this.authService.logout(userId, body.refresh_token);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
-  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+  async changePassword(@Request() req:any, @Body() changePasswordDto: ChangePasswordDto) {
     return this.authService.changePassword(
       req.user.id,
       changePasswordDto.oldPassword, 
@@ -94,7 +94,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Put('update-profile')
-  async updateProfile(@Request() req, @Body() data: any) {
+  async updateProfile(@Request() req:any, @Body() data: any) {
     return this.authService.updateProfile(req.user, data)
   }
 }

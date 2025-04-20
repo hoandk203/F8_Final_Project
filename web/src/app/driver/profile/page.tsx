@@ -21,7 +21,7 @@ import { getProfile, refreshToken } from "@/services/authService";
 
 interface User {
     fullname?: string;
-    phoneNumber?: string;
+    phone_number?: string;
     user?: {
       email?: string;
     }
@@ -122,7 +122,7 @@ export default function ProfilePage() {
             <div>
               <h1 className="text-xl font-bold">{user?.fullname || "Driver"}</h1>
               <p className="text-gray-400">{user?.user?.email || "email@example.com"}</p>
-              <p className="text-gray-400">{user?.phoneNumber || "No phone number"}</p>
+              <p className="text-gray-400">{user?.phone_number || "No phone number"}</p>
             </div>
           </div>
         </div>

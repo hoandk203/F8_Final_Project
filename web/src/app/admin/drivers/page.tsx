@@ -76,12 +76,12 @@ const columns= [
         key: "address",
     },
     {
-        name: "Vehicle status",
-        key: "vehicle_status",
-    },
-    {
         name: "Phone number",
         key: "phone_number",
+    },
+    {
+        name: "Vehicle status",
+        key: "vehicle_status",
     },
     {
         name: "Document status",

@@ -15,6 +15,7 @@ import { DataSource } from 'typeorm';
 import { StoreService } from '../store/store.service';
 import { In } from 'typeorm';
 import { DriverService } from '../driver/driver.service';
+import {Payment} from "../payment/entities/payment.entity";
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -109,6 +110,23 @@ export class OrderService extends BaseService {
         .getRawMany();
     }
 
+    async getOrdersUnpaidByStore(storeId: number) {
+        return this.orderRepository
+            .createQueryBuilder("orders")
+            .select([
+                'orders.*',
+                'orderDetail.weight',
+                'payment.status'
+            ])
+            .innerJoin(Payment, "payment", "payment.orderId = orders.id")
+            .innerJoin(OrderDetail, "orderDetail", "orderDetail.order_id = orders.id")
+            .where('orders.storeId = :storeId', { storeId })
+            .andWhere('orders.active = :active', { active: true })
+            .andWhere('payment.status = :status', { status: 'pending' })
+            .orderBy('orders.createdAt', 'DESC')
+            .getRawMany();
+    }
+
     async saveBase64Image(imageBase64: string, folder: string): Promise<string> {
         try {
             const payload = imageBase64.split(',')[1];
@@ -120,7 +138,7 @@ export class OrderService extends BaseService {
             }
 
             await writeFileAsync(path, payload, 'base64');
-            
+
             const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
             return `${BASE_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
         } catch (error) {

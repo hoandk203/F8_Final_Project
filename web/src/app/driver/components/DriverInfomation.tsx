@@ -14,10 +14,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import { updateUserProfile } from "@/services/authService";
 import { updateUserProfile as updateUserProfileSlice } from "@/redux/slice/authSlice";
 interface User {
+    dateOfBirth: string;
     fullname?: string;
-    phoneNumber?: string;
-    dateOfBirth?: string;
-    gstNumber?: string;
+    phone_number?: string;
+    date_of_birth?: string;
+    gst_number?: string;
     address?: string;
     city?: string;
     country?: string;
@@ -29,11 +30,11 @@ interface User {
 // Định nghĩa schema validation
 const driverInfoSchema = z.object({
   fullname: z.string().min(1, { message: "Fullname is required" }),
-  phoneNumber: z.string()
+  phone_number: z.string()
     .min(1, { message: "Phone number is required" })
     .regex(/^[0-9]{10,11}$/, { message: "Phone number must be 10-11 digits" }),
-  dateOfBirth: z.string().min(1, { message: "Date of birth is required" }),
-  gstNumber: z.string().optional(),
+  date_of_birth: z.string().min(1, { message: "Date of birth is required" }),
+  gst_number: z.string().optional(),
   address: z.string().min(1, { message: "Address is required" }),
   city: z.string().min(1, { message: "City is required" }),
   country: z.string().min(1, { message: "Country is required" }),
@@ -56,9 +57,9 @@ const DriverInfomation = () => {
         resolver: zodResolver(driverInfoSchema),
         defaultValues: {
             fullname: user?.fullname || "",
-            phoneNumber: user?.phoneNumber || "",
-            dateOfBirth: user?.dateOfBirth || "",
-            gstNumber: user?.gstNumber || "",
+            phone_number: user?.phone_number || "",
+            date_of_birth: user?.date_of_birth || "",
+            gst_number: user?.gst_number || "",
             address: user?.address || "",
             city: user?.city || "",
             country: user?.country || "",
@@ -70,9 +71,9 @@ const DriverInfomation = () => {
         if (user) {
             reset({
                 fullname: user.fullname || "",
-                phoneNumber: user.phoneNumber || "",
-                dateOfBirth: user.dateOfBirth || "",
-                gstNumber: user.gstNumber || "",
+                phone_number: user.phone_number || "",
+                date_of_birth: user.date_of_birth || "",
+                gst_number: user.gst_number || "",
                 address: user.address || "",
                 city: user.city || "",
                 country: user.country || "",
@@ -97,9 +98,9 @@ const DriverInfomation = () => {
         if (user) {
             reset({
                 fullname: user.fullname || "",
-                phoneNumber: user.phoneNumber || "",
-                dateOfBirth: user.dateOfBirth || "",
-                gstNumber: user.gstNumber || "",
+                phone_number: user.phone_number || "",
+                date_of_birth: user.date_of_birth || "",
+                gst_number: user.gst_number || "",
                 address: user.address || "",
                 city: user.city || "",
                 country: user.country || "",
@@ -177,15 +178,15 @@ const DriverInfomation = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                                     <Controller
-                                        name="phoneNumber"
+                                        name="phone_number"
                                         control={control}
                                         render={({ field }) => (
                                             <TextField
                                                 {...field}
                                                 fullWidth
                                                 size="small"
-                                                error={!!errors.phoneNumber}
-                                                helperText={errors.phoneNumber?.message}
+                                                error={!!errors.phone_number}
+                                                helperText={errors.phone_number?.message}
                                             />
                                         )}
                                     />
@@ -194,7 +195,7 @@ const DriverInfomation = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                                     <Controller
-                                        name="dateOfBirth"
+                                        name="date_of_birth"
                                         control={control}
                                         render={({ field }) => (
                                             <TextField
@@ -202,8 +203,8 @@ const DriverInfomation = () => {
                                                 fullWidth
                                                 type="date"
                                                 size="small"
-                                                error={!!errors.dateOfBirth}
-                                                helperText={errors.dateOfBirth?.message}
+                                                error={!!errors.date_of_birth}
+                                                helperText={errors.date_of_birth?.message}
                                                 InputLabelProps={{ shrink: true }}
                                             />
                                         )}
@@ -213,15 +214,15 @@ const DriverInfomation = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">GST Number</label>
                                     <Controller
-                                        name="gstNumber"
+                                        name="gst_number"
                                         control={control}
                                         render={({ field }) => (
                                             <TextField
                                                 {...field}
                                                 fullWidth
                                                 size="small"
-                                                error={!!errors.gstNumber}
-                                                helperText={errors.gstNumber?.message}
+                                                error={!!errors.gst_number}
+                                                helperText={errors.gst_number?.message}
                                             />
                                         )}
                                     />
@@ -309,15 +310,15 @@ const DriverInfomation = () => {
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Phone Number</p>
-                                    <p className="font-medium">{user?.phoneNumber || "Not updated"}</p>
+                                    <p className="font-medium">{user?.phone_number || "Not updated"}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Date of Birth</p>
-                                    <p className="font-medium">{user?.dateOfBirth || "Not updated"}</p>
+                                    <p className="font-medium">{user?.date_of_birth || "Not updated"}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">GST Number</p>
-                                    <p className="font-medium">{user?.gstNumber || "Not updated"}</p>
+                                    <p className="font-medium">{user?.gst_number || "Not updated"}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Address</p>
