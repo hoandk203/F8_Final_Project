@@ -12,9 +12,7 @@ import {
     UseGuards,
     Query,
     BadRequestException,
-    Request,
 } from '@nestjs/common';
-import { CreateDto, UpdateDto } from './order.dto';
 import { OrderService } from './order.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
@@ -50,7 +48,7 @@ export class OrderController {
 
     @UseGuards(JwtAuthGuard)
     @Get("/admin")
-    async adminGetAll(@Req() req: any){
+    async adminGetAll(){
         return this.orderService.adminGetAll();
     }
 

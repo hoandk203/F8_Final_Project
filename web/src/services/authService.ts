@@ -20,6 +20,23 @@ export const loginAPI = async (userData: any) => {
     }
 };
 
+export const verificationStatusAPI = async () => {
+    const accessToken = localStorage.getItem("access_token");
+    try {
+        const response = await axios.get(`${API_BASE_URL}/auth/verification-status`, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const getProfile = async (accessToken: string) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/auth/profile`, {

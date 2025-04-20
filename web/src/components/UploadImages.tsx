@@ -15,7 +15,6 @@ interface props {
 }
 
 const UploadImages = React.memo(({setFrontSide, setBackSide, setVehicleImageCallback, setVehicleRCImageCallback, setProofImage, setIssueImage, imageHeight, initialImage}:props) => {
-    console.log('UploadImages')
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = React.useState("");
     const handleClick = () => {

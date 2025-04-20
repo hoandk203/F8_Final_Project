@@ -14,7 +14,14 @@ const VerifyIdentity = () => {
     useEffect(() => {
         const userIdStore = JSON.parse(localStorage.getItem("userId") || "{}");
         setUserId(userIdStore)
+
+        const localStep= localStorage.getItem("verifyIdStep")
+
+        if(localStep){
+            setStep(Number(localStep))
+        }
     }, []);
+
 
 
     // xoa localStorage khi thoat trang

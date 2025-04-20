@@ -48,6 +48,11 @@ const VerifyVehicle = () => {
     }, []);
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
+        localStorage.removeItem("verifyIdStep")
+        localStorage.removeItem("verifyDriverStep")
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("refresh_token")
+        localStorage.removeItem("userId")
         try {
             if(vehicleImage && vehicleRCImage){
                 const driverId= JSON.parse(localStorage.getItem("driverId") || "{}")

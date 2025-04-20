@@ -59,6 +59,8 @@ const DriverHome = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
+            localStorage.removeItem("userId");
+            localStorage.removeItem("identityDocumentId");
             const accessToken = localStorage.getItem("access_token");
             if (!accessToken) {
                 router.push("/login");
@@ -184,7 +186,6 @@ const DriverHome = () => {
     };
 
     const updateLocation = () => {
-        // Ưu tiên sử dụng driverId từ state, sau đó từ localStorage
         const currentDriverId = driverId || parseInt(localStorage.getItem("driverId") || "0");
         
         if (!currentDriverId) {
@@ -261,11 +262,9 @@ const DriverHome = () => {
         setOrdersError("");
         
         try {
-            // Lấy driverId từ localStorage hoặc state
             const currentDriverId = driverId || parseInt(localStorage.getItem("driverId") || "0");
             
             if (!currentDriverId) {
-                toast.error("Driver ID not found");
                 return;
             }
             
@@ -273,9 +272,6 @@ const DriverHome = () => {
             const position = await getCurrentPosition();
             const { latitude, longitude } = position.coords;
             
-            
-            
-            // Gọi API để lấy đơn hàng gần đó
             const orders = await getNearbyOrders(
                 driverStatus || "idle",
                 currentDriverId, 

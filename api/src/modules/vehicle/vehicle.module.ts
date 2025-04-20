@@ -11,5 +11,6 @@ import {vehicleProviders} from "./vehicle.providers";
       ...vehicleProviders,
       VehicleService
   ],
+  exports: [VehicleService]
 })
 export class VehicleModule {}

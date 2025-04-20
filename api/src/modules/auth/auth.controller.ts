@@ -7,6 +7,8 @@ import {DriverService} from "../driver/driver.service";
 import {StoreService} from "../store/store.service";
 import { VendorService } from '../vendor/vendor.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { IdentityDocumentService } from '../identity-document/identity-document.service';
+import { VehicleService } from '../vehicle/vehicle.service';
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +17,9 @@ export class AuthController {
       private readonly userService: UsersService,
       private readonly driverService: DriverService,
       private readonly storeService: StoreService,
-      private readonly vendorService: VendorService
+      private readonly vendorService: VendorService,
+      private readonly identityDocumentService: IdentityDocumentService,
+      private readonly vehicleService: VehicleService
   ) {}
 
   @Post('/register')
@@ -33,6 +37,53 @@ export class AuthController {
   @Post('/login')
   async login(@Request() request: any){
     return this.authService.login(request.user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/verification-status')
+  async verificationStatus(@Request() request: any){
+    const userData= request.user
+    
+    if(userData.role === "driver"){
+      let idVerification= false
+      let driverVerification= false
+      let vehicleVerification= false
+      const identityDocument= await this.identityDocumentService.getOneByUserId(userData.id)
+      if(!identityDocument){
+        return{
+          userId: userData.id,
+          idVerification: false,
+          driverVerification: false,
+          vehicleVerification: false
+        }
+      }
+      if(identityDocument){
+        idVerification= true
+        const driver= await this.driverService.getByUserIdForVerification(userData.id)
+        console.log(11111111,driver);
+        
+        if(driver){
+          driverVerification= true
+          const vehicle= await this.vehicleService.getVehicleInfo(driver.id)
+          if(vehicle){
+            vehicleVerification= true
+          }
+        }
+      }
+      return{
+        userId: userData.id,
+        identityDocumentId: identityDocument.id,
+        idVerification,
+        driverVerification,
+        vehicleVerification
+      }
+    }
+    return{
+      userId: userData.id,
+      idVerification: false,
+      driverVerification: false,
+      vehicleVerification: false
+    }
   }
 
   @UseGuards(JwtAuthGuard)

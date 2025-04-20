@@ -12,5 +12,6 @@ import { DriverModule } from '../driver/driver.module';
     ...identityDocumentProviders,
     IdentityDocumentService
   ],
+  exports: [IdentityDocumentService]
 })
 export class IdentityDocumentModule {}

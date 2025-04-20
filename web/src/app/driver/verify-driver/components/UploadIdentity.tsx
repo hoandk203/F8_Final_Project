@@ -27,6 +27,8 @@ const UploadIdentity = ({setStep, userId, setIdentityDocumentId}:Props) => {
     }, []);
 
     const handleUploadIdCard = async () => {
+        localStorage.removeItem("verifyIdStep")
+        localStorage.removeItem("verifyDriverStep")
         try {
             if (frontSide && backSide) {
                 const identityData= {

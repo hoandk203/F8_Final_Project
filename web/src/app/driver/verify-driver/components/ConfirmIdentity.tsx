@@ -98,6 +98,9 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
     };
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
+        localStorage.removeItem("verifyIdStep")
+        localStorage.removeItem("verifyDriverStep")
+
         setError("");
         setSuccess("");
         
@@ -106,7 +109,10 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
             setError("Please grant location permission to continue.");
             return;
         }
-        
+        const idDocumentId= Number(localStorage.getItem("identityDocumentId"))
+        if(idDocumentId){
+            identityDocumentId=idDocumentId
+        }
         try {
             const driverData = {
                 ...data,
@@ -117,7 +123,9 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
             // Tạo tài xế
             const response = await createDriver(driverData);
             const driverId = response.id;
-            
+
+            localStorage.removeItem("identityDocumentId")
+            localStorage.removeItem("userId")
             // Lưu ID tài xế vào localStorage
             localStorage.setItem("driverId", JSON.stringify(driverId));
             

@@ -12,7 +12,8 @@ import {DriverModule} from "../driver/driver.module";
 import { StoreModule } from '../store/store.module';
 import {VendorModule} from "../vendor/vendor.module";
 import { OtpModule } from '../email-verification/otp.module';
-
+import { IdentityDocumentModule } from '../identity-document/identity-document.module';
+import { VehicleModule } from '../vehicle/vehicle.module';
 @Module({
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
@@ -23,6 +24,8 @@ import { OtpModule } from '../email-verification/otp.module';
       StoreModule,
       VendorModule,
       OtpModule,
+      IdentityDocumentModule,
+      VehicleModule,
       RefreshTokenModule,
       PassportModule,
       JwtModule.register({

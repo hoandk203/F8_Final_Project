@@ -9,7 +9,7 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
-import {loginAPI} from "@/services/authService";
+import {loginAPI, verificationStatusAPI} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -62,6 +62,24 @@ const LoginForm = () => {
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
             router.push("/driver");
+
+            const verificationStatus= await verificationStatusAPI();
+            if(!verificationStatus.idVerification){
+
+                localStorage.setItem("userId", verificationStatus.userId);
+                localStorage.setItem("verifyDriverStep", "1");
+                localStorage.setItem("verifyIdStep", "0");
+                router.push("/driver/verify-driver");
+            }else if(!verificationStatus.driverVerification){
+                localStorage.setItem("userId", verificationStatus.userId);
+                localStorage.setItem("identityDocumentId", verificationStatus.identityDocumentId);
+                localStorage.setItem("verifyDriverStep", "1");
+                localStorage.setItem("verifyIdStep", "1");
+                router.push("/driver/verify-driver");
+            }else if(!verificationStatus.vehicleVerification){
+                localStorage.setItem("verifyDriverStep", "2");
+                router.push("/driver/verify-driver");
+            }
         }catch (e) {
             if (e instanceof Error) {
                 setError(e.message);

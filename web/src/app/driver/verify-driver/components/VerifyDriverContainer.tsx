@@ -3,14 +3,21 @@
 import VerifyEmail from "../../../../components/VerifyEmail"
 import VerifyIdentity from "./VerifyIdentity";
 import VerifyVehicle from "./VerifyVehicle";
-import {useSelector} from "react-redux";
-import {RootState} from "@/redux/store";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "@/redux/store";
+import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
 
 // components này để bọc components con rồi dùng useSelector để VerifyDriverPage giữ server side
 const VerifyDriverContainer = () => {
+    const dispatch= useDispatch<AppDispatch>()
 
     const verifyDriverStep= useSelector((state: RootState) => state.verifyDriverStep.step)
 
+    const localStep= localStorage.getItem("verifyDriverStep")
+
+    if(localStep){
+        dispatch(setVerifyDriverStep(Number(localStep)))
+    }
 
     return (
         <>

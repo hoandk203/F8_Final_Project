@@ -52,6 +52,16 @@ export class DriverService extends BaseService{
             .getRawOne();
     }
 
+    async getByUserIdForVerification(userId: number) {
+        return this.driverRepository
+            .createQueryBuilder("driver")
+            .select([
+                'driver.*'
+            ])
+            .where("driver.user_id = :userId", {userId})
+            .getRawOne();
+    }
+
     async getDriverByOrderId(orderId: number) {
         return this.driverRepository
             .createQueryBuilder("driver")
