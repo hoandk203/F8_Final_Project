@@ -64,6 +64,7 @@ const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog,
                                                         unitPrice: row.unitPrice || 0,
                                                         email: row.email || "",
                                                         description: row.description || "",
+                                                        location: row.location || "",
                                                     };
                                                     
                                                     setCurrentData(dataToEdit);
