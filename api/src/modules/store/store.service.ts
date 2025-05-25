@@ -1,9 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { Repository } from "typeorm";
 import { Store } from "./store.entity";
 import { BaseService } from "../base/base.service";
 import { Vendor } from "../vendor/vendor.entity";
 import { BadRequestException } from '@nestjs/common';
+import { CreateStoreDto } from './dto/create-store.dto';
 
 @Injectable()
 export class StoreService extends BaseService {
@@ -27,7 +28,27 @@ export class StoreService extends BaseService {
             .getRawMany();
     }
 
-    async create(store: any) {
+    async create(data: CreateStoreDto) {
+        // Check if store with this email already exists
+        const existingStore = await this.storeRepository.findOne({
+            where: { email: data.email }
+        });
+
+        if (existingStore) {
+            throw new ConflictException('Store with this email already exists');
+        }
+
+        // Create new store
+        const store = this.storeRepository.create({
+            name: data.name,
+            location: data.location,
+            city: data.city,
+            email: data.email,
+            phone: data.phone,
+            vendorId: data.vendorId,
+            userId: data.userId
+        });
+
         return this.storeRepository.save(store);
     }
 
