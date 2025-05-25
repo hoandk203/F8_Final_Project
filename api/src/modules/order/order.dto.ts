@@ -26,9 +26,34 @@ export class OrderDetailDto {
     @IsNumber()
     @IsNotEmpty()
     weight: number;
+
+    @ApiProperty({
+        description: 'Amount calculated from weight and material price',
+        example: 1000
+    })
+    @IsNumber()
+    @IsOptional()
+    amount?: number;
 }
 
 export class CreateDto {
+    @ApiProperty({
+        description: 'Store ID',
+        example: 1
+    })
+    @IsNumber()
+    @IsOptional()
+    storeId?: number;
+
+    @ApiProperty({
+        description: 'Order status',
+        enum: OrderStatus,
+        default: OrderStatus.PENDING
+    })
+    @IsEnum(OrderStatus)
+    @IsOptional()
+    status?: OrderStatus;
+
     @ApiProperty({
         description: 'Scrap image in base64 format',
         example: 'data:image/jpeg;base64,...'

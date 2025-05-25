@@ -65,7 +65,7 @@ const VendorLoginForm = () => {
             if (response.role === 'vendor') {
                 router.push("/vendor");
             } else if (response.role === 'admin') {
-                router.push("/admin");
+                router.push("/admin/drivers");
             }
         } catch (e) {
             if (e instanceof Error) {

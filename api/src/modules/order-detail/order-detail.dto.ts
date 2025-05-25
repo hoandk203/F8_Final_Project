@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
 
 class CreateDto {
   @ApiProperty({
@@ -27,8 +27,8 @@ class CreateDto {
     default: 1000,
   })
   @IsNumber()
-  @IsNotEmpty()
-  amount: number;
+  @IsOptional()
+  amount?: number;
 }
 
 class UpdateDto extends CreateDto {}
