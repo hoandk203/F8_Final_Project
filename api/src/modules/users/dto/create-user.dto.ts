@@ -17,4 +17,5 @@ export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
     otp: string;
+
 }
