@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsNumber, IsString, Length, Matches } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Length, Matches, MaxLength } from 'class-validator';
 
 export enum VehicleStatus {
     PENDING = 'pending',
@@ -43,8 +43,11 @@ export class CreateVehicleDto {
     })
     @IsString()
     @IsNotEmpty()
-    @Matches(/^data:image\/(jpeg|png|jpg);base64,/, {
-        message: 'Vehicle image must be a valid base64 image'
+    @MaxLength(5 * 1024 * 1024, { // 5MB in base64
+        message: 'Vehicle image must be less than 5MB'
+    })
+    @Matches(/^data:image\/(jpeg|png|jpg);base64,[A-Za-z0-9+/=]+$/, {
+        message: 'Vehicle image must be a valid base64 image (JPEG, PNG, or JPG)'
     })
     vehicleImage: string;
 
@@ -54,8 +57,11 @@ export class CreateVehicleDto {
     })
     @IsString()
     @IsNotEmpty()
-    @Matches(/^data:image\/(jpeg|png|jpg);base64,/, {
-        message: 'Vehicle RC image must be a valid base64 image'
+    @MaxLength(5 * 1024 * 1024, { // 5MB in base64
+        message: 'Vehicle RC image must be less than 5MB'
+    })
+    @Matches(/^data:image\/(jpeg|png|jpg);base64,[A-Za-z0-9+/=]+$/, {
+        message: 'Vehicle RC image must be a valid base64 image (JPEG, PNG, or JPG)'
     })
     vehicleRCImage: string;
 

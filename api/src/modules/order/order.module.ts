@@ -8,6 +8,7 @@ import { MaterialModule } from '../material/material.module';
 import { StoreModule } from '../store/store.module';
 import { StoreLocationModule } from '../store-location/store-location.module';
 import { DriverModule } from '../driver/driver.module';
+import { ImageModule } from '../image/image.module';
 @Module({
   imports: [
     DatabaseModule,
@@ -15,7 +16,8 @@ import { DriverModule } from '../driver/driver.module';
     MaterialModule,
     StoreLocationModule,
     StoreModule,
-    DriverModule
+    DriverModule,
+    ImageModule
   ],
   controllers: [OrderController],
   providers: [

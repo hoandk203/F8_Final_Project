@@ -12,6 +12,7 @@ import {imageProviders} from "./image.providers";
     ...imageProviders,
     ImageService
   ],
+  exports: [ImageService]
 })
 
 export class ImageModule {}

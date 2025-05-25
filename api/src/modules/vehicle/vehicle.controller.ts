@@ -1,6 +1,7 @@
 import {Body, Controller, Post, Get, Param, Put} from '@nestjs/common';
 import { VehicleService } from './vehicle.service';
 import {CreateVehicleDto} from "./dto/create-vehicle.dto";
+import { AdminUpdateVehicleDto, UpdateVehicleDto } from './dto/update-vehicle.dto';
 
 @Controller('vehicle')
 export class VehicleController {
@@ -17,12 +18,12 @@ export class VehicleController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() updateVehicleDto: any) {
+  async update(@Param('id') id: number, @Body() updateVehicleDto: UpdateVehicleDto) {
     return this.vehicleService.updateVehicle(id, updateVehicleDto);
   }
 
   @Put('admin/:id')
-  async updateVehicleStatus(@Param('id') id: number, @Body() updateVehicleDto: any) {
+  async updateVehicleStatus(@Param('id') id: number, @Body() updateVehicleDto: AdminUpdateVehicleDto) {
     return this.vehicleService.updateVehicleStatus(id, updateVehicleDto);
   }
 
