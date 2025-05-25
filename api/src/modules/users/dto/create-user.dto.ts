@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsString, MaxLength, MinLength} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, ValidateIf} from 'class-validator';
 
 export class CreateUserDto {
     @IsEmail()
@@ -12,10 +12,14 @@ export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty()
-    role: 'admin' | 'vendor' | 'driver';
+    role: 'admin' | 'vendor' | 'driver' | 'store';
 
     @IsString()
     @IsNotEmpty()
     otp: string;
 
+    @IsString()
+    @ValidateIf((o) => o.role === 'vendor')
+    @IsNotEmpty({ message: 'Name is required for vendor role' })
+    name?: string;
 }

@@ -206,7 +206,7 @@ const VendorRegisterForm = () => {
                                         <em>Select role</em>
                                     </MenuItem>
                                     <MenuItem value="vendor">Vendor</MenuItem>
-                                    <MenuItem value="admin">Admin</MenuItem>
+                                    {/*<MenuItem value="admin">Admin</MenuItem>*/}
                                 </Select>
                                 {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
                             </FormControl>
