@@ -28,8 +28,8 @@ export class VehicleService extends BaseService{
             writeFile(path, payload, 'base64', (e) => {
                 console.log(e)
             })
-            const BASE_URL = process.env.BASE_URL
-            return `${BASE_URL}/image?path=files%2Fimages%2Fvehicle%2F${fileName}`;
+            const API_URL = process.env.API_URL
+            return `${API_URL}/image?path=files%2Fimages%2Fvehicle%2F${fileName}`;
         } catch (error) {
             console.log(error)
             throw new Error('Error saving image');
