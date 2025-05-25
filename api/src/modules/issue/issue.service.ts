@@ -32,8 +32,8 @@ export class IssueService extends BaseService {
                 console.log(e)
             })
 
-            const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-            return `${BASE_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
+            const API_URL = process.env.API_URL || 'http://localhost:3000';
+            return `${API_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
         } catch (error) {
             console.error(error);
             throw new Error('Error saving image');
