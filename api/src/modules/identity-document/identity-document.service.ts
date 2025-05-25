@@ -3,7 +3,7 @@ import {BaseService} from "../base/base.service";
 import {Repository} from "typeorm";
 import {IdentityDocument} from "./entities/identity-document.entity";
 import {CreateIdentityDto} from "./dto/create-identity.dto";
-import {UpdateIdentityDto} from "./dto/update-identity.dto";
+import {UpdateIdentityDto, UserUpdateIdentityDto} from "./dto/update-identity.dto";
 import { DriverService } from '../driver/driver.service';
 import { ImageService } from '../image/image.service';
 
@@ -32,16 +32,19 @@ export class IdentityDocumentService extends BaseService{
         return await this.identityDocumentRepository.save(identityDocument);
     }
     
-    async updateIdentityDocument(id: number, data: any): Promise<IdentityDocument> {
+    async updateIdentityDocument(id: number, data: UserUpdateIdentityDto): Promise<IdentityDocument> {
         const identityDocument = await this.identityDocumentRepository.findOne({ where: { id } });
+        if (!identityDocument) {
+            throw new NotFoundException(`Identity document with ID ${id} not found`);
+        }
         
         let frontImageUrl = identityDocument.frontImageUrl;
         let backImageUrl = identityDocument.backImageUrl;
 
-        if(identityDocument.frontImageUrl !== data.frontImageUrl){
+        if(data.frontImageUrl && identityDocument.frontImageUrl !== data.frontImageUrl){
             frontImageUrl = await this.imageService.uploadBase64Image(data.frontImageUrl, 'identity');
         }
-        if(identityDocument.backImageUrl !== data.backImageUrl){
+        if(data.backImageUrl && identityDocument.backImageUrl !== data.backImageUrl){
             backImageUrl = await this.imageService.uploadBase64Image(data.backImageUrl, 'identity');
         }
 

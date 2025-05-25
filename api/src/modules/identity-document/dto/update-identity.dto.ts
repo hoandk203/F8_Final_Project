@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, Matches } from 'class-validator';
 import { IdentityStatus } from './create-identity.dto';
 
-export class UpdateIdentityDto {
+export class UserUpdateIdentityDto {
     @ApiProperty({
         description: 'Front side image of identity document in base64 format',
         example: 'data:image/jpeg;base64,...',
@@ -28,7 +28,9 @@ export class UpdateIdentityDto {
         message: 'Back image must be a valid base64 image (JPEG, PNG, or JPG)'
     })
     backImageUrl?: string;
+}
 
+export class UpdateIdentityDto {
     @ApiProperty({
         description: 'Identity document verification status',
         enum: IdentityStatus
