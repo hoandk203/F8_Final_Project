@@ -1,18 +1,46 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-class CreateDto {
+export class CreateDto {
     @ApiProperty({
         description: 'name of vendor',
-        example: 'Hoan',
+        example: 'The Gioi Di Dong',
     })
+    @IsString()
+    @IsNotEmpty()
     name: string;
 
     @ApiProperty({
-        default: 'hoan1@gmail.com',
+        description: 'email of vendor',
+        example: 'vendor@example.com',
     })
+    @IsEmail()
+    @IsNotEmpty()
     email: string;
+
+    @ApiProperty({
+        description: 'ID of the user associated with this vendor',
+        example: 1,
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    userId: number;
 }
 
-class UpdateDto extends CreateDto {}
+export class UpdateDto {
+    @ApiProperty({
+        description: 'name of vendor',
+        example: 'The Gioi Di Dong',
+    })
+    @IsString()
+    @IsNotEmpty()
+    name: string;
 
-export { CreateDto, UpdateDto };
+    @ApiProperty({
+        description: 'email of vendor',
+        example: 'vendor@example.com',
+    })
+    @IsEmail()
+    @IsNotEmpty()
+    email: string;
+}

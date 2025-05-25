@@ -1,7 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Vendor } from './vendor.entity';
-import {BaseService} from "../base/base.service";
+import { BaseService } from "../base/base.service";
+import { CreateDto } from './vendor.dto';
 
 @Injectable()
 export class VendorService extends BaseService{
@@ -10,6 +11,26 @@ export class VendorService extends BaseService{
         private vendorRepository: Repository<Vendor>,
     ) {
         super(vendorRepository)
+    }
+
+    async create(data: CreateDto) {
+        // Check if vendor with this email already exists
+        const existingVendor = await this.vendorRepository.findOne({
+            where: { email: data.email }
+        });
+
+        if (existingVendor) {
+            throw new ConflictException('Vendor with this email already exists');
+        }
+
+        // Create new vendor
+        const vendor = this.vendorRepository.create({
+            name: data.name,
+            email: data.email,
+            userId: data.userId
+        });
+
+        return this.vendorRepository.save(vendor);
     }
 
     async getList() {
