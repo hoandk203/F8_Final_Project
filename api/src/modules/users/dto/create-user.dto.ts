@@ -13,4 +13,9 @@ export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
     role: 'admin' | 'vendor' | 'driver';
+
+    @IsString()
+    @IsNotEmpty()
+    otp: string;
+
 }
