@@ -16,6 +16,7 @@ import {StoreLocation} from "./modules/store-location/store-location.entity";
 import {Payment} from "./modules/payment/entities/payment.entity";
 import { Issue } from './modules/issue/entities/issue.entity';
 import { IssueMessage } from './modules/issue-message/entities/issue-message.entity';
+import { Admin } from './modules/admin/admin.entity';
 
 export const databaseProviders = [
     {
@@ -46,7 +47,8 @@ export const databaseProviders = [
                     StoreLocation,
                     Payment,
                     Issue,
-                    IssueMessage
+                    IssueMessage,
+                    Admin
                 ],
                 synchronize: true,
             });

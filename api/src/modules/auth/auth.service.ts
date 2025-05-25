@@ -23,26 +23,33 @@ export class AuthService {
     ) {}
 
     async login(user: any){
-        console.log(user);
-        
-        const uuid= uuidv4()
-        const payload= {email: user.email, sub: user.id, uuid}
-        const accessToken= this.jwtService.sign(payload)
-        const refreshToken= this.jwtService.sign(payload, {expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,})
+        // Kiểm tra role và validate
+        if (user.role === 'admin') {
+            const adminUser = await this.userService.validateUser(user.email, user.password);
+            if (!adminUser || adminUser.role !== 'admin') {
+                throw new UnauthorizedException('Access denied. Admin only.');
+            }
+        }
+
+        const uuid = uuidv4()
+        const payload = {email: user.email, sub: user.id, role: user.role, uuid}
+        const accessToken = this.jwtService.sign(payload)
+        const refreshToken = this.jwtService.sign(payload, {expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,})
 
         //decode de lay thoi gian het han
-        const decoded= this.jwtService.decode(refreshToken)
-        const expiresAt= new Date(decoded.exp * 1000)
+        const decoded = this.jwtService.decode(refreshToken)
+        const expiresAt = new Date(decoded.exp * 1000)
 
         //hash
-        const hashedRefreshToken= await bcrypt.hash(refreshToken, 10)
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
 
         // luu vao db
         await this.refreshTokenService.create(user.id, hashedRefreshToken, expiresAt, uuid)
 
         return{
             access_token: accessToken,
-            refresh_token: refreshToken
+            refresh_token: refreshToken,
+            role: user.role
         }
     }
 

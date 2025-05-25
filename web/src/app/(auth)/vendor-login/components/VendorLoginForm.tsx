@@ -56,13 +56,18 @@ const VendorLoginForm = () => {
     });
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-
         try {
-            const response= await loginAPI(data);
+            const response = await loginAPI(data);
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
-            router.push("/vendor");
-        }catch (e) {
+            
+            // Redirect based on role
+            if (response.role === 'vendor') {
+                router.push("/vendor");
+            } else if (response.role === 'admin') {
+                router.push("/admin");
+            }
+        } catch (e) {
             if (e instanceof Error) {
                 setError(e.message);
             } else {
@@ -70,7 +75,6 @@ const VendorLoginForm = () => {
             }
         }
         reset()
-
     }
 
     return (

@@ -58,6 +58,7 @@ const VendorRegisterForm = () => {
         reset,
         control,
         formState: { errors, isSubmitting },
+        watch,
     } = useForm<FormInput>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -72,7 +73,7 @@ const VendorRegisterForm = () => {
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         try {
             const userData = {
-                name: data.name,
+                name: data.role === 'vendor' ? data.name : undefined,
                 email: data.email,
                 password: data.password,
                 role: data.role,
@@ -82,7 +83,11 @@ const VendorRegisterForm = () => {
             localStorage.setItem("userData", JSON.stringify(userData));
             reset();
             
-            router.push("/vendor/verify-vendor");
+            if (data.role === 'vendor') {
+                router.push("/vendor/verify-vendor");
+            } else if (data.role === 'admin') {
+                router.push("/admin/verify-admin");
+            }
         } catch (error: any) {
             setError(error.message);
         }
@@ -92,21 +97,23 @@ const VendorRegisterForm = () => {
         <div>
             {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
-                <div className="flex flex-col gap-y-1">
-                    <label htmlFor="name" className="font-semibold">
-                        Name
-                    </label>
-                    <TextField
-                        {...register("name")}
-                        type="text"
-                        id="name"
-                        label="Name"
-                        variant="outlined"
-                        error={!!errors.name}
-                        helperText={errors.name?.message}
-                        inputRef={(input) => input && (input.tabIndex = 1)}
-                    />
-                </div>
+                {watch('role') === 'vendor' && (
+                    <div className="flex flex-col gap-y-1">
+                        <label htmlFor="name" className="font-semibold">
+                            Name
+                        </label>
+                        <TextField
+                            {...register("name")}
+                            type="text"
+                            id="name"
+                            label="Name"
+                            variant="outlined"
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
+                            inputRef={(input) => input && (input.tabIndex = 1)}
+                        />
+                    </div>
+                )}
                 
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor="email" className="font-semibold">
@@ -206,7 +213,7 @@ const VendorRegisterForm = () => {
                                         <em>Select role</em>
                                     </MenuItem>
                                     <MenuItem value="vendor">Vendor</MenuItem>
-                                    {/*<MenuItem value="admin">Admin</MenuItem>*/}
+                                    <MenuItem value="admin">Admin</MenuItem>
                                 </Select>
                                 {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
                             </FormControl>
