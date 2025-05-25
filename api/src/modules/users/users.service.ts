@@ -104,7 +104,7 @@ export class UsersService extends BaseService{
 
   // CREATE USER
   async create(data: any) {
-    const {email, password, role}= data
+    const {email, password, role, name}= data
     
     const userExist= await this.userRepository.findOne({where: {email}})
     if(userExist){
@@ -114,7 +114,6 @@ export class UsersService extends BaseService{
     const validateOtp= await this.otpService.validateOtp(data.email, data.otp)
 
     if(validateOtp){
-
       if(role === "store"){
         const passwordRandom = Math.random().toString(36).slice(-8) + "@Scrap1";
         data.password = passwordRandom;
@@ -176,13 +175,22 @@ export class UsersService extends BaseService{
         </html>
       `
         })
-
       }
       
       //hash password
-      data.password  = await bcrypt.hash(data.password, 10);
+      data.password = await bcrypt.hash(data.password, 10);
 
-      await this.repository
+      // Validate name field for vendor
+      if(role === 'vendor' && !name) {
+        throw new Error('Name is required for vendor role');
+      }
+
+      // Remove name field if role is not vendor
+      if(role !== 'vendor') {
+        delete data.name;
+      }
+
+      const user = await this.repository
           .createQueryBuilder()
           .insert()
           .values(data)

@@ -64,7 +64,7 @@ const StoreLoginForm = () => {
 
 
             const verificationStatus= await verificationStatusAPI()
-            if(!verificationStatus.storeVerification && !verificationStatus.driverVerification){
+            if(!verificationStatus.storeVerification){
                 localStorage.setItem("userId", verificationStatus.userId);
                 localStorage.setItem("stepVerifyStore", "1");
                 window.location.href = ("/store/verify-store");

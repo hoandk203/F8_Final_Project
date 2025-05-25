@@ -11,4 +11,7 @@ export class User extends Base{
 
     @Column()
     role: string;
+
+    @Column({ nullable: true })
+    name: string;
 }

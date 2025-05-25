@@ -11,10 +11,9 @@ const VerifyStoreContainer = () => {
     const router= useRouter()
 
     useEffect(() => {
-        localStorage.getItem("stepVerifyStore")
-            ? setStepVerifyStore(Number(localStorage.getItem("stepVerifyStore")))
-            : router.push("/store-login")
-
+        if(localStorage.getItem("stepVerifyStore")){
+            setStepVerifyStore(Number(localStorage.getItem("stepVerifyStore")))
+        }
     }, []);
 
     return (
