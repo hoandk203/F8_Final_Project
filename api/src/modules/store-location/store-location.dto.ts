@@ -1,22 +1,46 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsNotEmpty } from 'class-validator';
 
-class CreateDto {
+export class CreateDto {
   @ApiProperty({
-    default: 123,
+    description: 'Latitude of the store location',
+    example: 10.123456
   })
+  @IsNumber()
+  @IsNotEmpty()
   latitude: number;
 
   @ApiProperty({
-    default: 456,
+    description: 'Longitude of the store location',
+    example: 106.123456
   })
+  @IsNumber()
+  @IsNotEmpty()
   longitude: number;
 
   @ApiProperty({
-    default: 1,
+    description: 'ID of the store',
+    example: 1
   })
+  @IsNumber()
+  @IsNotEmpty()
   storeId: number;
 }
 
-class UpdateDto extends CreateDto {}
+export class UpdateDto {
+  @ApiProperty({
+    description: 'Latitude of the store location',
+    example: 10.123456
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  latitude: number;
 
-export { CreateDto, UpdateDto };
+  @ApiProperty({
+    description: 'Longitude of the store location',
+    example: 106.123456
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  longitude: number;
+}
