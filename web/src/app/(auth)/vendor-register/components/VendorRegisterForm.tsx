@@ -11,9 +11,10 @@ import { sendVerificationEmail } from "@/services/authService";
 import { FormControl, InputLabel, MenuItem, Select, FormHelperText, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import React from "react";
 
 const schema = z.object({
-    name: z.string().min(1, { message: "Name is required" }),
+    name: z.string().optional(),
     email: z
         .string()
         .min(1, { message: "Email is required" })
@@ -34,6 +35,19 @@ const schema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
+}).refine((data) => {
+    // Nếu role là vendor thì bắt buộc phải có name
+    if (data.role === 'vendor' && !data.name) {
+        return false;
+    }
+    // Nếu role là admin thì không được có name
+    if (data.role === 'admin' && data.name) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Name is required for vendor and not allowed for admin",
+    path: ["name"],
 });
 
 type FormInput = z.infer<typeof schema>;
@@ -59,6 +73,7 @@ const VendorRegisterForm = () => {
         control,
         formState: { errors, isSubmitting },
         watch,
+        setValue
     } = useForm<FormInput>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -69,6 +84,14 @@ const VendorRegisterForm = () => {
             role: "",
         },
     });
+
+    // Reset name field when role changes
+    const role = watch('role');
+    React.useEffect(() => {
+        if (role === 'admin') {
+            setValue('name', '');
+        }
+    }, [role, setValue]);
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         try {
@@ -97,6 +120,34 @@ const VendorRegisterForm = () => {
         <div>
             {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-1">
+                    <label htmlFor="role" className="font-semibold">
+                        Role
+                    </label>
+                    <Controller
+                        name="role"
+                        control={control}
+                        render={({ field }) => (
+                            <FormControl error={!!errors.role}>
+                                <Select
+                                    {...field}
+                                    id="role"
+                                    displayEmpty
+                                    inputProps={{ tabIndex: 1 }}
+                                    value={field.value || ""}
+                                >
+                                    <MenuItem value="" disabled>
+                                        <em>Select role</em>
+                                    </MenuItem>
+                                    <MenuItem value="vendor">Vendor</MenuItem>
+                                    <MenuItem value="admin">Admin</MenuItem>
+                                </Select>
+                                {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
+                            </FormControl>
+                        )}
+                    />
+                </div>
+
                 {watch('role') === 'vendor' && (
                     <div className="flex flex-col gap-y-1">
                         <label htmlFor="name" className="font-semibold">
@@ -110,7 +161,7 @@ const VendorRegisterForm = () => {
                             variant="outlined"
                             error={!!errors.name}
                             helperText={errors.name?.message}
-                            inputRef={(input) => input && (input.tabIndex = 1)}
+                            inputRef={(input) => input && (input.tabIndex = 2)}
                         />
                     </div>
                 )}
@@ -127,7 +178,7 @@ const VendorRegisterForm = () => {
                         variant="outlined"
                         error={!!errors.email}
                         helperText={errors.email?.message}
-                        inputRef={(input) => input && (input.tabIndex = 2)}
+                        inputRef={(input) => input && (input.tabIndex = 3)}
                     />
                 </div>
                 
@@ -143,7 +194,7 @@ const VendorRegisterForm = () => {
                         variant="outlined"
                         error={!!errors.password}
                         helperText={errors.password?.message}
-                        inputRef={(input) => input && (input.tabIndex = 3)}
+                        inputRef={(input) => input && (input.tabIndex = 4)}
                         slotProps={{
                             input: {
                                 endAdornment: (
@@ -174,7 +225,7 @@ const VendorRegisterForm = () => {
                         variant="outlined"
                         error={!!errors.confirmPassword}
                         helperText={errors.confirmPassword?.message}
-                        inputRef={(input) => input && (input.tabIndex = 4)}
+                        inputRef={(input) => input && (input.tabIndex = 5)}
                         slotProps={{
                             input: {
                                 endAdornment: (
@@ -190,34 +241,6 @@ const VendorRegisterForm = () => {
                                 )
                             }
                         }}
-                    />
-                </div>
-                
-                <div className="flex flex-col gap-y-1">
-                    <label htmlFor="role" className="font-semibold">
-                        Role
-                    </label>
-                    <Controller
-                        name="role"
-                        control={control}
-                        render={({ field }) => (
-                            <FormControl error={!!errors.role}>
-                                <Select
-                                    {...field}
-                                    id="role"
-                                    displayEmpty
-                                    inputProps={{ tabIndex: 5 }}
-                                    value={field.value || ""}
-                                >
-                                    <MenuItem value="" disabled>
-                                        <em>Select role</em>
-                                    </MenuItem>
-                                    <MenuItem value="vendor">Vendor</MenuItem>
-                                    <MenuItem value="admin">Admin</MenuItem>
-                                </Select>
-                                {errors.role && <FormHelperText>{errors.role.message}</FormHelperText>}
-                            </FormControl>
-                        )}
                     />
                 </div>
                 

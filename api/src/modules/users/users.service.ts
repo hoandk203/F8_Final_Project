@@ -240,8 +240,6 @@ export class UsersService extends BaseService{
     }
 
     //compare hash password
-    console.log(password);
-    console.log(user.password);
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password');

@@ -149,6 +149,22 @@ export const createVendor = async (vendorData: any) => {
     }
 }
 
+export const createAdmin = async (adminData: any) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/admin`, adminData, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if(error.response){
+            throw new Error(error.response.data.message);
+        }
+        throw error;
+    }
+}
+
 export const updateUserProfile = async (profileData: any) => {
   try {
     const accessToken = localStorage.getItem("access_token");

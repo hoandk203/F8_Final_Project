@@ -28,7 +28,7 @@ export class AuthController {
   }
 
   //flow: click login
-  // -> thong qua local auth guard, chay ham validate trong local auth guard
+  // -> thong qua local auth guard, chay ham validate trong passport local strategy
   // -> ham validate goi ham validateUser trong users service
   // -> tra ve user, tra nguoc vao request
   // -> lay request.user va truyen vao login trong auth service

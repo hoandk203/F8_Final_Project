@@ -7,7 +7,7 @@ import CustomButton from "@/components/CustomButton";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
-import {createVendor, resetPassword, sendVerificationEmail, verifyEmail} from "@/services/authService";
+import {createAdmin, createVendor, resetPassword, sendVerificationEmail, verifyEmail} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import LoadingOverlay from "./LoadingOverlay";
@@ -59,6 +59,25 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
                     }
                 }
 
+                if(userData.role === "admin"){
+                    try {
+                        const adminData= {
+                            userId: response.id,
+                            email: userData.email
+                        }
+                        await createAdmin(adminData)
+                        localStorage.removeItem("userData")
+                        router.push("/vendor-login")
+                        setIsLoading(false)
+                    } catch (error: any) {
+                        setIsLoading(false)
+                        console.log(1);
+                        
+                        setError(error.message)
+                    }
+                }
+
+
                 // lay userId cho vao verifyIdentity
                 localStorage.setItem("userId", JSON.stringify(response.id));
 
@@ -82,7 +101,7 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
                 }else if(response.role === "store"){
                     router.push("/store-login")
                 }else if(response.role === "admin"){
-                    router.push("/admin-login")
+                    router.push("/vendor-login")
                 }else {
                     router.push("/login")
                 }
