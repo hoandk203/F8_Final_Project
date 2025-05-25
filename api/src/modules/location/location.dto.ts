@@ -17,6 +17,16 @@ class CreateDto {
   driverId: number;
 }
 
-class UpdateDto extends CreateDto {}
+class UpdateDto {
+  @ApiProperty({
+    default: 123,
+  })
+  latitude: number;
+
+  @ApiProperty({
+    default: 456,
+  })
+  longitude: number;
+}
 
 export { CreateDto, UpdateDto };

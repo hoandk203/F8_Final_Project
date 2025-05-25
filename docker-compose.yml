@@ -1,23 +1,15 @@
-#version: '3'
-
 services:
-#  db:
-
-  api:
-    container_name: k9-backend
-    image: node:23.0.0
-    working_dir: /app/api
-    env_file:
-      - .env
-    volumes:
-      - './api:/app/api'
-    ports:
-      - '3001:3000'
-    command: ['npm', 'run', 'start:dev']
-#    command:
-#      - npm
-#      - run
-#      - start
+#  api:
+#    container_name: k9-backend
+#    image: node:23.0.0
+#    working_dir: /app/api
+#    env_file:
+#      - .env
+#    volumes:
+#      - './api:/app/api'
+#    ports:
+#      - '3000:3000'
+#    command: ['npm', 'run', 'start:dev']
 
   web:
     container_name: k9-frontend
