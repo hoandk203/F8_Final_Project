@@ -185,8 +185,7 @@ export class UsersService extends BaseService{
         throw new Error('Name is required for vendor role');
       }
 
-      // Remove name field if role is not vendor
-      if(role !== 'vendor') {
+      if(role === 'admin') {
         delete data.name;
       }
 
@@ -235,6 +234,8 @@ export class UsersService extends BaseService{
   async validateUser(email: string, password: string) {
     //check user exist
     const user= await this.userRepository.findOne({ where: { email } });
+    console.log(user);
+    
     if (!user) {
       throw new NotFoundException('User not found');
     }
