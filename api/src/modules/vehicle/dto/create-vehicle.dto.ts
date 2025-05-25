@@ -10,7 +10,7 @@ export enum VehicleStatus {
 export class CreateVehicleDto {
     @ApiProperty({
         description: 'Driver ID',
-        example: 1
+        example: 1,
     })
     @IsNumber()
     @IsNotEmpty()

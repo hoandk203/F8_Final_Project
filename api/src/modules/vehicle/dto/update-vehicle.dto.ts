@@ -6,7 +6,7 @@ export class UpdateVehicleDto {
     @ApiProperty({
         description: 'Vehicle plate number',
         example: 'ABC-123',
-        required: false
+        required: false,
     })
     @IsString()
     @IsOptional()
