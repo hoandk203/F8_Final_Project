@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { IdentityDocumentService } from './identity-document.service';
 import { CreateIdentityDto } from './dto/create-identity.dto';
-import { UpdateIdentityDto } from './dto/update-identity.dto';
+import { UpdateIdentityDto, UserUpdateIdentityDto } from './dto/update-identity.dto';
 import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 
 @Controller('identity-document')
@@ -35,7 +35,7 @@ export class IdentityDocumentController {
 
     @UseGuards(JwtAuthGuard)
     @Put('/:id')
-    async update(@Param('id') id: number, @Body() updateIdentityDto: UpdateIdentityDto) {
+    async update(@Param('id') id: number, @Body() updateIdentityDto: UserUpdateIdentityDto) {
         return this.identityDocumentService.updateIdentityDocument(id, updateIdentityDto);
     }
 
