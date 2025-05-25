@@ -1,19 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
 
-class CreateDto {
+export class CreateDto {
   @ApiProperty({
-    description: 'name of vendor',
-    example: 'iron',
+    description: 'Name of material',
+    example: 'iron'
   })
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty({
-    example: 100,
+    description: 'Price per unit',
+    example: 100
   })
+  @IsNumber()
+  @IsNotEmpty()
   unitPrice: number;
-
 }
 
-class UpdateDto extends CreateDto {}
+export class UpdateDto {
+  @ApiProperty({
+    description: 'Name of material',
+    example: 'iron'
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-export { CreateDto, UpdateDto };
+  @ApiProperty({
+    description: 'Price per unit',
+    example: 100
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  unitPrice: number;
+}
