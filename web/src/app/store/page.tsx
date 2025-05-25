@@ -10,7 +10,7 @@ import OrderList from "@/app/store/components/OrderList";
 import { useRouter } from "next/navigation";
 import { refreshToken } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { getOrders } from "@/services/orderService";
+import { getOrdersByStore } from "@/services/orderService";
 
 interface User {
   email: string;
@@ -53,7 +53,7 @@ const StorePage = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await getOrders();
+      const response = await getOrdersByStore();
       setOrders(response || []);
       processOrderData(response);
     } catch (err) {

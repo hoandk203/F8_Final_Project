@@ -1,4 +1,4 @@
-import {Injectable, UnauthorizedException, BadRequestException, ConflictException} from '@nestjs/common';
+import {Injectable, UnauthorizedException, BadRequestException} from '@nestjs/common';
 import {UsersService} from "../users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt'
@@ -6,7 +6,6 @@ import {RefreshTokenService} from "../refresh-token/refresh-token.service";
 import { v4 as uuidv4 } from 'uuid';
 import { OtpService } from '../email-verification/otp.service';
 import { MailerService } from '@nestjs-modules/mailer';
-import { userInfo } from 'os';
 import { StoreService } from '../store/store.service';
 import { VendorService } from '../vendor/vendor.service';
 import { DriverService } from '../driver/driver.service';

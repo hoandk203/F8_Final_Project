@@ -28,7 +28,7 @@ const AdminSidebar = () => {
         
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        router.push("/admin-login");
+        window.location.href =("/admin-login");
     };
 
     return (

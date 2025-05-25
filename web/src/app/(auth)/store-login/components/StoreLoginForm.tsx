@@ -10,7 +10,7 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
-import {loginAPI} from "@/services/authService";
+import {loginAPI, verificationStatusAPI} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -56,11 +56,19 @@ const StoreLoginForm = () => {
     });
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-
+        localStorage.clear()
         try {
             const response= await loginAPI(data);
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
+
+
+            const verificationStatus= await verificationStatusAPI()
+            if(!verificationStatus.storeVerification && !verificationStatus.driverVerification){
+                localStorage.setItem("userId", verificationStatus.userId);
+                localStorage.setItem("stepVerifyStore", "1");
+                window.location.href = ("/store/verify-store");
+            }
             router.push("/store");
         }catch (e) {
             if (e instanceof Error) {

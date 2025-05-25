@@ -60,7 +60,6 @@ export class AuthController {
       if(identityDocument){
         idVerification= true
         const driver= await this.driverService.getByUserIdForVerification(userData.id)
-        console.log(11111111,driver);
         
         if(driver){
           driverVerification= true
@@ -78,6 +77,19 @@ export class AuthController {
         vehicleVerification
       }
     }
+
+    if(userData.role === "store"){
+      let storeVerification= false
+      const store= await this.storeService.getByEmailForVerification(userData.email)
+      if(store){
+        storeVerification= true
+      }
+      return{
+        userId: userData.id,
+        storeVerification
+      }
+    }
+
     return{
       userId: userData.id,
       idVerification: false,

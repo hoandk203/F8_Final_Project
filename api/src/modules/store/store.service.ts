@@ -83,6 +83,7 @@ export class StoreService extends BaseService {
             ])
             .innerJoin(Vendor, "vendor", "vendor.id = store.vendorId")
             .where("store.email = :email", {email})
+            .andWhere("store.active = :active", {active: true})
             .getRawOne();
     }
 
@@ -90,6 +91,7 @@ export class StoreService extends BaseService {
         return this.storeRepository
             .createQueryBuilder("store")
             .where("store.user_id = :userId", {userId})
+            .andWhere("store.active = :active", {active: true})
             .getOne();
     }
 
@@ -97,6 +99,7 @@ export class StoreService extends BaseService {
         return this.storeRepository
             .createQueryBuilder("store")
             .where("store.id = :storeId", {storeId})
+            .andWhere("store.active = :active", {active: true})
             .getOne();
     }
 
@@ -114,5 +117,16 @@ export class StoreService extends BaseService {
             console.error('Error getting stores by vendor ID:', error);
             throw new BadRequestException('Failed to get stores by vendor ID');
         }
+    }
+
+    async getByEmailForVerification(email: string) {
+        return this.storeRepository
+            .createQueryBuilder("store")
+            .select([
+                'store.id',
+            ])
+            .where("store.email = :email", {email})
+            .andWhere("store.active = :active", {active: true})
+            .getRawOne();
     }
 }

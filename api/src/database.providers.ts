@@ -21,13 +21,14 @@ export const databaseProviders = [
     {
         provide: 'DATA_SOURCE',
         useFactory: async () => {
+            console.log('DATABASE_URL:', process.env.DATABASE_URL);
+            
             const dataSource = new DataSource({
-                type: process.env.DB_TYPE as any,
-                host: process.env.DB_HOST,
-                port: process.env.DB_PORT as any,
-                username: process.env.DB_USERNAME,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_NAME,
+                type: 'postgres',
+                url: process.env.DATABASE_URL,
+                ssl: {
+                    rejectUnauthorized: false
+                },
                 entities: [
                     Store,
                     Vendor,

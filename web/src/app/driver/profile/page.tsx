@@ -96,7 +96,7 @@ export default function ProfilePage() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("driverId");
-    router.push("/login");
+    window.location.href =("/login");
   };
 
   const toggleVehicleInfo = () => {

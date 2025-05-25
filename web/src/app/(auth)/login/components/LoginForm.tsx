@@ -61,7 +61,7 @@ const LoginForm = () => {
             const response= await loginAPI(data);
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
-            router.push("/driver");
+
 
             const verificationStatus= await verificationStatusAPI();
             if(!verificationStatus.idVerification){
@@ -78,8 +78,9 @@ const LoginForm = () => {
                 router.push("/driver/verify-driver");
             }else if(!verificationStatus.vehicleVerification){
                 localStorage.setItem("verifyDriverStep", "2");
-                router.push("/driver/verify-driver");
+                window.location.href= ("/driver/verify-driver");
             }
+            router.push("/driver");
         }catch (e) {
             if (e instanceof Error) {
                 setError(e.message);

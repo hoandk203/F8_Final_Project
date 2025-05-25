@@ -67,6 +67,7 @@ export class OrderDetailService extends BaseService {
                 ])
                 .innerJoin(Material, 'material', 'material.id = order_detail.material_id')
                 .where('order_detail.order_id = :orderId', { orderId })
+                .andWhere('order_detail.active = :active', { active: true })
                 .getRawMany();
                 
             console.log(`Found ${details.length} order details for order ${orderId}`);

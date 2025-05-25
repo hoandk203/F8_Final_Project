@@ -54,7 +54,7 @@ const StoreLayout = ({children}: {children: React.ReactNode}) => {
         
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        router.push("/store-login");
+        window.location.href= ("/store-login");
       };
 
     // Kiểm tra trạng thái cửa hàng sau khi đã load dữ liệu
@@ -65,16 +65,16 @@ const StoreLayout = ({children}: {children: React.ReactNode}) => {
                     <CardContent>
                         <Box className="text-center py-8">
                             <Typography variant="h4" color="error" gutterBottom>
-                                Cửa hàng chưa được phê duyệt
+                                Store not yet approved
                             </Typography>
                             <Typography variant="body1" paragraph>
-                                Cửa hàng của bạn hiện đang trong trạng thái chờ phê duyệt. Vui lòng liên hệ với nhà cung cấp ({user.vendor_name}) để được kích hoạt tài khoản.
+                                Your store is currently pending approval. Please contact the provider ({user.vendor_name}) to activate your account.
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Thông tin liên hệ của bạn:
+                                Your contact information:
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Email: {user.email} | Số điện thoại: {user.phone}
+                                Email: {user.email} | Phone number: {user.phone}
                             </Typography>
                             <Box className="mt-4 flex justify-center gap-4">
                                 <Button
@@ -82,7 +82,7 @@ const StoreLayout = ({children}: {children: React.ReactNode}) => {
                                     variant="outlined"
                                     onClick={() => router.push("/store/profile")}
                                 >
-                                    Xem thông tin cửa hàng
+                                    View profile
                                 </Button>
                                 <Button
                                     className={"bg-[#303030] text-white"}
@@ -90,7 +90,7 @@ const StoreLayout = ({children}: {children: React.ReactNode}) => {
                                     color="primary" 
                                     onClick={handleLogout}
                                 >
-                                    Đăng xuất
+                                    Logout
                                 </Button>
                             </Box>
                         </Box>

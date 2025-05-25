@@ -79,9 +79,9 @@ const StoreSidebar = () => {
     }
     
     if(pathname.startsWith("/vendor")){
-      router.push("/vendor-login");
+      window.location.href= ("/vendor-login");
     }else{
-      router.push("/store-login");
+      window.location.href= ("/store-login");
     }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");

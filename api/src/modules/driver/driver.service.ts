@@ -49,6 +49,7 @@ export class DriverService extends BaseService{
             .innerJoin(IdentityDocument, "identity_document", "identity_document.id = driver.identity_document_id")
             .innerJoin(Vehicle, 'vehicle', 'vehicle.driver_id = driver.id')
             .where("driver.user_id = :userId", {userId})
+            .andWhere("driver.active= :active", {active: true})
             .getRawOne();
     }
 
@@ -56,9 +57,10 @@ export class DriverService extends BaseService{
         return this.driverRepository
             .createQueryBuilder("driver")
             .select([
-                'driver.*'
+                'driver.id'
             ])
             .where("driver.user_id = :userId", {userId})
+            .andWhere("driver.active= :active", {active: true})
             .getRawOne();
     }
 
