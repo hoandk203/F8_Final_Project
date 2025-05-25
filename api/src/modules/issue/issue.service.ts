@@ -9,6 +9,7 @@ import {v4 as uuidv4} from "uuid";
 import { writeFile } from "fs";
 import { UsersService } from '../users/users.service';
 import { Driver } from '../driver/entities/driver.entity';
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class IssueService extends BaseService {
@@ -16,33 +17,14 @@ export class IssueService extends BaseService {
         @Inject('ISSUE_REPOSITORY')
         private readonly issueRepository: Repository<Issue>,
         private readonly driverService: DriverService,
-        private readonly userService: UsersService
+        private readonly userService: UsersService,
+        private readonly imageService: ImageService
     ) {
         super(issueRepository);
     }
 
-    async saveBase64Image(imageBase64: string, folder: string): Promise<string> {
-
-        try {
-            const payload = imageBase64.split(',')[1];
-            const fileName = `${uuidv4()}.png`;
-            const path = `files/images/${folder}/${fileName}`;
-
-            writeFile(path, payload, 'base64', (e) => {
-                console.log(e)
-            })
-
-            const API_URL = process.env.API_URL || 'http://localhost:3000';
-            return `${API_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
-        } catch (error) {
-            console.error(error);
-            throw new Error('Error saving image');
-        }
-    }
-
     async create(createIssueDto: CreateIssueDto): Promise<Issue> {
-
-        const issueImageUrl = await this.saveBase64Image(createIssueDto.issueImage, 'issue');
+        const issueImageUrl = await this.imageService.uploadBase64Image(createIssueDto.issueImage, 'issue');
 
         const driver = await this.driverService.getDriverByOrderId(createIssueDto.orderId);
         const issue = this.issueRepository.create({

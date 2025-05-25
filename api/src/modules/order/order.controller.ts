@@ -17,6 +17,7 @@ import { OrderService } from './order.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 import { StoreService } from '../store/store.service';
+import { CreateDto, UpdateDto } from './order.dto';
 
 @Controller('order')
 export class OrderController {
@@ -61,7 +62,7 @@ export class OrderController {
     @UseGuards(JwtAuthGuard)
     @Post('/')
     @UseInterceptors(FileInterceptor('scrapImage'))
-    async create(@Body() createDto: any, @UploadedFile() file, @Req() req) {
+    async create(@Body() createDto: CreateDto, @UploadedFile() file, @Req() req) {
         const userId = req.user.id;
         const store = await this.storeService.getStoreIdByUserId(userId);
         return this.orderService.createOrder(createDto, file, store.id);
@@ -69,7 +70,7 @@ export class OrderController {
 
     @UseGuards(JwtAuthGuard)
     @Put('/:id')
-    update(@Param('id') id: number, @Body() updateDto: any) {
+    update(@Param('id') id: number, @Body() updateDto: UpdateDto) {
         return this.orderService.update(id, updateDto);
     }
 

@@ -1,16 +1,16 @@
 import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
 import {BaseService} from "../base/base.service";
-import {v4} from "uuid";
-import {writeFile} from "fs";
 import {Repository} from "typeorm";
 import {Vehicle} from "./entities/vehicle.entity";
 import {CreateVehicleDto} from "./dto/create-vehicle.dto";
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class VehicleService extends BaseService{
     constructor(
         @Inject('VEHICLE_REPOSITORY')
         private readonly vehicleRepository: Repository<Vehicle>,
+        private readonly imageService: ImageService,
     ) {
         super(vehicleRepository);
     }
@@ -19,26 +19,9 @@ export class VehicleService extends BaseService{
         return await this.vehicleRepository.findOne({ where: { id } });
     }
 
-    async saveBase64Image(imageBase64: any): Promise<string> {
-        try {
-            const payload = imageBase64.split(',')[1]
-            const fileName = `${v4()}.png`
-            const path = `files/images/vehicle/${fileName}`
-
-            writeFile(path, payload, 'base64', (e) => {
-                console.log(e)
-            })
-            const API_URL = process.env.API_URL
-            return `${API_URL}/image?path=files%2Fimages%2Fvehicle%2F${fileName}`;
-        } catch (error) {
-            console.log(error)
-            throw new Error('Error saving image');
-        }
-    }
-
     async createVehicle(data: CreateVehicleDto): Promise<Vehicle> {
-        const vehicleImage = await this.saveBase64Image(data.vehicleImage);
-        const vehicleRCImage = await this.saveBase64Image(data.vehicleRCImage);
+        const vehicleImage = await this.imageService.uploadBase64Image(data.vehicleImage, 'vehicle');
+        const vehicleRCImage = await this.imageService.uploadBase64Image(data.vehicleRCImage, 'vehicle');
 
         const vehicle = this.vehicleRepository.create({
             driverId: data.driverId,
@@ -62,17 +45,17 @@ export class VehicleService extends BaseService{
             throw new Error('Vehicle not found');
         }
 
-        let vehicleImageUrl:string
-        let vehicleRCImageUrl:string
+        let vehicleImageUrl = vehicle.vehicleImage;
+        let vehicleRCImageUrl = vehicle.vehicleRCImage;
+
         if(vehicle.vehicleImage !== data.vehicleImage){
-            vehicleImageUrl = await this.saveBase64Image(data.vehicleImage);
+            vehicleImageUrl = await this.imageService.uploadBase64Image(data.vehicleImage, 'vehicle');
         }
 
         if(vehicle.vehicleRCImage !== data.vehicleRCImage){
-            vehicleRCImageUrl = await this.saveBase64Image(data.vehicleRCImage);
+            vehicleRCImageUrl = await this.imageService.uploadBase64Image(data.vehicleRCImage, 'vehicle');
         }
 
-        
         await this.vehicleRepository.update(id, {
             vehicleImage: vehicleImageUrl,
             vehicleRCImage: vehicleRCImageUrl,
@@ -105,6 +88,5 @@ export class VehicleService extends BaseService{
             console.log("update vehicle",e)
             throw new BadRequestException('Failed to update vehicle');
         }
-
     }
 }

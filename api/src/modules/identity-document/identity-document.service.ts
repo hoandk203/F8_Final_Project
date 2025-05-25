@@ -2,41 +2,25 @@ import {Inject, Injectable, NotFoundException, BadRequestException} from '@nestj
 import {BaseService} from "../base/base.service";
 import {Repository} from "typeorm";
 import {IdentityDocument} from "./entities/identity-document.entity";
-import {v4} from "uuid";
-import {writeFile} from "fs";
 import {CreateIdentityDto} from "./dto/create-identity.dto";
 import {UpdateIdentityDto} from "./dto/update-identity.dto";
 import { DriverService } from '../driver/driver.service';
+import { ImageService } from '../image/image.service';
+
 @Injectable()
 export class IdentityDocumentService extends BaseService{
     constructor(
         @Inject('IDENTITY_DOCUMENT_REPOSITORY')
         private identityDocumentRepository: Repository<IdentityDocument>,
         private driverService: DriverService,
+        private imageService: ImageService,
     ) {
         super(identityDocumentRepository)
     }
 
-    async saveBase64Image(identityImage: any): Promise<string> {
-        try {
-            const payload= identityImage.split(',')[1]
-            const fileName= `${v4()}.png`
-            const path= `files/images/identity/${fileName}`
-
-            writeFile(path, payload, 'base64', (e) => {
-                console.log(e)
-            })
-            const API_URL = process.env.API_URL
-            return `${API_URL}/image?path=files%2Fimages%2Fidentity%2F${fileName}`;
-        } catch (error) {
-            console.log(error)
-            throw new Error('Error saving image');
-        }
-    }
-
     async createIdentityDocument(data: CreateIdentityDto): Promise<IdentityDocument> {
-        const frontImageUrl = await this.saveBase64Image(data.frontImageUrl);
-        const backImageUrl = await this.saveBase64Image(data.backImageUrl);
+        const frontImageUrl = await this.imageService.uploadBase64Image(data.frontImageUrl, 'identity');
+        const backImageUrl = await this.imageService.uploadBase64Image(data.backImageUrl, 'identity');
 
         const identityDocument = this.identityDocumentRepository.create({
             userId: data.userId,
@@ -49,15 +33,16 @@ export class IdentityDocumentService extends BaseService{
     }
     
     async updateIdentityDocument(id: number, data: any): Promise<IdentityDocument> {
-        const identityDocument= await this.identityDocumentRepository.findOne({ where: { id } });
+        const identityDocument = await this.identityDocumentRepository.findOne({ where: { id } });
         
-        let frontImageUrl:string
-        let backImageUrl:string
-        if(identityDocument.frontImageUrl !==data.frontImageUrl){
-            frontImageUrl = await this.saveBase64Image(data.frontImageUrl);
+        let frontImageUrl = identityDocument.frontImageUrl;
+        let backImageUrl = identityDocument.backImageUrl;
+
+        if(identityDocument.frontImageUrl !== data.frontImageUrl){
+            frontImageUrl = await this.imageService.uploadBase64Image(data.frontImageUrl, 'identity');
         }
-        if(identityDocument.backImageUrl !==data.backImageUrl){
-            backImageUrl = await this.saveBase64Image(data.backImageUrl);
+        if(identityDocument.backImageUrl !== data.backImageUrl){
+            backImageUrl = await this.imageService.uploadBase64Image(data.backImageUrl, 'identity');
         }
 
         await this.identityDocumentRepository.update(id, {

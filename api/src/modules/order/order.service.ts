@@ -16,6 +16,7 @@ import { StoreService } from '../store/store.service';
 import { In } from 'typeorm';
 import { DriverService } from '../driver/driver.service';
 import {Payment} from "../payment/entities/payment.entity";
+import { ImageService } from '../image/image.service';
 
 const writeFileAsync = promisify(fs.writeFile);
 
@@ -29,6 +30,7 @@ export class OrderService extends BaseService {
         private materialService: MaterialService,
         private storeService: StoreService,
         private driverService: DriverService,
+        private imageService: ImageService,
     ) {
         super(orderRepository);
     }
@@ -127,33 +129,13 @@ export class OrderService extends BaseService {
             .getRawMany();
     }
 
-    async saveBase64Image(imageBase64: string, folder: string): Promise<string> {
-        try {
-            const payload = imageBase64.split(',')[1];
-            const fileName = `${uuidv4()}.png`;
-            const path = `files/images/${folder}/${fileName}`;
-
-            if (!fs.existsSync(`files/images/${folder}`)) {
-                fs.mkdirSync(`files/images/${folder}`, { recursive: true });
-            }
-
-            await writeFileAsync(path, payload, 'base64');
-
-            const API_URL = process.env.API_URL || 'http://localhost:3000';
-            return `${API_URL}/image?path=files%2Fimages%2F${folder}%2F${fileName}`;
-        } catch (error) {
-            console.error(error);
-            throw new Error('Error saving image');
-        }
-    }
-
     async createOrder(createDto: any, file: any, storeId: number) {
         const { orderDetails, scrapImage, ...orderData } = createDto;
         
         try {
             let scrapImageUrl = '';
             if (scrapImage) {
-                scrapImageUrl = await this.saveBase64Image(scrapImage, 'scrap');
+                scrapImageUrl = await this.imageService.uploadBase64Image(scrapImage, 'scrap');
             }
 
             let totalAmount = 0;
@@ -205,9 +187,9 @@ export class OrderService extends BaseService {
 
         const { status, proofImage } = updateDto;
 
-        let proofImageUrl = '';
-        if (proofImage) {
-            proofImageUrl = await this.saveBase64Image(proofImage, 'proof');
+        let proofImageUrl = order.proofImageUrl;
+        if (proofImage && proofImage !== order.proofImageUrl) {
+            proofImageUrl = await this.imageService.uploadBase64Image(proofImage, 'proof');
         }
 
         return this.orderRepository.update(id, {

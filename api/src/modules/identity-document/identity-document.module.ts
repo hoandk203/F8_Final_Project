@@ -5,8 +5,9 @@ import {DatabaseModule} from "../../database.module";
 import {identityDocumentProviders} from "./identity-document.providers";
 import {IdentityDocumentService} from "./identity-document.service";
 import { DriverModule } from '../driver/driver.module';
+import { ImageModule } from '../image/image.module';
 @Module({
-  imports: [DatabaseModule, DriverModule],
+  imports: [DatabaseModule, DriverModule, ImageModule],
   controllers: [IdentityDocumentController],
   providers: [
     ...identityDocumentProviders,
