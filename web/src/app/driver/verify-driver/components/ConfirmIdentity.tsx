@@ -113,10 +113,11 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
         if(idDocumentId){
             identityDocumentId=idDocumentId
         }
+        const userIdNumber= userId || Number(localStorage.getItem("userId")) 
         try {
             const driverData = {
                 ...data,
-                userId,
+                userId: userIdNumber,
                 identityDocumentId
             };
             
@@ -280,12 +281,12 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
                             variant="dark"
                             size="large"
                         />
-                        <CustomButton
+                        {/* <CustomButton
                             label={"Retake"}
                             variant="light"
                             size="large"
                             handleVerifyIdStep={handleVerifyIdStep}
-                        />
+                        /> */}
                     </div>
                 </form>
             </div>
