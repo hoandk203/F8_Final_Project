@@ -26,7 +26,10 @@ export class Payment {
     @JoinColumn({ name: 'orderId' })
     order: Order;
 
-    @Column()
+    @Column({
+        type: "numeric",
+        nullable: true
+    })
     amount: number;
 
     @Column({
