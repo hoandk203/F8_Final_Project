@@ -30,7 +30,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import { getIssuesByStore, createIssue, deleteIssue, searchIssueByName, storeSearchIssueByName } from '@/services/issueService';
-import { getOrders } from '@/services/orderService';
+import { getOrdersByStore } from '@/services/orderService';
 import { Issue } from '@/types/issue';
 import IssueChat from '@/components/issues/IssueChat';
 import { useSelector } from 'react-redux';
@@ -166,7 +166,7 @@ const IssueStorePage = () => {
   // Fetch orders for create issue dialog
   const fetchOrders = async () => {
     try {
-      const response = await getOrders();
+      const response = await getOrdersByStore();
       setOrders(response);
     } catch (error) {
       console.error('Error fetching orders:', error);
