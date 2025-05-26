@@ -1,25 +1,33 @@
 "use client"
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import VerifyEmail from "../../../../components/VerifyEmail"
 import VerifyIdentity from "./VerifyIdentity";
 import VerifyVehicle from "./VerifyVehicle";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "@/redux/store";
 import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlice";
+import { CircularProgress } from '@mui/material';
 
 // components này để bọc components con rồi dùng useSelector để VerifyDriverPage giữ server side
 const VerifyDriverContainer = () => {
     const dispatch = useDispatch<AppDispatch>();
     const verifyDriverStep = useSelector((state: RootState) => state.verifyDriverStep.step);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        // Chỉ truy cập localStorage ở phía client
-        const localStep = localStorage.getItem("verifyDriverStep");
+        setIsMounted(true);
+        const localStep = window?.localStorage?.getItem("verifyDriverStep");
         if (localStep) {
             dispatch(setVerifyDriverStep(Number(localStep)));
         }
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
+
+    if (!isMounted) {
+        return <div className="flex justify-center items-center">
+            <CircularProgress />
+        </div>;
+    }
 
     return (
         <>
