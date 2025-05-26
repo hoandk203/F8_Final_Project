@@ -6,7 +6,6 @@ export class UpdateDriverDto extends PartialType(CreateDriverDto) {
     gstNumber?: string;
     address?: string;
     city?: string;
-    dateOfBirth?: Date;
     country?: string;
     phoneNumber?: string;
     identityDocumentId?: number;
