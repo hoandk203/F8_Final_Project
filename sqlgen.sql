@@ -311,7 +311,7 @@ create table payment
     "orderId"        integer                                                    not null
         constraint "FK_d09d285fe1645cd2f0db811e293"
             references "order",
-    amount           integer                                                    not null,
+    amount           numeric(10,2)                                                    not null,
     status           payment_status_enum default 'pending'::payment_status_enum not null,
     method           payment_method_enum default 'vnpay'::payment_method_enum   not null,
     "transactionId"  varchar,

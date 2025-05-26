@@ -1,6 +1,7 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PaymentMethod } from '../entities/payment.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreatePaymentDto {
     @ApiProperty({
@@ -16,6 +17,12 @@ export class CreatePaymentDto {
         example: 100000
     })
     @IsNotEmpty()
+    @Transform(({ value }) => {
+        if (typeof value === 'string') {
+            return parseFloat(value);
+        }
+        return value;
+    })
     @IsNumber()
     amount: number;
 
