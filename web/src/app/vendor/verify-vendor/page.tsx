@@ -1,4 +1,4 @@
-
+"use client"
 import VerifyVendorContainer from "./components/VerifyVendorContainer";
 
 

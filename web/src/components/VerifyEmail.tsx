@@ -53,8 +53,6 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
                         setIsLoading(false)
                     } catch (error: any) {
                         setIsLoading(false)
-                        console.log(1);
-                        
                         setError(error.message)
                     }
                 }
@@ -71,12 +69,9 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
                         setIsLoading(false)
                     } catch (error: any) {
                         setIsLoading(false)
-                        console.log(1);
-                        
                         setError(error.message)
                     }
                 }
-
 
                 // lay userId cho vao verifyIdentity
                 localStorage.setItem("userId", JSON.stringify(response.id));
@@ -139,7 +134,6 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
         }else{
             setResend(true)
         }
-
     }, [countDown])
 
     // Xóa localStorage khi đóng trang nếu chưa verify OTP
@@ -179,7 +173,6 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
             <div className="text-center mt-5">
                 <p className="text-[#666]">Didn't receive the code?</p>
                 {resend ? <p onClick={resendOtp} className={`${isResending ? "text-[#666] pointer-events-none" : "text-black"} underline cursor-pointer font-semibold`}><RestartAltIcon/>Resend code</p> : <p className="text-black font-semibold">Resend in {countDown} seconds</p>}
-
             </div>
             <div className={"grid grid-cols-1 mt-5"}>
                 <CustomButton isLoading={isLoading} disabled={isLoading} label="Verify Code" variant="dark" size="large" handleVerifyEmail={handleVerifyEmail}/>

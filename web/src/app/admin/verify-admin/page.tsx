@@ -1,3 +1,5 @@
+"use client"
+
 import VerifyAdminContainer from "@/app/admin/verify-admin/components/VerifyAdminContainer";
 
 
