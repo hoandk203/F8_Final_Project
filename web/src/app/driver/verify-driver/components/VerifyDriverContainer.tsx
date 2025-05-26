@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from 'react';
 import VerifyEmail from "../../../../components/VerifyEmail"
 import VerifyIdentity from "./VerifyIdentity";
 import VerifyVehicle from "./VerifyVehicle";
@@ -9,15 +10,16 @@ import {setStep as setVerifyDriverStep} from "@/redux/slice/verifyDriverStepSlic
 
 // components này để bọc components con rồi dùng useSelector để VerifyDriverPage giữ server side
 const VerifyDriverContainer = () => {
-    const dispatch= useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>();
+    const verifyDriverStep = useSelector((state: RootState) => state.verifyDriverStep.step);
 
-    const verifyDriverStep= useSelector((state: RootState) => state.verifyDriverStep.step)
-
-    const localStep= localStorage.getItem("verifyDriverStep")
-
-    if(localStep){
-        dispatch(setVerifyDriverStep(Number(localStep)))
-    }
+    useEffect(() => {
+        // Chỉ truy cập localStorage ở phía client
+        const localStep = localStorage.getItem("verifyDriverStep");
+        if (localStep) {
+            dispatch(setVerifyDriverStep(Number(localStep)));
+        }
+    }, []); // Empty dependency array means this runs once on mount
 
     return (
         <>
@@ -25,7 +27,7 @@ const VerifyDriverContainer = () => {
             {verifyDriverStep === 1 && <VerifyIdentity/>}
             {verifyDriverStep === 2 && <VerifyVehicle/>}
         </>
-    )
-}
+    );
+};
 
-export default VerifyDriverContainer
+export default VerifyDriverContainer;
