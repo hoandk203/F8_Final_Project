@@ -1,21 +1,24 @@
 "use client"
 
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { CircularProgress } from '@mui/material';
-import VerifyVendorContainer from "./components/VerifyVendorContainer";
 
-// Prevent pre-rendering
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+const VerifyVendorContainer = dynamic(
+    () => import('./components/VerifyVendorContainer'),
+    {
+        ssr: false,
+        loading: () => <div className="flex justify-center items-center">
+            <CircularProgress />
+        </div>
+    }
+);
 
 const VerifyVendorPage = () => {
     return (
         <div className="container mx-auto">
             <div className="text-[16px] pt-8 px-4">
                 <div className="text-center py-8">
-                    <Suspense fallback={<CircularProgress />}>
-                        <VerifyVendorContainer />
-                    </Suspense>
+                    <VerifyVendorContainer />
                 </div>
             </div>
         </div>

@@ -1,21 +1,24 @@
 "use client"
 
-import VerifyDriverContainer from "@/app/driver/verify-driver/components/VerifyDriverContainer";
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { CircularProgress } from '@mui/material';
 
-// Prevent pre-rendering
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+const VerifyDriverContainer = dynamic(
+    () => import('./components/VerifyDriverContainer'),
+    {
+        ssr: false,
+        loading: () => <div className="flex justify-center items-center">
+            <CircularProgress />
+        </div>
+    }
+);
 
 const VerifyDriverPage = () => {
     return (
         <div className="container mx-auto">
             <div className="text-[16px] pt-8 px-4">
                 <div className="text-center py-8">
-                    <Suspense fallback={<CircularProgress />}>
-                        <VerifyDriverContainer />
-                    </Suspense>
+                    <VerifyDriverContainer />
                 </div>
             </div>
         </div>
