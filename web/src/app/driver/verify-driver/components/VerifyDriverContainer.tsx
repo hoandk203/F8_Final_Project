@@ -14,12 +14,14 @@ const VerifyDriverContainer = () => {
     const verifyDriverStep = useSelector((state: RootState) => state.verifyDriverStep.step);
 
     useEffect(() => {
-        // Chỉ truy cập localStorage ở phía client
-        const localStep = localStorage.getItem("verifyDriverStep");
-        if (localStep) {
-            dispatch(setVerifyDriverStep(Number(localStep)));
+        // Đảm bảo code chỉ chạy ở client side
+        if (typeof window !== 'undefined') {
+            const localStep = localStorage.getItem("verifyDriverStep");
+            if (localStep) {
+                dispatch(setVerifyDriverStep(Number(localStep)));
+            }
         }
-    }, []); // Empty dependency array means this runs once on mount
+    }, [dispatch]); // Thêm dispatch vào dependencies
 
     return (
         <>

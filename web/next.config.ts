@@ -24,23 +24,19 @@ const nextConfig: NextConfig = {
   // Cấu hình output
   output: 'standalone',
 
-  // Cấu hình headers bảo mật
+  // Disable static optimization for specific routes
+  unstable_runtimeJS: true,
+  
+  // Prevent static optimization for authentication routes
   async headers() {
     return [
       {
-        source: '/:path*',
+        // Áp dụng cho tất cả các route verify
+        source: '/:path*/(verify-driver|verify-admin|verify-vendor|verify-store)/:path*',
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            key: 'Cache-Control',
+            value: 'no-store, must-revalidate',
           },
         ],
       },
@@ -64,4 +60,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
