@@ -28,7 +28,7 @@ const AdminSidebar = () => {
         
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-        window.location.href =("/admin-login");
+        window.location.href =("/vendor-login");
     };
 
     return (

@@ -1,4 +1,16 @@
 services:
+  web:
+    container_name: k9-frontend
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - '5000:3000'
+    volumes:
+      - './web:/app/web'
+    env_file:
+      - ./web/.env
+    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
 #  api:
 #    container_name: k9-backend
 #    image: node:23.0.0
@@ -10,16 +22,6 @@ services:
 #    ports:
 #      - '3000:3000'
 #    command: ['npm', 'run', 'start:dev']
-
-  web:
-    container_name: k9-frontend
-    image: node:23.0.0
-    working_dir: /app/web
-    volumes:
-      - './web:/app/web'
-    ports:
-      - '5000:3000'
-    command: ['npm', 'run', 'dev', '--', '-H', '0.0.0.0']
 
 #   db:
 #     container_name: k9-db
