@@ -58,7 +58,15 @@ const ProofSubmitedDialog = ({ open, handleClose, order, stateOrderStatus, payme
             <OrderInfo order={order} stateOrderStatus={stateOrderStatus}/>
           </div>
         </DialogTitle>
-        <DialogActions className="grid grid-cols-1 font-semibold pt-4 pb-4 px-4 gap-y-2">
+        <DialogActions sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          fontWeight: 600,
+          pt: 4,
+          pb: 4,
+          px: 4,
+          gap: 2
+        }}>
             <CustomButton 
               label={isProcessing ? "Loading..." : "Go to payment"} 
               variant={"dark"} 

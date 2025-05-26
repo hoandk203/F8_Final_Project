@@ -378,7 +378,12 @@ const DriverHome = () => {
                             startIcon={<PaymentIcon />}
                             onClick={handlePayment}
                             disabled={loadingPayment}
-                            className="bg-red-600 hover:bg-red-700"
+                            sx={{ 
+                                backgroundColor: '#dc2626', // bg-red-600
+                                '&:hover': {
+                                    backgroundColor: '#b91c1c', // bg-red-700
+                                }
+                            }}
                         >
                             {loadingPayment ? <CircularProgress size={24} /> : "Payment"}
                         </Button>

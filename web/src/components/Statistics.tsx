@@ -31,9 +31,11 @@ const Statistics = ({driverId}: Props) => {
         const orderMonth = orderDate.getMonth();
         const orderYear = orderDate.getFullYear();
         
-        // Chỉ tính tổng cho các đơn hàng trong tháng hiện tại
-        if (orderMonth === currentMonth && orderYear === currentYear) {
-            return total + order.amount;
+        // Chỉ tính tổng cho các đơn hàng trong tháng hiện tại và đã completed
+        if (orderMonth === currentMonth && 
+            orderYear === currentYear && 
+            order.status === 'completed') {
+            return total + parseFloat(order.amount);
         }
         return total;
     }, 0);
@@ -44,12 +46,18 @@ const Statistics = ({driverId}: Props) => {
         fetchOrderByDriverId().catch();
     }, [driverId]);
     
-    
-
     return (
         <div className="grid grid-cols-2 gap-3 text-black">
-            <StatisticsBox label={"Amount delivered (m)"} data={totalAmountDelivered} unit={"dollars"}/>
-            <StatisticsBox label={"Total orders"} data={totalOrders} unit={"orders"}/>
+            <StatisticsBox 
+                label={"Amount delivered"} 
+                data={totalAmountDelivered} 
+                unit={"$"}
+            />
+            <StatisticsBox 
+                label={"Total orders"} 
+                data={totalOrders} 
+                unit={"orders"}
+            />
         </div>
     )
 }
