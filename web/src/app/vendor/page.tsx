@@ -10,7 +10,7 @@ import OrderList from "@/app/store/components/OrderList";
 import { useRouter } from "next/navigation";
 import { refreshToken } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { getOrders, getVendorOrders } from "@/services/orderService";
+import { getVendorOrders } from "@/services/orderService";
 
 interface User {
   email: string;
