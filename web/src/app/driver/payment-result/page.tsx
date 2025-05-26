@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Typography, Paper, Box, Button, CircularProgress } from '@mui/material';
@@ -7,7 +8,15 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { getPaymentsByOrderId } from '@/services/paymentService';
 
-const PaymentResultPage = () => {
+// Loading component
+const LoadingComponent = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <CircularProgress />
+  </Box>
+);
+
+// Main payment result component
+const PaymentResultContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -31,9 +40,7 @@ const PaymentResultPage = () => {
           }
           
           const payments = await getPaymentsByOrderId(orderIdNumber);
-          // Lấy payment gần nhất
           if (payments && payments.length > 0) {
-            // Sắp xếp theo thời gian tạo giảm dần và lấy mục đầu tiên
             const sortedPayments = [...payments].sort(
               (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
@@ -61,11 +68,7 @@ const PaymentResultPage = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingComponent />;
   }
 
   const isSuccess = status === 'success' || (payment && payment.status === 'success');
@@ -127,6 +130,15 @@ const PaymentResultPage = () => {
         </Box>
       </Paper>
     </Box>
+  );
+};
+
+// Main page component wrapped with Suspense
+const PaymentResultPage = () => {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <PaymentResultContent />
+    </Suspense>
   );
 };
 
