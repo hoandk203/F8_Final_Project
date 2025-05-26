@@ -69,13 +69,13 @@ const LoginForm = () => {
                 localStorage.setItem("userId", verificationStatus.userId);
                 localStorage.setItem("verifyDriverStep", "1");
                 localStorage.setItem("verifyIdStep", "0");
-                router.push("/driver/verify-driver");
+                window.location.href= ("/driver/verify-driver");
             }else if(!verificationStatus.driverVerification){
                 localStorage.setItem("userId", verificationStatus.userId);
                 localStorage.setItem("identityDocumentId", verificationStatus.identityDocumentId);
                 localStorage.setItem("verifyDriverStep", "1");
                 localStorage.setItem("verifyIdStep", "1");
-                router.push("/driver/verify-driver");
+                window.location.href= ("/driver/verify-driver");
             }else if(!verificationStatus.vehicleVerification){
                 localStorage.setItem("verifyDriverStep", "2");
                 window.location.href= ("/driver/verify-driver");
