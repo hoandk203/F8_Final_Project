@@ -11,7 +11,7 @@ async function bootstrap() {
   const allowedOrigins = [
     "http://localhost:5000",
     "http://192.168.0.108:5000",
-    "https://f8-final-project.vercel.app/"
+    "https://f8-final-project-opfoj7thz-shinki1809s-projects.vercel.app"
   ];
   
   app.enableCors({
