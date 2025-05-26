@@ -11,7 +11,7 @@ async function bootstrap() {
   const allowedOrigins = [
     "http://localhost:5000",
     "http://192.168.0.108:5000",
-    "https://your-frontend-domain.vercel.app" // Thêm domain của frontend trên Vercel
+    "https://f8-final-project.vercel.app/"
   ];
   
   app.enableCors({
