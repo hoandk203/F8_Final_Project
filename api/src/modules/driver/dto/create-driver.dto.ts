@@ -41,7 +41,7 @@ export class CreateDriverDto {
     })
     @IsNotEmpty()
     @IsString()
-    @Length(10, 15)
+    @Length(1, 15)
     gstNumber: string;
 
     @ApiProperty({
@@ -50,7 +50,7 @@ export class CreateDriverDto {
     })
     @IsNotEmpty()
     @IsString()
-    @Length(5, 200)
+    @Length(2, 200)
     address: string;
 
     @ApiProperty({
