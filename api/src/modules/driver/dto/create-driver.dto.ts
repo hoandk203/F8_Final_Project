@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, Length, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsDateString, IsOptional, Length, Matches, IsEnum } from 'class-validator';
 
 export class CreateDriverDto {
     @ApiProperty({
@@ -82,4 +82,14 @@ export class CreateDriverDto {
         message: 'Phone number must be in international format'
     })
     phoneNumber?: string;
+
+    @ApiProperty({
+        description: 'Driver status',
+        example: 'idle',
+        enum: ['idle', 'busy'],
+        default: 'idle'
+    })
+    @IsOptional()
+    @IsEnum(['idle', 'busy'])
+    status?: 'idle' | 'busy';
 }

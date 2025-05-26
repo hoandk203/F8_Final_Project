@@ -96,7 +96,7 @@ create table "order"
     deleted_by         integer,
     status             varchar   default 'pending'::character varying not null,
     store_id           integer,
-    amount             integer                                        not null,
+    amount             numeric(10, 2)                                 not null,
     scrap_image_url    varchar                                        not null,
     staff_id           integer,
     proof_image_url    varchar,
