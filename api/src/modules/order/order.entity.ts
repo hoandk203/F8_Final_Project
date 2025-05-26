@@ -18,6 +18,8 @@ export class Order extends Base{
 
     @Column({
         name: "amount",
+        nullable: true,
+        type: "numeric"
     })
     amount: number
 
