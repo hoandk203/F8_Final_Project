@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, MoreThan } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Payment, PaymentStatus, PaymentMethod } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -8,6 +8,7 @@ import * as crypto from 'crypto';
 import * as moment from 'moment';
 import * as querystring from 'querystring';
 import { OrderService } from '../order/order.service';
+
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
@@ -20,12 +21,17 @@ export class PaymentService {
   ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
+    // Tính thời gian hết hạn (12 giờ từ thời điểm tạo)
+    const expiredAt = new Date();
+    expiredAt.setHours(expiredAt.getHours() + 12);
+
     // Tao payment record trong database
     const payment = this.paymentRepository.create({
       orderId: createPaymentDto.orderId,
       amount: createPaymentDto.amount,
       method: createPaymentDto.method,
       status: PaymentStatus.PENDING,
+      expiredAt: expiredAt
     });
 
     const savedPayment = await this.paymentRepository.save(payment);
@@ -189,11 +195,11 @@ export class PaymentService {
     const vnpCommand = 'pay';
     const vnpCurrCode = 'VND';
 
-    // Tao transaction reference
+    // Tao transaction reference với timestamp hiện tại
     const dateFormat = moment(new Date()).format('YYYYMMDDHHmmss');
     const transactionRef = `${dateFormat}.${payment.id}`;
 
-    // Cap nhat payment voi transaction reference
+    // Cap nhat payment voi transaction reference mới
     payment.transactionRef = transactionRef;
     await this.paymentRepository.save(payment);
 
@@ -222,7 +228,7 @@ export class PaymentService {
       vnp_Amount: payment.amount * 100 * 25000,
       vnp_ReturnUrl: `${apiUrl}/payment/vnpay-callback?returnUrl=${encodeURIComponent(fullReturnUrl)}`,
       vnp_IpAddr: '127.0.0.1',
-      vnp_CreateDate: dateFormat,
+      vnp_CreateDate: dateFormat
     };
 
     // Sap xep cac tham so theo thu tu abc
@@ -268,15 +274,37 @@ export class PaymentService {
     let payment: any;
 
     for (const order of orders) {
+      // Chỉ lấy payment còn pending và chưa hết hạn
       payment = await this.paymentRepository.findOne({
-        where: { status: PaymentStatus.PENDING, orderId: order.id, active: true }
+        where: { 
+          status: PaymentStatus.PENDING, 
+          orderId: order.id, 
+          active: true,
+          expiredAt: MoreThan(new Date()) 
+        }
       });
+
       if (payment) {
-        break;
+        // Tạo URL mới nếu payment vẫn còn hiệu lực
+        const newPaymentUrl = await this.createVnpayPaymentUrl(
+          payment,
+          '/driver/payment-result'
+        );
+        
+        // Cập nhật URL mới vào payment
+        await this.paymentRepository.update(payment.id, {
+          paymentUrl: newPaymentUrl
+        });
+
+        // Trả về payment với URL mới
+        return {
+          ...payment,
+          paymentUrl: newPaymentUrl
+        };
       }
     }
     
-    return payment;
+    return null;
   }
 
   async update(id: number, paymentUrl: string) {

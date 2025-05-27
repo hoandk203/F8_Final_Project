@@ -6,6 +6,7 @@ export enum PaymentStatus {
     SUCCESS = 'success',
     FAILED = 'failed',
     CANCELED = 'canceled',
+    EXPIRED = 'expired'
 }
 
 export enum PaymentMethod {
@@ -66,4 +67,7 @@ export class Payment {
 
     @Column({ nullable: true })
     paymentUrl: string
+
+    @Column({ type: 'timestamp', nullable: true })
+    expiredAt: Date;
 } 

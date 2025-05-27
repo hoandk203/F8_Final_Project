@@ -48,4 +48,8 @@ export class VnpayCallbackDto {
     @IsNotEmpty()
     @IsString()
     vnp_SecureHash: string;
+
+    @IsNotEmpty()
+    @IsString()
+    returnUrl: string;
 } 

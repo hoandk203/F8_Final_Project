@@ -16,6 +16,7 @@ import { toast } from 'react-toastify';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import MaterialPriceDialog from "./MaterialPriceDialog";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface User {
     id: number;
@@ -37,6 +38,7 @@ let driverStatus = "idle";
 
 const DriverHome = () => {
     const router = useRouter();
+    const pathname = usePathname();
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth as { user: User | null, status: string, error: string | null });
     const [locationUpdateError, setLocationUpdateError] = useState("");
@@ -131,11 +133,12 @@ const DriverHome = () => {
         checkAuth().catch(console.error);
     }, [dispatch, router, user]);
 
-    // sang component khac roi quay lai thi fetch lai
     useEffect(() => {
-        fetchNearbyOrders().catch(console.error);
-        fetchUnpaidPayments().catch(console.error);
-    }, []);
+        if(pathname === "/driver"){
+            fetchNearbyOrders().catch(console.error);
+            fetchUnpaidPayments().catch(console.error);
+        }
+    }, [pathname]);
 
     // Thiết lập cập nhật vị trí định kỳ
     useEffect(() => {
@@ -372,6 +375,7 @@ const DriverHome = () => {
                     <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-center">
                         <p className="text-yellow-700 mb-2">You have a pending <span className="text-[16px]font-bold">${unpaidAmount.toLocaleString()}</span> payment.</p>
                         <p className="text-gray-600 text-sm mb-4">Please pay to continue receiving new orders</p>
+                        <p className="text-gray-600 text-sm mb-4">You must complete the payment within 12 hours after the order is successfully placed.</p>
                         <Button
                             variant="contained"
                             color="primary"
