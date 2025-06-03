@@ -138,7 +138,7 @@ const DriverHome = () => {
             fetchNearbyOrders().catch(console.error);
             fetchUnpaidPayments().catch(console.error);
         }
-    }, []);
+    }, [pathname]);
 
     // Thiết lập cập nhật vị trí định kỳ
     useEffect(() => {

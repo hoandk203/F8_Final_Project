@@ -112,22 +112,6 @@ export class PaymentController {
       this.logger.error(`Invalid driver ID received: ${driverId}`);
       throw new BadRequestException(`Invalid driver ID: ${driverId}`);
     }
-    
-    const payment = await this.paymentService.getUnpaidPaymentsByDriver(driverIdNum);
-    
-    // Đảm bảo luôn trả về object JSON, không bao giờ null
-    if (!payment) {
-      return {
-        hasUnpaidPayments: false,
-        payment: null,
-        message: 'No unpaid payments found'
-      };
-    }
-    
-    return {
-      hasUnpaidPayments: true,
-      payment: payment,
-      message: 'Unpaid payment found'
-    };
+    return this.paymentService.getUnpaidPaymentsByDriver(driverIdNum);
   }
 }
