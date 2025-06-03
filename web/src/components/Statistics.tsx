@@ -35,12 +35,30 @@ const Statistics = ({driverId}: Props) => {
         if (orderMonth === currentMonth && 
             orderYear === currentYear && 
             order.status === 'completed') {
-            return total + parseFloat(order.amount);
+            // Validate order.amount trước khi parse
+            const amount = parseFloat(order.amount);
+            if (!isNaN(amount) && amount > 0) {
+                return total + amount;
+            }
         }
         return total;
     }, 0);
 
     const totalOrders = orders.length;
+
+    // Nếu không có đơn hàng completed trong tháng này, tính tổng tất cả đơn hàng completed
+    const totalAmountAllTime = orders.reduce((total, order) => {
+        if (order.status === 'completed') {
+            const amount = parseFloat(order.amount);
+            if (!isNaN(amount) && amount > 0) {
+                return total + amount;
+            }
+        }
+        return total;
+    }, 0);
+
+    // Sử dụng totalAmountAllTime nếu totalAmountDelivered = 0
+    const displayAmount = totalAmountDelivered > 0 ? totalAmountDelivered : totalAmountAllTime;
 
     useEffect(() => {
         fetchOrderByDriverId().catch();
@@ -50,7 +68,7 @@ const Statistics = ({driverId}: Props) => {
         <div className="grid grid-cols-2 gap-3 text-black">
             <StatisticsBox 
                 label={"Amount delivered"} 
-                data={totalAmountDelivered} 
+                data={displayAmount} 
                 unit={"$"}
             />
             <StatisticsBox 

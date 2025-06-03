@@ -4,6 +4,17 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
+  // Cấu hình cho Docker hot reload
+  ...(process.env.NODE_ENV === 'development' && {
+    webpackDevMiddleware: (config: any) => {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      };
+      return config;
+    },
+  }),
+  
   // Tối ưu hóa images
   images: {
     domains: ['k9-backend.onrender.com'], // Thêm domain của backend nếu có sử dụng hình ảnh từ backend

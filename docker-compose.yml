@@ -7,7 +7,11 @@ services:
     ports:
       - '5000:3000'
     volumes:
-      - './web:/app/web'
+      - './web:/app'
+      - '/app/node_modules'
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./web/.env
     command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]

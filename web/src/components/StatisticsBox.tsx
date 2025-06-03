@@ -8,9 +8,14 @@ interface StatisticsBoxProps {
 }
 
 const StatisticsBox: React.FC<StatisticsBoxProps> = ({label, data, unit}) => {
+    
+    // Kiểm tra data hợp lệ
+    const validData = isNaN(data) ? 0 : data;
+    
     const formattedData = unit === '$' 
-        ? `${unit}${data.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
-        : `${data.toLocaleString()}`;
+        ? `${unit}${validData.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
+        : `${validData.toLocaleString()}`;
+
 
     return (
         <div className="bg-gray-200 p-3 rounded-lg flex flex-col justify-between">
