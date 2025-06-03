@@ -80,12 +80,12 @@ const StorePage = () => {
       // Only count completed orders for revenue
       if (order.status.toLowerCase() === 'completed') {
         // Calculate total revenue
-        total += order.amount;
+        total += parseFloat(order.amount.toString());
         
         // Calculate revenue by month
         const orderDate = new Date(order.created_at);
         const month = orderDate.getMonth(); // 0-11
-        monthlyRevenue[month] += order.amount;
+        monthlyRevenue[month] += parseFloat(order.amount.toString());
       }
       
       // Calculate total weight for all orders

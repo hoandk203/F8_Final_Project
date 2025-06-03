@@ -131,14 +131,29 @@ const DriverHome = () => {
         };
         
         checkAuth().catch(console.error);
+        
     }, [dispatch, router, user]);
 
     useEffect(() => {
         if(pathname === "/driver"){
             fetchNearbyOrders().catch(console.error);
-            fetchUnpaidPayments().catch(console.error);
         }
     }, [pathname]);
+
+    // Gọi fetchUnpaidPayments mỗi khi có driverId (bao gồm cả navigate và reload)
+    useEffect(() => {
+        if (driverId) {
+            fetchUnpaidPayments().catch(console.error);
+        }
+    }, [driverId]);
+
+    // Gọi fetchUnpaidPayments ngay khi component mount nếu có stored driverId
+    useEffect(() => {
+        const storedDriverId = localStorage.getItem("driverId");
+        if (storedDriverId && !driverId) {
+            setDriverId(parseInt(storedDriverId));
+        }
+    }, []); // Chỉ chạy một lần khi component mount
 
     // Thiết lập cập nhật vị trí định kỳ
     useEffect(() => {
@@ -171,7 +186,6 @@ const DriverHome = () => {
 
         // Thiết lập interval để cập nhật vị trí mỗi 20 giây
         locationIntervalRef.current = setInterval(() => {
-            
             updateLocation();
             
             if(driverStatus === "idle"){
