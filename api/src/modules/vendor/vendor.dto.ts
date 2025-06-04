@@ -36,11 +36,4 @@ export class UpdateDto {
     @IsNotEmpty()
     name: string;
 
-    @ApiProperty({
-        description: 'email of vendor',
-        example: 'vendor@example.com',
-    })
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
 }

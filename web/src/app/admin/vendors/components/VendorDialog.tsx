@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import axios from "axios";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 
@@ -13,10 +12,10 @@ import AdminDialog from "@/app/admin/components/AdminDialog";
 import TextField from "@mui/material/TextField";
 import CustomButton from "@/components/CustomButton";
 
-import {createVendor, updateVendor} from "@/redux/slice/vendorSlice";
 import { fetchVendorList } from "@/redux/middlewares/vendorMiddleware";
+import { createUser } from "@/services/userService";
+import { createVendor, updateVendor } from "@/services/vendorService";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const schema = z.object({
     name: z.string().min(1, { message: "Name is required" }).min(2, { message: "Name must be at least 2 characters" }),
     email: z
@@ -53,7 +52,7 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
 
     // Cập nhật giá trị form khi currentData thay đổi
     useEffect(() => {
-        if(!open){
+        if (!open) {
             reset();
         }
         if (currentData) {
@@ -62,13 +61,11 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
     }, [currentData, reset, open]);
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        console.log("Form data:", data);
-        
         try {
-            if(currentData && currentId) {
+            if (currentData && currentId) {
                 // Update existing vendor
-                const response = await axios.put(`${BASE_URL}/vendor/${currentId}`, data);
-                if (response.data) {
+                const response = await updateVendor(currentId, data);
+                if (response) {
                     dispatch(fetchVendorList());
                     handleClose();
                     reset();
@@ -76,17 +73,34 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
                 }
             } else {
                 // Create new vendor
-                const response = await axios.post(`${BASE_URL}/vendor`, data);
-                if (response.data) {
-                    dispatch(fetchVendorList());
-                    handleClose();
-                    reset();
-                    toast.success("Vendor created successfully");
+                try {
+                    const userData = await createUser({
+                        name: data.name,
+                        email: data.email,
+                        role: "vendor",
+                    });
+                    const userId = userData.id;
+                    
+                    const vendorData = {
+                        ...data,
+                        userId: parseInt(userId),
+                    };
+                    
+                    const response = await createVendor(vendorData);
+                    if (response) {
+                        dispatch(fetchVendorList());
+                        handleClose();
+                        reset();
+                        toast.success("Vendor created successfully. Please check your email to get the password.");
+                    }
+                } catch (error: any) {
+                    toast.error(error.message || "Failed to create vendor");
+                    console.log(error);
                 }
             }
         } catch (error: any) {
             console.error("API Error:", error);
-            toast.error(error.response?.data?.message || "Operation failed");
+            toast.error(error.message || "Operation failed");
         }
     };
 
@@ -111,20 +125,22 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
                         helperText={errors.name?.message}
                     />
                 </div>
-                <div className="flex flex-col gap-y-1">
-                    <label htmlFor="email" className="font-semibold">
-                        Email
-                    </label>
-                    <TextField
-                        {...register("email")}
-                        type="email"
-                        id="email"
-                        label="Email"
-                        variant="outlined"
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                    />
-                </div>
+                {!currentId && (
+                    <div className="flex flex-col gap-y-1">
+                        <label htmlFor="email" className="font-semibold">
+                            Email
+                        </label>
+                        <TextField
+                            {...register("email")}
+                            type="email"
+                            id="email"
+                            label="Email"
+                            variant="outlined"
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                        />
+                    </div>   
+                )}
                 <div className="grid grid-cols-1 mt-3">
                     <CustomButton
                         type="submit"

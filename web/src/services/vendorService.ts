@@ -1,9 +1,8 @@
-import axios from "axios";
+import apiClient from "@/utils/axiosInterceptor";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const getVendorListForStore = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/vendor/list-for-store`);
+    const response = await apiClient.get(`/vendor/list-for-store`);
     return response.data
   } catch (error: any) {
     if (error.response) {
@@ -12,3 +11,25 @@ export const getVendorListForStore = async () => {
     throw new Error("Server connection error");
   }
 };
+
+export const createVendor = async (vendorData: any) => {
+  try {
+    const response = await apiClient.post('/vendor', vendorData);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to create vendor");
+    }
+  }
+}
+
+export const updateVendor = async (vendorId: number, vendorData: any) => {
+  try {
+    const response = await apiClient.put(`/vendor/${vendorId}`, vendorData);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to update vendor");
+    }
+  }
+}           

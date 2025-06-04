@@ -25,8 +25,12 @@ const ROUTE_CONFIG: RouteConfig = {
     '/store-login', 
     '/vendor-login',
     '/register',
+    '/store-register',
+    '/vendor-register',
     '/forgot-password',
-    '/verify-email',
+    '/vendor/verify-vendor',
+    '/store/verify-store',
+    '/driver/verify-driver',
   ],
   
   // Role-specific routes

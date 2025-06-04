@@ -367,7 +367,7 @@ const DriversPage = () => {
                         />
                     </div>
                     <div>
-                        <CustomButton label={"Add driver"} variant={"dark"} handleOpenDialog={handleClickOpen}/>
+                        {/* <CustomButton label={"Add driver"} variant={"dark"} handleOpenDialog={handleClickOpen}/> */}
                         <DriverDialog 
                             open={open} 
                             handleClose={handleClose} 

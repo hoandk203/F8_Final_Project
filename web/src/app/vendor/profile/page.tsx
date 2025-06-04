@@ -43,9 +43,6 @@ interface User {
 // Định nghĩa schema validation
 const profileSchema = z.object({
   name: z.string().min(1, { message: "Store name is required" }),
-  email: z.string()
-    .min(1, { message: "Email is required" })
-    .email({ message: "Invalid email format" }),
 });
 
 type ProfileFormInput = z.infer<typeof profileSchema>;
@@ -65,8 +62,7 @@ const VendorProfilePage = () => {
   const { control, handleSubmit, reset, formState: { errors } } = useForm<ProfileFormInput>({
     resolver: zodResolver(profileSchema),
     defaultValues: user || {
-      name: "",
-      email: ""
+      name: ""
     }
   });
 
@@ -115,7 +111,6 @@ const VendorProfilePage = () => {
     if (user) {
       reset({
         name: user.name || "",
-        email: user.email || ""
       });
     }
   }, [user, reset]);
@@ -128,7 +123,6 @@ const VendorProfilePage = () => {
     if (user) {
       reset({
         name: user.name || "",
-        email: user.email || "",
       });
     }
     setEditing(false);
@@ -328,26 +322,9 @@ const VendorProfilePage = () => {
                     <Typography variant="subtitle2" color="text.secondary">
                       Email
                     </Typography>
-                    {editing ? (
-                      <Controller
-                        name="email"
-                        control={control}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            fullWidth
-                            margin="dense"
-                            size="small"
-                            error={!!errors.email}
-                            helperText={errors.email?.message}
-                          />
-                        )}
-                      />
-                    ) : (
                       <Typography variant="body1" sx={{ mb: 2 }}>
                         {user?.email}
                       </Typography>
-                    )}
                   </Grid>
                   
                 </Grid>
