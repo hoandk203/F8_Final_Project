@@ -79,7 +79,18 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
                 country: currentData.country || "",
                 phoneNumber: currentData.phone_number || "",
                 userId: currentData.user_id,
-                identityDocumentId: currentData.identity_document_id
+                identityDocumentId: currentData.identity_document_id,
+            });
+        }else{
+            reset({
+                fullname: "",
+                dateOfBirth: "",
+                gstNumber: "",
+                address: "",
+                city: "",
+                country: "",
+                phoneNumber: "",
+                email: "",
             });
         }
     }, [currentData, reset, open]);
@@ -108,7 +119,13 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
                 
                 try {
                     const driverData= {
-                        ...data,
+                        fullname: data.fullname,
+                        dateOfBirth: data.dateOfBirth,
+                        gstNumber: data.gstNumber,
+                        address: data.address,
+                        city: data.city,
+                        country: data.country,
+                        phoneNumber: data.phoneNumber,
                         userId: parseInt(userId),
                     }
                     const response = await createDriver(driverData);
@@ -136,20 +153,23 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
             handleClose={handleClose}
         >
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
-                <div className="flex flex-col gap-y-1">
-                    <label htmlFor="email" className="font-semibold">
-                        Email
-                    </label>
-                    <TextField
-                        {...register("email")}
-                        type="text"
-                        id="email"
-                        label="Email"
-                        variant="outlined"
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                    />
-                </div>
+                {!currentId && (
+                    <div className="flex flex-col gap-y-1">
+                        <label htmlFor="email" className="font-semibold">
+                            Email
+                        </label>
+                        <TextField
+                            {...register("email")}
+                            type="text"
+                            id="email"
+                            label="Email"
+                            variant="outlined"
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                        />
+                    </div>
+                )}
+                
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor="fullname" className="font-semibold">
                         Fullname

@@ -7,7 +7,7 @@ export class Driver extends Base{
     @Column({name: "user_id", nullable: false})
     userId: number;
 
-    @Column({name: "identity_document_id", nullable: false})
+    @Column({name: "identity_document_id", nullable: true})
     identityDocumentId: number;
 
     @Column({nullable: false})
