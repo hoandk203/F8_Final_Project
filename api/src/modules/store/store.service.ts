@@ -4,7 +4,7 @@ import { Store } from "./store.entity";
 import { BaseService } from "../base/base.service";
 import { Vendor } from "../vendor/vendor.entity";
 import { BadRequestException } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
+import { CreateStoreDto, UpdateStoreDto } from './dto/create-store.dto';
 
 @Injectable()
 export class StoreService extends BaseService {
@@ -52,11 +52,12 @@ export class StoreService extends BaseService {
         return this.storeRepository.save(store);
     }
 
-    async updateOne(id: number, data: any) {
+    async updateOne(id: number, data: UpdateStoreDto) {
         try {
             // Cập nhật dữ liệu
             await this.storeRepository.update(id, {
                 ...data,
+                vendorId: data.vendorId ? Number(data.vendorId) : null,
                 modifiedAt: new Date()
             });
             

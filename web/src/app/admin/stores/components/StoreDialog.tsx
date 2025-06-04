@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import axios from "axios";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,13 +12,10 @@ import AdminDialog from "@/app/admin/components/AdminDialog";
 import TextField from "@mui/material/TextField";
 import CustomButton from "@/components/CustomButton";
 
-
 import { MenuItem } from "@mui/material";
 import { fetchStoreList } from "@/redux/middlewares/storeMiddleware";
 import { updateStore, createStore } from "@/services/storeService";
 import { createUser } from "@/services/userService";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const schema = z.object({
     name: z.string().min(1, { message: "Name is required" }).min(2, { message: "Name must be at least 2 characters" }),

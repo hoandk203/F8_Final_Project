@@ -1,5 +1,3 @@
-import axios from "axios";
-import { clientCookies } from "@/utils/cookies";
 import apiClient from "@/utils/axiosInterceptor";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -16,6 +14,7 @@ export const createStore = async (storeData: any) => {
 }
 
 export const updateStore = async (storeId: number, storeData: any) => {
+  
   try {
     const response = await apiClient.put(`/store/${storeId}`, storeData);
     return response.data;
@@ -49,8 +48,7 @@ export const uploadStoreLogo = async (file: File) => {
 
 export const saveStoreLocation = async (storeId: number, latitude: number, longitude: number) => {
   try {
-    
-    const response = await axios.post(`${API_BASE_URL}/store-location`, {
+    const response = await apiClient.post(`/store-location`, {
       storeId,
       latitude,
       longitude
@@ -67,7 +65,7 @@ export const saveStoreLocation = async (storeId: number, latitude: number, longi
 
 export const getStoreByVendorId = async (vendorId: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/store/vendor/${vendorId}`);
+    const response = await apiClient.get(`/store/vendor/${vendorId}`);
     return response.data;
   } catch (error: any) {
     if (error.response) {

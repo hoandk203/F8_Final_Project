@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, IsOptional } from 'class-validator';
 
 export enum StoreStatus {
     PENDING = 'pending',
@@ -108,17 +108,19 @@ export class UpdateStoreDto {
     @ApiProperty({
         description: 'Status of the store',
         example: StoreStatus.PENDING,
-        enum: StoreStatus
+        enum: StoreStatus,
+        required: false
     })
+    @IsOptional()
     @IsString()
-    @IsNotEmpty() 
     status?: StoreStatus;
 
     @ApiProperty({
         description: 'ID of the vendor this store belongs to',
         example: 1,
+        required: false
     })
+    @IsOptional()
     @IsNumber()
-    @IsNotEmpty()
     vendorId?: number;
 }
