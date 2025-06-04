@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
-import { Repository, MoreThan } from 'typeorm';
+import { Repository, MoreThan, In } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Payment, PaymentStatus, PaymentMethod } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -278,7 +278,7 @@ export class PaymentService {
       // Tìm payment pending (bao gồm cả đã hết hạn)
       payment = await this.paymentRepository.findOne({
         where: { 
-          status: PaymentStatus.PENDING || PaymentStatus.EXPIRED,
+          status: In([PaymentStatus.PENDING, PaymentStatus.EXPIRED]),
           orderId: order.id, 
           active: true
         }
