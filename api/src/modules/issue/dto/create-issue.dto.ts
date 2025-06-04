@@ -4,6 +4,22 @@ import { IssueStatus } from '../entities/issue.entity';
 
 export class CreateIssueDto {
     @ApiProperty({
+        description: 'User ID',
+        example: 1
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    userId: number;
+
+    @ApiProperty({
+        description: 'Creator role',
+        example: 'store'
+    })
+    @IsString()
+    @IsNotEmpty()
+    creatorRole: string;
+
+    @ApiProperty({
         description: 'Issue name/title',
         example: 'Wrong material weight'
     })

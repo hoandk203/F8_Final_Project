@@ -211,7 +211,8 @@ const IssueStorePage = () => {
         description: newIssue.description,
         storeId: user?.id || 0,
         creatorRole: 'store',
-        issueImage
+        issueImage,
+        status: 'open'
       });
       
       // Refresh issues list
