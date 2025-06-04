@@ -316,7 +316,6 @@ const DriverHome = () => {
             if (!driverId) return;
             
             const payment = await getUnpaidPayments(driverId);
-            console.log(payment);
             
             if (payment) {
                 // Kiểm tra nếu payment đã hết hạn
@@ -417,13 +416,7 @@ const DriverHome = () => {
                         <p className="text-gray-600 text-sm mb-4">{expiredPaymentMessage}</p>
                         <p className="text-gray-600 text-sm mb-4">Contact support for assistance with your expired payment.</p>
                         <div className="flex gap-2 justify-center">
-                            <Button
-                                variant="outlined"
-                                color="error"
-                                onClick={() => setHasExpiredPayment(false)}
-                            >
-                                Dismiss
-                            </Button>
+                            <p className="text-gray-600 text-sm mb-4">Support Email: hoanyttv@gmail.com</p>
                         </div>
                     </div>
                 ) : hasUnpaidOrders ? (
