@@ -16,6 +16,8 @@ import CustomButton from "@/components/CustomButton";
 
 import { MenuItem } from "@mui/material";
 import { fetchStoreList } from "@/redux/middlewares/storeMiddleware";
+import { updateStore, createStore } from "@/services/storeService";
+import { createUser } from "@/services/userService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -38,11 +40,12 @@ interface Props {
     open: boolean;
     handleClose: () => void;
     vendorList: any;
-    currentData?: Partial<FormInput>;
+    currentData?: Partial<FormInput & { vendor_id?: number | string }>;
     currentId?: any
 }
 
 const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: Props) => {
+    
     const {
         register,
         control,
@@ -57,7 +60,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
             location: currentData?.location || "",
             city: currentData?.city || "",
             phone: currentData?.phone || "",
-            vendorId: String(currentData?.vendorId) || "",
+            vendorId: currentData?.vendor_id ? String(currentData.vendor_id) : "",
         },
     });
 
@@ -72,7 +75,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                 location: currentData?.location || "",
                 city: currentData?.city || "",
                 phone: currentData?.phone || "",
-                vendorId: String(currentData?.vendorId) || "",
+                vendorId: currentData?.vendor_id ? String(currentData.vendor_id) : "",
             });
         }
         if (currentData) {
@@ -82,7 +85,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                 location: currentData?.location || "",
                 city: currentData?.city || "",
                 phone: currentData?.phone || "",
-                vendorId: String(currentData?.vendorId) || "",
+                vendorId: currentData?.vendor_id ? String(currentData.vendor_id) : "",
             }); // Reset giá trị form bằng currentData
         }
     }, [currentData, reset, open]);
@@ -90,7 +93,7 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         if(currentData && currentData.name !== ""){
             try {
-                const response = await axios.put(`${BASE_URL}/store/${currentId}`, data);
+                const response = await updateStore(currentId, data);
                 if (response.data) {
                     // dispatch(updateVendor([currentId, data]));
                     dispatch(fetchStoreList())
@@ -105,17 +108,36 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
         }
         if(currentData && currentData.name === "") {
             try {
-                const response = await axios.post(`${BASE_URL}/store`, data);
-                if (response.data) {
-                    // dispatch(createVendor(data))
-                    dispatch(fetchStoreList())
-                    toast.success("Store created successfully");
+                const userData= await createUser({
+                    email: data.email,
+                    role: "store",
+                });
+                const userId= userData.id;
+
+                const storeData= {
+                    ...data,
+                    vendorId: parseInt(data.vendorId),
+                    userId: parseInt(userId),
                 }
-            } catch (e) {
+                
+                try {
+                    const response = await createStore(storeData);
+                    if (response.data) {
+                        // dispatch(createVendor(data))
+                        dispatch(fetchStoreList())
+                        toast.success("Store created successfully");
+                    }
+                } catch (e) {
+                    toast.error("Store create failed");
+                    console.log(e);
+                    return e;
+                }
+            } catch (error) {
                 toast.error("Store create failed");
-                console.log(e);
-                return e;
+                console.log(error);
+                return error;
             }
+            
         }
 
     };
@@ -209,12 +231,15 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                                 select
                                 fullWidth
                                 label="Vendor"
-                                value={value}
+                                value={value || ""}
                                 onChange={onChange}
                                 error={!!errors.vendorId}
                                 helperText={errors.vendorId?.message}
                             >
-                                {vendorList.map((option: any) => (
+                                <MenuItem value="">
+                                    <em>Select a vendor</em>
+                                </MenuItem>
+                                {vendorList?.map((option: any) => (
                                     <MenuItem key={option.id} value={String(option.id)}>
                                         {option.name}
                                     </MenuItem>

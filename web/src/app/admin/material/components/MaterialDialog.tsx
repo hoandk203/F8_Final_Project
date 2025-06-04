@@ -38,7 +38,7 @@ type FormInput = z.infer<typeof schema>;
 interface Props {
   open: boolean;
   handleClose: () => void;
-  currentData?: Partial<FormInput>;
+  currentData?: Partial<FormInput & { unit_price?: number | string }>;
   currentId?: any;
 }
 
@@ -66,13 +66,12 @@ const MaterialDialog = ({ open, handleClose, currentData, currentId }: Props) =>
     if (currentData) {
       reset({
         name: currentData.name || "",
-        unitPrice: currentData.unitPrice ? String(currentData.unitPrice) : "",
+        unitPrice: currentData.unit_price ? String(currentData.unit_price) : "",
       });
     }
   }, [currentData, reset, open]);
 
   const onSubmit: SubmitHandler<FormInput> = async (data) => {
-    console.log("Form data:", data);
 
     try {
       const formattedData = {
@@ -90,14 +89,22 @@ const MaterialDialog = ({ open, handleClose, currentData, currentId }: Props) =>
           toast.success("Material updated successfully");
         }
       } else {
-        // Create new material
-        const response = await createMaterial(formattedData);
-        if (response) {
-          dispatch(fetchMaterialList());
-          handleClose();
-          reset();
-          toast.success("Material created successfully");
+        try {
+            // Create new material
+          const response = await createMaterial(formattedData);
+          
+          if (response) {
+            dispatch(fetchMaterialList());
+            handleClose();
+            reset();
+            toast.success("Material created successfully");
+          }
+        } catch (error) {
+          toast.error("Material create failed");
+          console.log(error);
+          return error;
         }
+        
       }
     } catch (error: any) {
       console.error("API Error:", error);

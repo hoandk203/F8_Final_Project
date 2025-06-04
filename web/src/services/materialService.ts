@@ -1,16 +1,8 @@
-import axios from "axios";
-import { clientCookies } from "@/utils/cookies";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import apiClient from "@/utils/axiosInterceptor";
 
 export const getMaterials = async () => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.get(`${BASE_URL}/material`, {
-      headers: {
-        Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.get('/material');
     return response.data;
   } catch (error) {
     console.error("Error fetching materials:", error);
@@ -19,13 +11,8 @@ export const getMaterials = async () => {
 };
 
 export const getMaterialById = async (id: number) => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.get(`${BASE_URL}/material/${id}`, {
-      headers: {
-        Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.get(`/material/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching material with id ${id}:`, error);
@@ -34,13 +21,8 @@ export const getMaterialById = async (id: number) => {
 };
 
 export const createMaterial = async (data: any) => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.post(`${BASE_URL}/material`, data, {
-      headers: {
-        Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.post('/material', data);
     return response.data;
   } catch (error) {
     console.error("Error creating material:", error);
@@ -49,13 +31,8 @@ export const createMaterial = async (data: any) => {
 };
 
 export const updateMaterial = async (id: number, data: any) => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.put(`${BASE_URL}/material/${id}`, data, {
-      headers: {
-        Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.put(`/material/${id}`, data);
     return response.data;
   } catch (error) {
     console.error(`Error updating material with id ${id}:`, error);
@@ -64,13 +41,8 @@ export const updateMaterial = async (id: number, data: any) => {
 };
 
 export const deleteMaterial = async (id: number) => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.delete(`${BASE_URL}/material/${id}`, {
-      headers: {
-          Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.delete(`/material/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error deleting material with id ${id}:`, error);
@@ -79,13 +51,8 @@ export const deleteMaterial = async (id: number) => {
 };
 
 export const searchMaterial = async (name: string) => {
-  const tokens = clientCookies.getAuthTokens();
   try {
-    const response = await axios.get(`${BASE_URL}/material/search?name=${name}`, {
-      headers: {
-        Authorization: `Bearer ${tokens?.access_token}`,
-      },
-    });
+    const response = await apiClient.get(`/material/search?name=${name}`);
     return response.data;
   } catch (error) {
     console.error(`Error searching materials with name ${name}:`, error);

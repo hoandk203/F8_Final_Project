@@ -43,7 +43,7 @@ export class UsersController {
   }
 
   @Post('admin/create')
-  adminCreate(@Body() createUserDto: any) {
-    return this.usersService.adminCreate(createUserDto);
+  adminCreate(@Body() createUser: any) {
+    return this.usersService.adminCreate(createUser);
   }
 }

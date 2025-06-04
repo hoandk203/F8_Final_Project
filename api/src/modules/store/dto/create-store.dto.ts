@@ -112,5 +112,13 @@ export class UpdateStoreDto {
     })
     @IsString()
     @IsNotEmpty() 
-    status: StoreStatus;
+    status?: StoreStatus;
+
+    @ApiProperty({
+        description: 'ID of the vendor this store belongs to',
+        example: 1,
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    vendorId?: number;
 }
