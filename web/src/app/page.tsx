@@ -24,21 +24,21 @@ export default function Home() {
   const roles = [
     {
       title: "Driver",
-      description: "Đăng nhập với vai trò tài xế giao hàng",
+      description: "Login with driver role",
       icon: <PersonIcon sx={{ fontSize: 60, color: "#1976d2" }} />,
       path: "/login",
       color: "#1976d2"
     },
     {
       title: "Store",
-      description: "Đăng nhập với vai trò cửa hàng",
+      description: "Login with store role",
       icon: <StoreIcon sx={{ fontSize: 60, color: "#388e3c" }} />,
       path: "/store-login",
       color: "#388e3c"
     },
     {
       title: "Admin/Vendor",
-      description: "Đăng nhập với vai trò quản trị viên hoặc nhà cung cấp",
+      description: "Login with admin/vendor role",
       icon: <VendorIcon sx={{ fontSize: 60, color: "#f57c00" }} />,
       path: "/vendor-login",
       color: "#f57c00"
@@ -91,14 +91,14 @@ export default function Home() {
               mb: 2
             }}
           >
-            Chọn Vai Trò Đăng Nhập
+            Choose Your Role
           </Typography>
           <Typography 
             variant="h6" 
             color="text.secondary"
             sx={{ maxWidth: 600, mx: "auto" }}
           >
-            Vui lòng chọn vai trò phù hợp để truy cập vào hệ thống
+            Please choose the role to access the system
           </Typography>
         </Box>
 
@@ -161,7 +161,7 @@ export default function Home() {
                       py: 1.5
                     }}
                   >
-                    Đăng Nhập
+                    Login
                   </Button>
                 </CardActions>
               </Card>
@@ -172,7 +172,7 @@ export default function Home() {
         {/* Footer */}
         <Box sx={{ textAlign: "center", mt: 6 }}>
           <Typography variant="body2" color="text.secondary">
-            © 2025 Scrap Plan. hoanyttv@gmail.com.
+            © 2025 Scrap Plan. hoanyttv@gmail.com
           </Typography>
         </Box>
       </Box>
