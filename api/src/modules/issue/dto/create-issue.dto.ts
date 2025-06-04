@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsString, Length, MaxLength, Matches } from 'class-validator';
-import { IssueStatus } from '../entities/issue.entity';
+import { CreatorRole, IssueStatus } from '../entities/issue.entity';
 
 export class CreateIssueDto {
     @ApiProperty({
@@ -13,11 +13,12 @@ export class CreateIssueDto {
 
     @ApiProperty({
         description: 'Creator role',
-        example: 'store'
+        enum: CreatorRole,
+        default: CreatorRole.STORE
     })
     @IsString()
     @IsNotEmpty()
-    creatorRole: string;
+    creatorRole: CreatorRole;
 
     @ApiProperty({
         description: 'Issue name/title',

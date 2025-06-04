@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Issue, IssueStatus } from './entities/issue.entity';
+import { CreatorRole, Issue, IssueStatus } from './entities/issue.entity';
 import { BaseService } from '../base/base.service';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
