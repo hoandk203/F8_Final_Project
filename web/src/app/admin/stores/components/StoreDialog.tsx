@@ -89,8 +89,12 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         if(currentData && currentData.name !== ""){
             try {
-                const response = await updateStore(currentId, data);
-                if (response.data) {
+                const storeData= {
+                    ...data,
+                    vendorId: parseInt(data.vendorId),
+                }
+                const response = await updateStore(currentId, storeData);
+                if (response) {
                     // dispatch(updateVendor([currentId, data]));
                     dispatch(fetchStoreList())
                     handleClose();

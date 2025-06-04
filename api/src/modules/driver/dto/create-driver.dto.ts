@@ -73,14 +73,11 @@ export class CreateDriverDto {
 
     @ApiProperty({
         description: 'Phone number',
-        example: '+1234567890',
+        example: '1234567890',
         required: false
     })
     @IsOptional()
     @IsString()
-    @Matches(/^\+?[1-9]\d{1,14}$/, {
-        message: 'Phone number must be in international format'
-    })
     phoneNumber?: string;
 
     @ApiProperty({

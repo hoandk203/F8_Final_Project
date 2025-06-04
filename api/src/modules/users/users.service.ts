@@ -211,7 +211,7 @@ export class UsersService extends BaseService{
 
   async adminCreate(data: any) {
     const {email, password, role}= data
-    
+
     const passwordRandom = Math.random().toString(36).slice(-8) + "@Scrap1";
 
     const userExist= await this.userRepository.findOne({where: {email}})
@@ -222,7 +222,7 @@ export class UsersService extends BaseService{
 
     data.password  = await bcrypt.hash(passwordRandom, 10);
 
-    await this.userRepository.save(data)
+    return await this.userRepository.save(data)
   }
 
   async adminGetList() {
