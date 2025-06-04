@@ -64,7 +64,7 @@ const VendorDialog = ({ open, handleClose, currentData, currentId }: Props) => {
         try {
             if (currentData && currentId) {
                 // Update existing vendor
-                const response = await updateVendor(currentId, data);
+                const response = await updateVendor(currentId, {name: data.name});
                 if (response) {
                     dispatch(fetchVendorList());
                     handleClose();
