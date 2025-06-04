@@ -278,7 +278,7 @@ export class PaymentService {
       // Tìm payment pending (bao gồm cả đã hết hạn)
       payment = await this.paymentRepository.findOne({
         where: { 
-          status: PaymentStatus.PENDING, 
+          status: PaymentStatus.PENDING || PaymentStatus.EXPIRED,
           orderId: order.id, 
           active: true
         }
@@ -293,7 +293,7 @@ export class PaymentService {
           
           // Cập nhật status thành FAILED vì hết hạn
           await this.paymentRepository.update(payment.id, {
-            status: PaymentStatus.FAILED
+            status: PaymentStatus.EXPIRED
           });
           
           continue; // Tiếp tục tìm payment khác

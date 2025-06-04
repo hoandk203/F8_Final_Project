@@ -316,6 +316,7 @@ const DriverHome = () => {
             if (!driverId) return;
             
             const payment = await getUnpaidPayments(driverId);
+            console.log(payment);
             
             if (payment) {
                 // Kiểm tra nếu payment đã hết hạn

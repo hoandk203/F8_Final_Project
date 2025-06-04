@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -54,6 +54,13 @@ const LoginForm = () => {
             password: "",
         },
     });
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem("access_token");
+        if(accessToken){
+            router.push("/driver");
+        }
+    }, [])
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
 
