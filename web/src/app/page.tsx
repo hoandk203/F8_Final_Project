@@ -60,13 +60,34 @@ export default function Home() {
       }}>
         {/* Header */}
         <Box sx={{ textAlign: "center", mb: 6 }}>
+          <Box sx={{ mb: 3, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <img 
+              src="/logo.png" 
+              alt="Scrap Plan Logo" 
+              style={{ 
+                width: "80px", 
+                height: "80px", 
+                marginRight: "16px" 
+              }} 
+            />
+            <Typography 
+              variant="h3" 
+              component="h1" 
+              sx={{ 
+                fontWeight: "bold", 
+                color: "#333",
+                margin: 0
+              }}
+            >
+              Scrap Plan
+            </Typography>
+          </Box>
           <Typography 
-            variant="h3" 
-            component="h1" 
+            variant="h5" 
             gutterBottom
             sx={{ 
-              fontWeight: "bold", 
-              color: "#333",
+              fontWeight: "medium", 
+              color: "#555",
               mb: 2
             }}
           >
