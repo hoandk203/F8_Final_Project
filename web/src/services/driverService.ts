@@ -1,5 +1,6 @@
 import axios from "axios";
 import { clientCookies } from "@/utils/cookies";
+import apiClient from "@/utils/axiosInterceptor";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -114,9 +115,21 @@ export const declineOrder = async (orderId: number, driverId: number) => {
   }
 };
 
+export const createDriver = async (driverData: any) => {
+  try {
+    const response = await apiClient.post('/driver', driverData);
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to create driver");
+    }
+    throw new Error("Server connection error");
+  }
+}
+
 export const updateDriver = async (driverId: number, data: any) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/driver/${driverId}`, data);
+    const response = await apiClient.put(`/driver/${driverId}`, data);
     return response.data;
   } catch (error: any) {
     if (error.response) {

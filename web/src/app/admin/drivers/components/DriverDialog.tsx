@@ -13,10 +13,14 @@ import AdminDialog from "@/app/admin/components/AdminDialog";
 import TextField from "@mui/material/TextField";
 import CustomButton from "@/components/CustomButton";
 import { fetchDriverList } from "@/redux/middlewares/driverMiddleware";
+import { createDriver, updateDriver } from "@/services/driverService";
+import { Try } from "@mui/icons-material";
+import { createUser } from "@/services/userService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const schema = z.object({
+    email: z.string().email({ message: "Invalid email address" }).optional(),
     fullname: z.string().min(1, { message: "Fullname is required" }),
     dateOfBirth: z.string().min(1, { message: "Date of birth is required" }),
     gstNumber: z.string().min(1, { message: "GST number is required" }),
@@ -83,8 +87,8 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         if(currentId){
             try {
-                const response = await axios.put(`${BASE_URL}/driver/${currentId}`, data);
-                if (response.data) {
+                const response = await updateDriver(currentId, data);
+                if (response) {
                     dispatch(fetchDriverList());
                     handleClose();
                     toast.success("Driver updated successfully");
@@ -96,17 +100,32 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
             }
         } else {
             try {
-                const response = await axios.post(`${BASE_URL}/driver`, data);
-                if (response.data) {
-                    dispatch(fetchDriverList());
-                    handleClose();
-                    toast.success("Driver created successfully");
+                const userData= await createUser({
+                    email: data.email,
+                    role: "driver",
+                });
+                const userId= userData.id;
+                
+                try {
+                    const driverData= {
+                        ...data,
+                        userId: parseInt(userId),
+                    }
+                    const response = await createDriver(driverData);
+                    if (response) {
+                        dispatch(fetchDriverList());
+                        handleClose();
+                        toast.success("Driver created successfully. Check your email to get the password.");
+                    }
+                } catch (e) {
+                    toast.error("Driver create failed");
+                    console.log(e);
+                    return e;
                 }
-            } catch (e) {
-                toast.error("Driver create failed");
-                console.log(e);
-                return e;
+            } catch (error) {
+                
             }
+            
         }
     };
 
@@ -117,6 +136,20 @@ const DriverDialog = ({ open, handleClose, currentData, currentId }: Props) => {
             handleClose={handleClose}
         >
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
+                <div className="flex flex-col gap-y-1">
+                    <label htmlFor="email" className="font-semibold">
+                        Email
+                    </label>
+                    <TextField
+                        {...register("email")}
+                        type="text"
+                        id="email"
+                        label="Email"
+                        variant="outlined"
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                    />
+                </div>
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor="fullname" className="font-semibold">
                         Fullname

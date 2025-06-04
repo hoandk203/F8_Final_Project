@@ -220,6 +220,65 @@ export class UsersService extends BaseService{
       throw new ConflictException('Email already registered')
     }
 
+    await this.mailerService.sendMail({
+      from: "hoanyttv@gmail.com",
+      to: email,
+      subject: "Password for Scrap Plan",
+      html: `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to Scrap Plan</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+
+            .wrapper{
+                margin: 0 auto;
+                background-color: rgb(33, 36, 41);
+                padding: 50px;
+                width: 700px;
+            }
+
+            .container {
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                font-size: 16px;
+            }
+            p {
+                color: #555555;
+                line-height: 1.6;
+            }
+            .otp-code {
+                font-size: 24px;
+                margin: 20px 0;
+            }
+            .note {
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="container">
+                <p class="dear">Dear ${email},</p>
+                <div class="otp-code">Your Password: <b>${passwordRandom}</b></div>
+                <p class="note">Thank you for registering with us.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `
+    })
+
     data.password  = await bcrypt.hash(passwordRandom, 10);
 
     return await this.userRepository.save(data)

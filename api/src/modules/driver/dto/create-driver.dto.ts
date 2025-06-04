@@ -14,9 +14,9 @@ export class CreateDriverDto {
         description: 'Identity Document ID',
         example: 1
     })
-    @IsNotEmpty()
+    @IsOptional()
     @IsNumber()
-    identityDocumentId: number;
+    identityDocumentId?: number;
 
     @ApiProperty({
         description: 'Full name of the driver',

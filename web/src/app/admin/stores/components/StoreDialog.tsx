@@ -122,18 +122,19 @@ const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: 
                 
                 try {
                     const response = await createStore(storeData);
-                    if (response.data) {
+                    if (response) {
                         // dispatch(createVendor(data))
                         dispatch(fetchStoreList())
-                        toast.success("Store created successfully");
+                        handleClose();
+                        toast.success("Store created successfully. Check your email to get the password.");
                     }
                 } catch (e) {
                     toast.error("Store create failed");
                     console.log(e);
                     return e;
                 }
-            } catch (error) {
-                toast.error("Store create failed");
+            } catch (error: any) {
+                toast.error(`${error}`);
                 console.log(error);
                 return error;
             }
