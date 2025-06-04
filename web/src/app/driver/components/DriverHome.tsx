@@ -58,6 +58,10 @@ const DriverHome = () => {
     const [materialPriceDialogOpen, setMaterialPriceDialogOpen] = useState(false);
     const [pendingIdDocument, setPendingIdDocument] = useState("");
     const [pendingVehicle, setPendingVehicle] = useState("");
+    
+    // Thêm state cho expired payment
+    const [hasExpiredPayment, setHasExpiredPayment] = useState(false);
+    const [expiredPaymentMessage, setExpiredPaymentMessage] = useState("");
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -314,16 +318,36 @@ const DriverHome = () => {
             const payment = await getUnpaidPayments(driverId);
             
             if (payment) {
-                const amount = payment.amount;
-                setUnpaidAmount(amount);
-                setPaymentUrl(payment.paymentUrl);
-                setHasUnpaidOrders(true);
+                // Kiểm tra nếu payment đã hết hạn
+                if (payment.isExpired) {
+                    setHasExpiredPayment(true);
+                    setExpiredPaymentMessage(payment.message);
+                    setUnpaidAmount(payment.amount);
+                    setHasUnpaidOrders(false);
+                    setPaymentUrl(null);
+                } else {
+                    // Payment vẫn còn hiệu lực
+                    const amount = payment.amount;
+                    setUnpaidAmount(amount);
+                    setPaymentUrl(payment.paymentUrl);
+                    setHasUnpaidOrders(true);
+                    setHasExpiredPayment(false);
+                    setExpiredPaymentMessage("");
+                }
             } else {
+                // Không có payment nào
                 setUnpaidAmount(0);
                 setHasUnpaidOrders(false);
+                setPaymentUrl(null);
+                setHasExpiredPayment(false);
+                setExpiredPaymentMessage("");
             }
         } catch (error) {
-            console.error("Error fetching unpaid payments:", error);
+            setUnpaidAmount(0);
+            setHasUnpaidOrders(false);
+            setPaymentUrl(null);
+            setHasExpiredPayment(false);
+            setExpiredPaymentMessage("");
         }
     };
 
@@ -384,6 +408,22 @@ const DriverHome = () => {
                 {loadingOrders ? (
                     <div className="flex justify-center py-4">
                         <CircularProgress size={30} />
+                    </div>
+                ) : hasExpiredPayment ? (
+                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg text-center">
+                        <p className="text-red-700 mb-2">Payment Expired</p>
+                        <p className="text-red-600 font-bold mb-2">${unpaidAmount.toLocaleString()}</p>
+                        <p className="text-gray-600 text-sm mb-4">{expiredPaymentMessage}</p>
+                        <p className="text-gray-600 text-sm mb-4">Contact support for assistance with your expired payment.</p>
+                        <div className="flex gap-2 justify-center">
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                onClick={() => setHasExpiredPayment(false)}
+                            >
+                                Dismiss
+                            </Button>
+                        </div>
                     </div>
                 ) : hasUnpaidOrders ? (
                     <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-center">

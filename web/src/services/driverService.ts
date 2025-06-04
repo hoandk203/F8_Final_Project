@@ -196,17 +196,53 @@ export const updateIdentityDocument = async (documentId: number, documentData: a
 
 export const getUnpaidPayments = async (driverId: number) => {
   try {
+    
     const response = await axios.get(`${API_BASE_URL}/payment/driver/${driverId}/unpaid`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${localStorage.getItem("access_token")}`
       }
     });
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      throw new Error(error.response.data.message || "Không thể lấy thông tin thanh toán");
+
+    // Xử lý trường hợp backend cũ trả về empty response
+    if (!response.data || response.data === "" || Object.keys(response.data).length === 0) {
+      return null;
     }
-    throw new Error("Lỗi kết nối server");
+    
+    // Check for expired payment
+    if (response.data.isExpired) {
+      return {
+        isExpired: true,
+        ...response.data.expiredPayment,
+        message: response.data.message
+      };
+    }
+    
+    // Check for new format (sau khi backend được deploy)
+    if (response.data.hasOwnProperty('hasUnpaidPayments')) {
+      if (response.data.hasUnpaidPayments) {
+        return response.data.payment;
+      } else {
+        return null;
+      }
+    }
+    
+    // Check for old format (direct payment object)
+    if (response.data && typeof response.data === 'object' && response.data.amount) {
+      return response.data;
+    }
+    
+    // Unexpected format
+    return null;
+    
+  } catch (error: any) {
+    
+    if (error.response) {      
+      if (error.response.status === 404) {
+        return null;
+      }
+      throw new Error(error.response.data.message || "Failed to get unpaid payments");
+    }
+    throw new Error("Server connection error");
   }
 };

@@ -82,6 +82,7 @@ const IssueStorePage = () => {
 
   // State cho dialog tạo issue mới
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [dialogError, setDialogError] = useState<string | null>(null);
   const [newIssue, setNewIssue] = useState({
     orderId: '',
     issueName: '',
@@ -214,15 +215,19 @@ const IssueStorePage = () => {
         issueImage,
         status: 'open'
       });
-      
+
       // Refresh issues list
       const response = await getIssuesByStore(user?.id || 0);
       setIssues(response);
       setTotalIssues(response.length);
       
       handleCloseCreateDialog();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating issue:', error);
+      const errorMessage = Array.isArray(error.response.data.message) 
+        ? error.response.data.message.join(', ') 
+        : error.response.data.message;
+      setDialogError(errorMessage);
     } finally {
       setCreatingIssue(false);
     }
@@ -458,7 +463,13 @@ const IssueStorePage = () => {
 
             <UploadImages setIssueImage={setIssueImage} />
           </Box>
+          {dialogError && (
+            <Typography sx={{color: "red", marginTop: 2}}>
+              {dialogError}
+            </Typography>
+          )}
         </DialogContent>
+        
         <DialogActions>
           <Button onClick={handleCloseCreateDialog}>Cancel</Button>
           <Button 

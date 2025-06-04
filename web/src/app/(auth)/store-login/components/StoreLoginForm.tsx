@@ -61,15 +61,18 @@ const StoreLoginForm = () => {
             const response= await loginAPI(data);
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
-
-
-            const verificationStatus= await verificationStatusAPI()
-            if(!verificationStatus.storeVerification){
-                localStorage.setItem("userId", verificationStatus.userId);
-                localStorage.setItem("stepVerifyStore", "1");
-                window.location.href = ("/store/verify-store");
+            if(response.role === "store"){
+                const verificationStatus= await verificationStatusAPI()
+                if(!verificationStatus.storeVerification){
+                    localStorage.setItem("userId", verificationStatus.userId);
+                    localStorage.setItem("stepVerifyStore", "1");
+                    window.location.href = ("/store/verify-store");
+                }else{
+                    router.push("/store");
+                }
+            }else{
+                setError("You are not authorized to access this page");
             }
-            router.push("/store");
         }catch (e) {
             if (e instanceof Error) {
                 setError(e.message);

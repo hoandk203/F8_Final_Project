@@ -67,7 +67,11 @@ const VendorLoginForm = () => {
                 router.push("/vendor");
             } else if (response.role === 'admin') {
                 router.push("/admin/drivers");
+            }else{
+                setError("You are not authorized to access this page");
             }
+
+
         } catch (e) {
             if (e instanceof Error) {
                 setError(e.message);

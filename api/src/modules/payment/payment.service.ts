@@ -272,19 +272,34 @@ export class PaymentService {
     const orders = await this.orderService.getByDriverId(driverId);
 
     let payment: any;
+    let expiredPayment: any;
 
     for (const order of orders) {
-      // Chỉ lấy payment còn pending và chưa hết hạn
+      // Tìm payment pending (bao gồm cả đã hết hạn)
       payment = await this.paymentRepository.findOne({
         where: { 
           status: PaymentStatus.PENDING, 
           orderId: order.id, 
-          active: true,
-          expiredAt: MoreThan(new Date()) 
+          active: true
         }
       });
 
       if (payment) {
+        // Kiểm tra xem payment có hết hạn không
+        const now = new Date();
+        if (payment.expiredAt && payment.expiredAt < now) {
+          // Payment đã hết hạn
+          expiredPayment = payment;
+          
+          // Cập nhật status thành FAILED vì hết hạn
+          await this.paymentRepository.update(payment.id, {
+            status: PaymentStatus.FAILED
+          });
+          
+          continue; // Tiếp tục tìm payment khác
+        }
+
+        // Payment vẫn còn hiệu lực
         // Tạo URL mới nếu payment vẫn còn hiệu lực
         const newPaymentUrl = await this.createVnpayPaymentUrl(
           payment,
@@ -302,6 +317,17 @@ export class PaymentService {
           paymentUrl: newPaymentUrl
         };
       }
+    }
+    
+    // Nếu có expired payment nhưng không có payment còn hiệu lực
+    if (expiredPayment) {
+      return {
+        isExpired: true,
+        expiredAt: expiredPayment.expiredAt,
+        amount: expiredPayment.amount,
+        orderId: expiredPayment.orderId,
+        message: 'Payment has expired. Please contact support.'
+      };
     }
     
     return null;

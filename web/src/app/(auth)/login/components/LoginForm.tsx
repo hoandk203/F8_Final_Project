@@ -62,6 +62,10 @@ const LoginForm = () => {
             localStorage.setItem("access_token", response.access_token);
             localStorage.setItem("refresh_token", response.refresh_token);
 
+            if(response.role !== "driver"){
+                setError("You are not authorized to access this page");
+                return;
+            }
 
             const verificationStatus= await verificationStatusAPI();
             if(!verificationStatus.idVerification){
@@ -79,8 +83,9 @@ const LoginForm = () => {
             }else if(!verificationStatus.vehicleVerification){
                 localStorage.setItem("verifyDriverStep", "2");
                 window.location.href= ("/driver/verify-driver");
+            }else{
+                router.push("/driver");
             }
-            router.push("/driver");
         }catch (e) {
             if (e instanceof Error) {
                 setError(e.message);
