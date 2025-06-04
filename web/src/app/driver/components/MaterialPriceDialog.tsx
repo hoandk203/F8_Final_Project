@@ -62,7 +62,7 @@ const MaterialPriceDialog = ({ open, onClose }: MaterialPriceDialogProps) => {
       setFilteredMaterials(data);
     } catch (err) {
       console.error("Failed to fetch materials:", err);
-      setError("Không thể tải danh sách vật liệu. Vui lòng thử lại sau.");
+      setError("Can't load material list. Please try again later.");
     } finally {
       setLoading(false);
     }

@@ -1,13 +1,14 @@
 import axios from "axios";
+import { clientCookies } from "@/utils/cookies";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const getMaterials = async () => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.get(`${BASE_URL}/material`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -18,11 +19,11 @@ export const getMaterials = async () => {
 };
 
 export const getMaterialById = async (id: number) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.get(`${BASE_URL}/material/${id}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -33,11 +34,11 @@ export const getMaterialById = async (id: number) => {
 };
 
 export const createMaterial = async (data: any) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.post(`${BASE_URL}/material`, data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -48,11 +49,11 @@ export const createMaterial = async (data: any) => {
 };
 
 export const updateMaterial = async (id: number, data: any) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.put(`${BASE_URL}/material/${id}`, data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -63,11 +64,11 @@ export const updateMaterial = async (id: number, data: any) => {
 };
 
 export const deleteMaterial = async (id: number) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.delete(`${BASE_URL}/material/${id}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -78,11 +79,11 @@ export const deleteMaterial = async (id: number) => {
 };
 
 export const searchMaterial = async (name: string) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.get(`${BASE_URL}/material/search?name=${name}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
