@@ -8,7 +8,7 @@ import { Home as HomeIcon, Store as StoreIcon, AttachMoney as AttachMoneyIcon } 
 import LineChart from "@/app/store/components/LineChart";
 import OrderList from "@/app/store/components/OrderList";
 import { useRouter } from "next/navigation";
-import { refreshToken } from "@/services/authService";
+import { refreshToken, getAuthTokens, setAuthTokens, clearAuthTokens } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { getOrdersByStore } from "@/services/orderService";
 
@@ -113,39 +113,41 @@ const StorePage = () => {
 
   useEffect(() => {
     const checkAuth= async () => {
-        const accessToken= localStorage.getItem("access_token")
-        if(!accessToken){
+        const tokens = getAuthTokens();
+        if(!tokens?.access_token){
             router.push("/store-login")
             return
         }
         if(!user){
             try {
                 // Dispatch action to get profile info and save to Redux store
-                const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                const userData= await dispatch(fetchUserProfile(tokens.access_token)).unwrap()
                 if(userData.user.role !== "store"){
                     router.push("/store-login");
-                    localStorage.removeItem("access_token")
-                    localStorage.removeItem("refresh_token")
+                    clearAuthTokens();
                 }
             }catch (err: any) {
                 if (err?.message === "Access token expired") {
                     try {
-                        const oldRefreshToken= localStorage.getItem("refresh_token")
-                        const newTokens= await refreshToken(oldRefreshToken || "")
-                        localStorage.setItem("access_token", newTokens.access_token)
-                        localStorage.setItem("refresh_token", newTokens.refresh_token)
+                        const oldRefreshToken = tokens.refresh_token;
+                        const newTokens = await refreshToken(oldRefreshToken || "");
+                        
+                        // Update tokens in cookies
+                        setAuthTokens({
+                            access_token: newTokens.access_token,
+                            refresh_token: newTokens.refresh_token,
+                            role: tokens.role
+                        });
 
                         // Retry with new token
                         await dispatch(fetchUserProfile(newTokens.access_token)).unwrap()
                     }
                     catch (refreshError) {
-                        localStorage.removeItem("access_token")
-                        localStorage.removeItem("refresh_token")
+                        clearAuthTokens();
                         router.push("/store-login")
                     }
                 } else {
-                    localStorage.removeItem("access_token")
-                    localStorage.removeItem("refresh_token")
+                    clearAuthTokens();
                     router.push("/store-login")
                 }
             }

@@ -1,13 +1,14 @@
 import axios from "axios";
+import { clientCookies } from "@/utils/cookies";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const getVehicleById= async (id: number) => {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     try {
         const response= await axios.get(`${BASE_URL}/vehicle/${id}`, {
             headers: {
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: `Bearer ${tokens?.access_token}`,
             },
         });
 
@@ -19,11 +20,11 @@ export const getVehicleById= async (id: number) => {
 }
 
 export const updateVehicleStatus= async (id: number, status: string) => {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     try {
         const response= await axios.put(`${BASE_URL}/vehicle/admin/${id}`, { status }, {
             headers: {
-                Authorization: `Bearer ${accessToken}`,
+                Authorization: `Bearer ${tokens?.access_token}`,
             },
         });
 

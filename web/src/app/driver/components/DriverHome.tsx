@@ -4,7 +4,7 @@ import Statistics from "@/components/Statistics";
 import OrderManager from "@/components/OrderManager";
 import DriverBottomNav from "./DriverBottomNav";
 import { useEffect, useState, useRef } from "react";
-import { refreshToken } from "@/services/authService";
+import { refreshToken, getAuthTokens, setAuthTokens, clearAuthTokens } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
@@ -65,22 +65,23 @@ const DriverHome = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
+            // Clear temporary localStorage data (keep only verification process data)
             localStorage.removeItem("userId");
             localStorage.removeItem("identityDocumentId");
-            const accessToken = localStorage.getItem("access_token");
-            if (!accessToken) {
+            
+            const tokens = getAuthTokens();
+            if (!tokens?.access_token) {
                 router.push("/login");
                 return;
             }
             
             try {
                 if (!user) {
-                    const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
+                    const userData = await dispatch(fetchUserProfile(tokens.access_token)).unwrap();
                     if(userData.user.role !== "driver"){
-                        localStorage.removeItem("access_token");
-                        localStorage.removeItem("refresh_token");
-                        localStorage.removeItem("driverId");
+                        clearAuthTokens();
                         router.push("/login");
+                        return;
                     }
 
                     if (userData && userData.id) {
@@ -106,10 +107,15 @@ const DriverHome = () => {
                 
                 if (err?.message === "Access token expired") {
                     try {
-                        const oldRefreshToken = localStorage.getItem("refresh_token");
+                        const oldRefreshToken = tokens.refresh_token;
                         const newTokens = await refreshToken(oldRefreshToken || "");
-                        localStorage.setItem("access_token", newTokens.access_token);
-                        localStorage.setItem("refresh_token", newTokens.refresh_token);
+                        
+                        // Update tokens in cookies
+                        setAuthTokens({
+                            access_token: newTokens.access_token,
+                            refresh_token: newTokens.refresh_token,
+                            role: tokens.role
+                        });
 
                         // Thử lại với token mới
                         const userData = await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
@@ -120,15 +126,11 @@ const DriverHome = () => {
                         }
                     } catch (refreshError) {
                         console.error("Error refreshing token:", refreshError);
-                        localStorage.removeItem("access_token");
-                        localStorage.removeItem("refresh_token");
-                        localStorage.removeItem("driverId");
+                        clearAuthTokens();
                         router.push("/login");
                     }
                 } else {
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
-                    localStorage.removeItem("driverId");
+                    clearAuthTokens();
                     router.push("/login");
                 }
             }

@@ -28,7 +28,7 @@ import MaterialDialog from "@/app/admin/material/components/MaterialDialog";
 import { searchMaterialByName, softDeleteMaterial } from "@/redux/slice/materialSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { refreshToken } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { deleteMaterial, searchMaterial } from "@/services/materialService";
 
@@ -117,34 +117,35 @@ const MaterialPage = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
-        router.push("/admin-login");
+      const tokens = getAuthTokens();
+      if (!tokens?.access_token) {
+        router.push("/vendor-login");
         return;
       }
       if (!user) {
         try {
           // Dispatch action to get profile info and save to Redux store
-          await dispatch(fetchUserProfile(accessToken)).unwrap();
+          await dispatch(fetchUserProfile(tokens.access_token)).unwrap();
         } catch (err: any) {
           if (err?.message === "Access token expired") {
             try {
-              const oldRefreshToken = localStorage.getItem("refresh_token");
+              const oldRefreshToken = tokens.refresh_token;
               const newTokens = await refreshToken(oldRefreshToken || "");
-              localStorage.setItem("access_token", newTokens.access_token);
-              localStorage.setItem("refresh_token", newTokens.refresh_token);
+              setAuthTokens({
+                access_token: newTokens.access_token,
+                refresh_token: newTokens.refresh_token,
+                role: tokens.role
+              });
 
               // Retry with new token
               await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             } catch (refreshError) {
-              localStorage.removeItem("access_token");
-              localStorage.removeItem("refresh_token");
-              router.push("/admin-login");
+              clearAuthTokens();
+              router.push("/vendor-login");
             }
           } else {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            router.push("/admin-login");
+            clearAuthTokens();
+            router.push("/vendor-login");
           }
         }
       }

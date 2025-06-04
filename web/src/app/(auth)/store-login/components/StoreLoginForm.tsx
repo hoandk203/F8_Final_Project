@@ -10,7 +10,7 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
-import {loginAPI, verificationStatusAPI} from "@/services/authService";
+import {loginAPI, verificationStatusAPI, setAuthTokens, clearAuthTokens} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -56,24 +56,36 @@ const StoreLoginForm = () => {
     });
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
-        localStorage.clear()
+        // Clear any existing authentication data
+        clearAuthTokens();
+        localStorage.clear();
+        
         try {
-            const response= await loginAPI(data);
-            localStorage.setItem("access_token", response.access_token);
-            localStorage.setItem("refresh_token", response.refresh_token);
+            const response = await loginAPI(data);
+            
+            // Store tokens in cookies
+            setAuthTokens({
+                access_token: response.access_token,
+                refresh_token: response.refresh_token,
+                role: response.role
+            });
+            
             if(response.role === "store"){
-                const verificationStatus= await verificationStatusAPI()
+                const verificationStatus = await verificationStatusAPI();
                 if(!verificationStatus.storeVerification){
+                    // Store temporary data in localStorage for verification process only
                     localStorage.setItem("userId", verificationStatus.userId);
                     localStorage.setItem("stepVerifyStore", "1");
-                    window.location.href = ("/store/verify-store");
-                }else{
+                    window.location.href = "/store/verify-store";
+                } else {
                     router.push("/store");
                 }
-            }else{
+            } else {
                 setError("You are not authorized to access this page");
+                clearAuthTokens();
             }
-        }catch (e) {
+        } catch (e) {
+            clearAuthTokens();
             if (e instanceof Error) {
                 setError(e.message);
             } else {

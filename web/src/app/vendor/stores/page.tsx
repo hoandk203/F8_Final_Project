@@ -17,7 +17,8 @@ import {
     InputAdornment,
     TextField,
     Typography,
-    CircularProgress
+    CircularProgress,
+    Box
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -29,7 +30,7 @@ import StoreDialog from "@/app/vendor/stores/components/StoreDialog";
 import {searchStoreByName, softDeleteStore} from "@/redux/slice/storeSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { refreshToken } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from "@/services/authService";
 import { useRouter } from "next/navigation";
 import { getStoreByVendorId } from "@/services/storeService";
 
@@ -127,8 +128,8 @@ const StoresPage = () => {
     useEffect(() => {
         const checkAuth= async () => {
             
-            const accessToken= localStorage.getItem("access_token")
-            if(!accessToken){
+            const tokens = getAuthTokens();
+            if(!tokens?.access_token){
                 router.push("/vendor-login")
                 return
             }
@@ -136,12 +137,11 @@ const StoresPage = () => {
             try {
                 // Dispatch action to get profile info and save to Redux store
                 setLoading(true);
-                const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                const userData= await dispatch(fetchUserProfile(tokens.access_token)).unwrap()
                 
                 if(userData?.user.role !== "vendor"){
                     router.push("/vendor-login");
-                    localStorage.removeItem("access_token")
-                    localStorage.removeItem("refresh_token")
+                    clearAuthTokens();
                 }
                 await fetchStoreList(userData?.id || 0)
                 setLoading(false);
@@ -150,10 +150,13 @@ const StoresPage = () => {
                 if (err?.message === "Access token expired") {
                     try {
                         setLoading(true);
-                        const oldRefreshToken= localStorage.getItem("refresh_token")
-                        const newTokens= await refreshToken(oldRefreshToken || "")
-                        localStorage.setItem("access_token", newTokens.access_token)
-                        localStorage.setItem("refresh_token", newTokens.refresh_token)
+                        const oldRefreshToken = tokens.refresh_token;
+                        const newTokens = await refreshToken(oldRefreshToken || "");
+                        setAuthTokens({
+                            access_token: newTokens.access_token,
+                            refresh_token: newTokens.refresh_token,
+                            role: tokens.role
+                        });
 
                         // Retry with new token
                         const userData= await dispatch(fetchUserProfile(newTokens.access_token)).unwrap()
@@ -161,14 +164,12 @@ const StoresPage = () => {
                     }
                     catch (refreshError) {
                         setLoading(false);
-                        localStorage.removeItem("access_token")
-                        localStorage.removeItem("refresh_token")
+                        clearAuthTokens();
                         router.push("/vendor-login")
                     }
                 } else {
                     setLoading(false);
-                    localStorage.removeItem("access_token")
-                    localStorage.removeItem("refresh_token")
+                    clearAuthTokens();
                     router.push("/vendor-login")
                 }
             }
@@ -248,9 +249,13 @@ const StoresPage = () => {
     }
     
     return (
-        <div className={"container mx-auto"}>
+        <Box sx={{ p: 3 }}>
 
-            <h1 className="text-3xl font-bold lg:hidden mb-5">stores</h1>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
+        <Typography variant="h5" component="h1">
+          Stores
+        </Typography>
+      </Box>
             <div>
                 
                <CommonTable 
@@ -302,7 +307,7 @@ const StoresPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </Box>
     )
 }
 

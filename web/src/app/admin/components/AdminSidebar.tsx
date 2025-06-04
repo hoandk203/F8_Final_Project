@@ -12,6 +12,7 @@ import { logoutUser } from "@/redux/middlewares/authMiddleware";
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import RecyclingIcon from '@mui/icons-material/Recycling';
+import { clearAuthTokens, getAuthTokens } from "@/services/authService";
 
 const AdminSidebar = () => {
     const dispatch = useDispatch();
@@ -19,15 +20,13 @@ const AdminSidebar = () => {
     const pathname = usePathname();
 
     const handleLogout = async () => {
-        const accessToken = localStorage.getItem("access_token");
-        const refreshToken = localStorage.getItem("refresh_token");
+        const tokens = getAuthTokens();
         
-        if (accessToken && refreshToken) {
-            await dispatch(logoutUser({ accessToken, refreshToken }) as any);
+        if (tokens?.access_token && tokens?.refresh_token) {
+            await dispatch(logoutUser({ accessToken: tokens.access_token, refreshToken: tokens.refresh_token }) as any);
         }
         
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
+        clearAuthTokens();
         window.location.href =("/vendor-login");
     };
 

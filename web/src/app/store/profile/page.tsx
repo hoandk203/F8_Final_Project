@@ -29,6 +29,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { clientCookies } from "@/utils/cookies";
 
 interface User {
   email: string;
@@ -80,8 +81,8 @@ const StoreProfilePage = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const tokens = clientCookies.getAuthTokens();
+      if (!tokens?.access_token) {
         router.push("/store-login");
         return;
       }
@@ -89,25 +90,22 @@ const StoreProfilePage = () => {
       if (!user) {
         try {
           // Dispatch action để lấy thông tin profile và lưu vào Redux store
-          await dispatch(fetchUserProfile(accessToken)).unwrap();
+          await dispatch(fetchUserProfile(tokens?.access_token)).unwrap();
         } catch (err: any) {
           if (err?.message === "Access token expired") {
             try {
-              const oldRefreshToken = localStorage.getItem("refresh_token");
+              const oldRefreshToken = tokens.refresh_token;
               const newTokens = await refreshToken(oldRefreshToken || "");
-              localStorage.setItem("access_token", newTokens.access_token);
-              localStorage.setItem("refresh_token", newTokens.refresh_token);
+              clientCookies.setAuthTokens(newTokens);
 
               // Thử lại với token mới
               await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             } catch (refreshError) {
-              localStorage.removeItem("access_token");
-              localStorage.removeItem("refresh_token");
+              clientCookies.clearAuthTokens();
               router.push("/store-login");
             }
           } else {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
+            clientCookies.clearAuthTokens();
             router.push("/store-login");
           }
         }

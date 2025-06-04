@@ -9,7 +9,7 @@ import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
-import {loginAPI, verificationStatusAPI} from "@/services/authService";
+import {loginAPI, verificationStatusAPI, setAuthTokens, isAuthenticated, clearAuthTokens} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -56,44 +56,54 @@ const LoginForm = () => {
     });
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("access_token");
-        if(accessToken){
+        // Check if user is already authenticated
+        if (isAuthenticated()) {
             router.push("/driver");
         }
-    }, [])
+    }, [router])
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
 
         try {
-            const response= await loginAPI(data);
-            localStorage.setItem("access_token", response.access_token);
-            localStorage.setItem("refresh_token", response.refresh_token);
+            // Clear any existing tokens first
+            clearAuthTokens();
+            
+            const response = await loginAPI(data);
+            
+            // Store tokens in cookies
+            setAuthTokens({
+                access_token: response.access_token,
+                refresh_token: response.refresh_token,
+                role: response.role
+            });
 
             if(response.role !== "driver"){
                 setError("You are not authorized to access this page");
+                clearAuthTokens();
                 return;
             }
 
-            const verificationStatus= await verificationStatusAPI();
+            const verificationStatus = await verificationStatusAPI();
             if(!verificationStatus.idVerification){
-
+                // Store temporary data in localStorage for verification process only
                 localStorage.setItem("userId", verificationStatus.userId);
                 localStorage.setItem("verifyDriverStep", "1");
                 localStorage.setItem("verifyIdStep", "0");
-                window.location.href= ("/driver/verify-driver");
-            }else if(!verificationStatus.driverVerification){
+                window.location.href = "/driver/verify-driver";
+            } else if(!verificationStatus.driverVerification){
                 localStorage.setItem("userId", verificationStatus.userId);
                 localStorage.setItem("identityDocumentId", verificationStatus.identityDocumentId);
                 localStorage.setItem("verifyDriverStep", "1");
                 localStorage.setItem("verifyIdStep", "1");
-                window.location.href= ("/driver/verify-driver");
-            }else if(!verificationStatus.vehicleVerification){
+                window.location.href = "/driver/verify-driver";
+            } else if(!verificationStatus.vehicleVerification){
                 localStorage.setItem("verifyDriverStep", "2");
-                window.location.href= ("/driver/verify-driver");
-            }else{
+                window.location.href = "/driver/verify-driver";
+            } else {
                 router.push("/driver");
             }
-        }catch (e) {
+        } catch (e) {
+            clearAuthTokens();
             if (e instanceof Error) {
                 setError(e.message);
             } else {

@@ -163,7 +163,7 @@ export class AuthService {
             await this.mailerService.sendMail({
               from: "hoanyttv@gmail.com",
               to: data.email,
-              subject: "Password for Scrap Plan",
+              subject: "New password for Scrap Plan",
               html: `
             <!DOCTYPE html>
             <html lang="en">
@@ -223,7 +223,7 @@ export class AuthService {
           
           //hash password
           data.password  = await bcrypt.hash(passwordRandom, 10);
-          await this.userService.resetPassword(userId, data.password)
+          await this.userService.updatePassword(userId, data.password)
     
           return {...data, role: user.role}
         }

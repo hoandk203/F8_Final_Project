@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clientCookies } from '@/utils/cookies';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -26,11 +27,11 @@ export const createPayment = async (
   params: CreatePaymentParams
 ): Promise<PaymentResponse> => {
   try {
-    const accessToken = localStorage.getItem('access_token');
+    const tokens = clientCookies.getAuthTokens();
     
     const response = await axios.post(`${BASE_URL}/payment`, params, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     
@@ -46,13 +47,13 @@ export const updatePayment = async (
   paymentUrl: string
 ): Promise<PaymentResponse> => {
   try {
-    const accessToken = localStorage.getItem('access_token');
+    const tokens = clientCookies.getAuthTokens();
     
     const response = await axios.put(`${BASE_URL}/payment/${paymentId}`, {
       paymentUrl: paymentUrl
     }, { 
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     
@@ -69,11 +70,11 @@ export const getPaymentsByOrderId = async (
   orderId: number
 ): Promise<PaymentResponse[]> => {
   try {
-    const accessToken = localStorage.getItem('access_token');
+    const tokens = clientCookies.getAuthTokens();
     
     const response = await axios.get(`${BASE_URL}/payment/order/${orderId}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     
@@ -88,11 +89,11 @@ export const getPaymentById = async (
   paymentId: number
 ): Promise<PaymentResponse> => {
   try {
-    const accessToken = localStorage.getItem('access_token');
+    const tokens = clientCookies.getAuthTokens();
     
     const response = await axios.get(`${BASE_URL}/payment/${paymentId}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     

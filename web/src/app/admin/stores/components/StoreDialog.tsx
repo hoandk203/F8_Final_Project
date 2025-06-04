@@ -43,7 +43,6 @@ interface Props {
 }
 
 const StoreDialog = ({ open, handleClose, currentData, currentId, vendorList }: Props) => {
-    console.log(currentData);
     const {
         register,
         control,

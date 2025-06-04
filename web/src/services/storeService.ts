@@ -1,18 +1,19 @@
 import axios from "axios";
+import { clientCookies } from "@/utils/cookies";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const getStoreProfile = async () => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
     const response = await axios.get(`${API_BASE_URL}/store/profile`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${tokens?.access_token}`
       }
     });
     
@@ -27,15 +28,15 @@ export const getStoreProfile = async () => {
 
 export const updateStoreProfile = async (profileData: any) => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
     const response = await axios.put(`${API_BASE_URL}/store/profile`, profileData, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${tokens?.access_token}`
       }
     });
     
@@ -50,9 +51,9 @@ export const updateStoreProfile = async (profileData: any) => {
 
 export const uploadStoreLogo = async (file: File) => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
@@ -61,7 +62,7 @@ export const uploadStoreLogo = async (file: File) => {
     
     const response = await axios.post(`${API_BASE_URL}/store/upload-logo`, formData, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
         "Content-Type": "multipart/form-data"
       }
     });
@@ -95,15 +96,15 @@ export const saveStoreLocation = async (storeId: number, latitude: number, longi
 
 export const getStoreLocation = async (storeId: number) => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
     const response = await axios.get(`${API_BASE_URL}/location/store/${storeId}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${tokens?.access_token}`
       }
     });
     

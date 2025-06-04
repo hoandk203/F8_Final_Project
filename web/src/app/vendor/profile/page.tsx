@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon, PhotoCamera as PhotoCameraIcon } from "@mui/icons-material";
 import { uploadStoreLogo } from "@/services/storeService";
-import { updateUserProfile } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, setAuthTokens, updateUserProfile } from "@/services/authService";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -72,8 +72,8 @@ const VendorProfilePage = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const tokens = getAuthTokens();
+      if (!tokens?.access_token) {
         router.push("/vendor-login");
         return;
       }
@@ -81,25 +81,26 @@ const VendorProfilePage = () => {
       if (!user) {
         try {
           // Dispatch action để lấy thông tin profile và lưu vào Redux store
-          await dispatch(fetchUserProfile(accessToken)).unwrap();
+          await dispatch(fetchUserProfile(tokens.access_token)).unwrap();
         } catch (err: any) {
           if (err?.message === "Access token expired") {
             try {
-              const oldRefreshToken = localStorage.getItem("refresh_token");
+              const oldRefreshToken = tokens.refresh_token;
               const newTokens = await refreshToken(oldRefreshToken || "");
-              localStorage.setItem("access_token", newTokens.access_token);
-              localStorage.setItem("refresh_token", newTokens.refresh_token);
+              setAuthTokens({
+                access_token: newTokens.access_token,
+                refresh_token: newTokens.refresh_token,
+                role: tokens.role
+              });
 
               // Thử lại với token mới
               await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             } catch (refreshError) {
-              localStorage.removeItem("access_token");
-              localStorage.removeItem("refresh_token");
+              clearAuthTokens();
               router.push("/vendor-login");
             }
           } else {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
+            clearAuthTokens();
             router.push("/vendor-login");
           }
         }

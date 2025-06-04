@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clientCookies } from "@/utils/cookies";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -127,10 +128,11 @@ export const updateDriver = async (driverId: number, data: any) => {
 
 export const getVehicleInfo = async (driverId: number) => {
   try {
+      const tokens = clientCookies.getAuthTokens();
       const response = await axios.get(`${API_BASE_URL}/vehicle/driver/${driverId}`, {
           headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+              "Authorization": `Bearer ${tokens?.access_token}`
           }
       });
       return response.data;
@@ -144,10 +146,11 @@ export const getVehicleInfo = async (driverId: number) => {
 
 export const updateVehicleInfo = async (vehicleId: number, vehicleData: any) => {
   try {
+      const tokens = clientCookies.getAuthTokens();
       const response = await axios.put(`${API_BASE_URL}/vehicle/${vehicleId}`, vehicleData, {
           headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+              "Authorization": `Bearer ${tokens?.access_token}`
           }
       });
       return response.data;
@@ -161,10 +164,11 @@ export const updateVehicleInfo = async (vehicleId: number, vehicleData: any) => 
 
 export const getIdentityDocument = async (userId: number) => {
   try {
+      const tokens = clientCookies.getAuthTokens();
       const response = await axios.get(`${API_BASE_URL}/identity-document/user/${userId}`, {
           headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+              "Authorization": `Bearer ${tokens?.access_token}`
           }
       });
       return response.data;
@@ -178,10 +182,11 @@ export const getIdentityDocument = async (userId: number) => {
 
 export const updateIdentityDocument = async (documentId: number, documentData: any) => {
   try {
+        const tokens = clientCookies.getAuthTokens();
         const response = await axios.put(`${API_BASE_URL}/identity-document/${documentId}`, documentData, {
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                "Authorization": `Bearer ${tokens?.access_token}`
             }
         });
       
@@ -196,11 +201,12 @@ export const updateIdentityDocument = async (documentId: number, documentData: a
 
 export const getUnpaidPayments = async (driverId: number) => {
   try {
+    const tokens = clientCookies.getAuthTokens();
     
     const response = await axios.get(`${API_BASE_URL}/payment/driver/${driverId}/unpaid`, {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+        "Authorization": `Bearer ${tokens?.access_token}`
       }
     });
 

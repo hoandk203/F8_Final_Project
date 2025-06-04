@@ -275,15 +275,4 @@ export class UsersService extends BaseService{
         }
     );
   }
-
-  async resetPassword(userId: number, password: string) {
-    await this.userRepository
-        .createQueryBuilder()
-        .update(User)
-        .set({password, modifiedAt: new Date()})
-        .where("id = :userId", {userId})
-        .execute()
-    
-    
-  }
 }

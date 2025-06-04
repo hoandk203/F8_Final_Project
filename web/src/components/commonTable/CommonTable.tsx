@@ -21,7 +21,6 @@ interface Props {
 }
 
 const CommonTable = memo(function CommonTable({ columns, rows, handleOpenDialog, setCurrentData, softDelete, onViewDocument, onViewVehicle }: Props) {
-    console.log(rows);
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full bg-white">

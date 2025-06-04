@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { Add as AddIcon, Visibility as VisibilityIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { getVendorOrders, deleteOrder } from "@/services/orderService";
-import { refreshToken } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from "@/services/authService";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -66,45 +66,42 @@ const VendorOrdersPage = () => {
   
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
-        router.push("/store-login");
+      const tokens = getAuthTokens();
+      if (!tokens?.access_token) {
+        router.push("/vendor-login");
         return;
       }
-
+      
       try {
-        const vendorData= await dispatch(fetchUserProfile(accessToken)).unwrap();
+        const vendorData= await dispatch(fetchUserProfile(tokens?.access_token)).unwrap();
         fetchOrders(vendorData.id);
       } catch (err: any) {
         if (err?.message === "Access token expired") {
           try {
-            const oldRefreshToken = localStorage.getItem("refresh_token");
+            const oldRefreshToken = tokens.refresh_token;
             const newTokens = await refreshToken(oldRefreshToken || "");
-            localStorage.setItem("access_token", newTokens.access_token);
-            localStorage.setItem("refresh_token", newTokens.refresh_token);
+            setAuthTokens({
+              access_token: newTokens.access_token,
+              refresh_token: newTokens.refresh_token,
+              role: tokens.role
+            });
 
             // Thử lại với token mới
-            const vendorData= await dispatch(fetchUserProfile(accessToken)).unwrap();
+            const vendorData= await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             fetchOrders(vendorData.id);
           } catch (refreshError) {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
-            router.push("/store-login");
+            clearAuthTokens();
+            router.push("/vendor-login");
           }
         } else {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          router.push("/store-login");
+          clearAuthTokens();
+          router.push("/vendor-login");
         }
       }
     };
 
     checkAuth();
   }, [dispatch, router]);
-
-  const handleViewDetails = (orderId: number) => {
-    router.push(`/store/orders/${orderId}`);
-  };
 
   const handleViewImage = (imageUrl: string) => {
     setViewImageUrl(imageUrl);

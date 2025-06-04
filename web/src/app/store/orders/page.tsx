@@ -31,6 +31,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "@/redux/store";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import FilterDialog from "@/app/store/orders/components/FilterDialog";
+import { clientCookies } from "@/utils/cookies";
 interface Order {
   id: number;
   store_id: number;
@@ -80,34 +81,31 @@ const OrdersPage = () => {
   
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const tokens = clientCookies.getAuthTokens();
+      if (!tokens?.access_token) {
         router.push("/store-login");
         return;
       }
 
       try {
-        await dispatch(fetchUserProfile(accessToken)).unwrap();
+        await dispatch(fetchUserProfile(tokens?.access_token)).unwrap();
         fetchOrders();
       } catch (err: any) {
         if (err?.message === "Access token expired") {
           try {
-            const oldRefreshToken = localStorage.getItem("refresh_token");
+            const oldRefreshToken = tokens.refresh_token;
             const newTokens = await refreshToken(oldRefreshToken || "");
-            localStorage.setItem("access_token", newTokens.access_token);
-            localStorage.setItem("refresh_token", newTokens.refresh_token);
+            clientCookies.setAuthTokens(newTokens);
 
             // Thử lại với token mới
             await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             fetchOrders();
           } catch (refreshError) {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
+            clientCookies.clearAuthTokens();
             router.push("/store-login");
           }
         } else {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
+          clientCookies.clearAuthTokens();
           router.push("/store-login");
         }
       }

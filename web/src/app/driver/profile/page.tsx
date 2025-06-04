@@ -17,7 +17,7 @@ import DriverInfomation from "../components/DriverInfomation";
 import ChangePasswordForm from "@/components/ChangePasswordForm";
 import VehicleInfo from "../components/VehicleInfo";
 import IdentityDocumentInfo from "../components/IdentityDocumentInfo";
-import { getProfile, refreshToken } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from "@/services/authService";
 
 interface User {
     fullname?: string;
@@ -37,8 +37,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-        const accessToken = localStorage.getItem("access_token");
-        if (!accessToken) {
+      const tokens = getAuthTokens();
+        if (!tokens?.access_token) {
             router.push("/login");
             return;
         }
@@ -46,11 +46,9 @@ export default function ProfilePage() {
         try {
             // Dispatch action để lấy thông tin profile và lưu vào Redux store
             if (!user) {
-                const userData = await dispatch(fetchUserProfile(accessToken)).unwrap();
+                const userData = await dispatch(fetchUserProfile(tokens.access_token)).unwrap();
                 if(userData.user.role !== "driver"){
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
-                    localStorage.removeItem("driverId");
+                    clearAuthTokens();
                     router.push("/login");
                 }
               }
@@ -58,25 +56,24 @@ export default function ProfilePage() {
             
             if (err?.message === "Access token expired") {
                 try {
-                    const oldRefreshToken = localStorage.getItem("refresh_token");
+                    const oldRefreshToken = tokens.refresh_token;
                     const newTokens = await refreshToken(oldRefreshToken || "");
-                    localStorage.setItem("access_token", newTokens.access_token);
-                    localStorage.setItem("refresh_token", newTokens.refresh_token);
+                    setAuthTokens({
+                        access_token: newTokens.access_token,
+                        refresh_token: newTokens.refresh_token,
+                        role: tokens.role
+                    });
 
                     // Thử lại với token mới
                     const userData = await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
                     
                 } catch (refreshError) {
                     console.error("Error refreshing token:", refreshError);
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
-                    localStorage.removeItem("driverId");
+                    clearAuthTokens();
                     router.push("/login");
                 }
             } else {
-                localStorage.removeItem("access_token");
-                localStorage.removeItem("refresh_token");
-                localStorage.removeItem("driverId");
+                clearAuthTokens();
                 router.push("/login");
             }
         }
@@ -86,16 +83,7 @@ export default function ProfilePage() {
 }, [dispatch, router, user]);
 
   const handleLogout = async () => {
-    const accessToken = localStorage.getItem("access_token");
-    const refreshToken = localStorage.getItem("refresh_token");
-    
-    if (accessToken && refreshToken) {
-      await dispatch(logoutUser({ accessToken, refreshToken }));
-    }
-    
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("driverId");
+    clearAuthTokens();
     window.location.href =("/login");
   };
 

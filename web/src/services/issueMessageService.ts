@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clientCookies } from '@/utils/cookies';
 import { IssueMessage } from '@/types/issue';
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -9,11 +10,11 @@ export const getIssueMessages = async (
   page: number = 1, 
   limit: number = 10
 ): Promise<{ messages: IssueMessage[], total: number }> => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   const response = await axios.get(`${API_URL}/issues/${issueId}/messages`, {
     params: { page, limit },
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${tokens?.access_token}`
     }
   });
   return response.data;
@@ -26,10 +27,10 @@ export const createIssueMessage = async (data: {
   senderId: number;
   fileIds?: string[];
 }): Promise<IssueMessage> => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   const response = await axios.post(`${API_URL}/issues/${data.issueId}/messages`, data, {
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${tokens?.access_token}`
     }
   });
   return response.data;

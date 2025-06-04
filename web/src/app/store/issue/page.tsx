@@ -36,7 +36,7 @@ import IssueChat from '@/components/issues/IssueChat';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import UploadImages from '@/components/UploadImages';
-import { refreshToken } from '@/services/authService';
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from '@/services/authService';
 import router from 'next/router';
 import { fetchUserProfile } from '@/redux/middlewares/authMiddleware';
 import { useDispatch } from 'react-redux';
@@ -106,34 +106,35 @@ const IssueStorePage = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
+      const tokens = getAuthTokens();
+      if (!tokens?.access_token) {
         router.push("/store-login");
         return;
       }
 
       try {
-        await dispatch(fetchUserProfile(accessToken)).unwrap();
+        await dispatch(fetchUserProfile(tokens.access_token)).unwrap();
         setUserLoaded(true);
       } catch (err: any) {
         if (err?.message === "Access token expired") {
           try {
-            const oldRefreshToken = localStorage.getItem("refresh_token");
+            const oldRefreshToken = tokens.refresh_token;
             const newTokens = await refreshToken(oldRefreshToken || "");
-            localStorage.setItem("access_token", newTokens.access_token);
-            localStorage.setItem("refresh_token", newTokens.refresh_token);
+            setAuthTokens({
+              access_token: newTokens.access_token,
+              refresh_token: newTokens.refresh_token,
+              role: tokens.role
+            });
 
             // Thử lại với token mới
             await dispatch(fetchUserProfile(newTokens.access_token)).unwrap();
             setUserLoaded(true);
           } catch (refreshError) {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("refresh_token");
+            clearAuthTokens();
             router.push("/store-login");
           }
         } else {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
+          clearAuthTokens();
           router.push("/store-login");
         }
       }

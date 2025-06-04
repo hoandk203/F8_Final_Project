@@ -29,7 +29,7 @@ import StoreDialog from "@/app/admin/stores/components/StoreDialog";
 import {searchStoreByName, softDeleteStore} from "@/redux/slice/storeSlice";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { fetchUserProfile } from "@/redux/middlewares/authMiddleware";
-import { refreshToken } from "@/services/authService";
+import { clearAuthTokens, getAuthTokens, refreshToken, setAuthTokens } from "@/services/authService";
 import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -129,40 +129,40 @@ const StoresPage = () => {
 
     useEffect(() => {
         const checkAuth= async () => {
-            const accessToken= localStorage.getItem("access_token")
-            if(!accessToken){
-                router.push("/admin-login")
+            const tokens = getAuthTokens();
+            if(!tokens?.access_token){
+                router.push("/vendor-login")
                 return
             }
             if(!user){
                 try {
                     // Dispatch action to get profile info and save to Redux store
-                    const userData= await dispatch(fetchUserProfile(accessToken)).unwrap()
+                    const userData= await dispatch(fetchUserProfile(tokens.access_token)).unwrap()
                     if(userData?.role !== "admin"){
-                        router.push("/admin-login");
-                        localStorage.removeItem("access_token")
-                        localStorage.removeItem("refresh_token")
+                        router.push("/vendor-login");
+                        clearAuthTokens();
                     }
                 }catch (err: any) {
                     if (err?.message === "Access token expired") {
                         try {
-                            const oldRefreshToken= localStorage.getItem("refresh_token")
+                            const oldRefreshToken= tokens.refresh_token
                             const newTokens= await refreshToken(oldRefreshToken || "")
-                            localStorage.setItem("access_token", newTokens.access_token)
-                            localStorage.setItem("refresh_token", newTokens.refresh_token)
+                            setAuthTokens({
+                                access_token: newTokens.access_token,
+                                refresh_token: newTokens.refresh_token,
+                                role: tokens.role
+                            });
     
                             // Retry with new token
                             await dispatch(fetchUserProfile(newTokens.access_token)).unwrap()
                         }
                         catch (refreshError) {
-                            localStorage.removeItem("access_token")
-                            localStorage.removeItem("refresh_token")
-                            router.push("/admin-login")
+                            clearAuthTokens();
+                            router.push("/vendor-login")
                         }
                     } else {
-                        localStorage.removeItem("access_token")
-                        localStorage.removeItem("refresh_token")
-                        router.push("/admin-login")
+                        clearAuthTokens();
+                        router.push("/vendor-login")
                     }
                 }
             }

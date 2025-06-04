@@ -1,13 +1,14 @@
 import axios from "axios";
+import { clientCookies } from "@/utils/cookies";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const getIdentityDocument = async (id: number) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     const response = await axios.get(`${BASE_URL}/identity-document/${id}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${tokens?.access_token}`,
       },
     });
     return response.data;
@@ -18,14 +19,14 @@ export const getIdentityDocument = async (id: number) => {
 };
 
 export const updateIdentityDocumentStatus = async (documentId: number, status: string) => {
-  const accessToken = localStorage.getItem("access_token");
+  const tokens = clientCookies.getAuthTokens();
   try {
     return await axios.put(
         `${BASE_URL}/identity-document/admin/${documentId}`,
         { status },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${tokens?.access_token}`,
           },
         }
     );

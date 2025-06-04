@@ -5,11 +5,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
-import { IconButton, InputAdornment } from "@mui/material";
+import { IconButton, InputAdornment, Link } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomButton from "@/components/CustomButton";
-import {loginAPI, verificationStatusAPI} from "@/services/authService";
+import {loginAPI, setAuthTokens, clearAuthTokens} from "@/services/authService";
 import {useRouter} from "next/navigation";
 import LoadingOverlay from "@/components/LoadingOverlay";
 
@@ -58,21 +58,30 @@ const VendorLoginForm = () => {
 
     const onSubmit: SubmitHandler<FormInput> = async (data) => {
         try {
+            // Clear any existing authentication data
+            clearAuthTokens();
+            
             const response = await loginAPI(data);
-            localStorage.setItem("access_token", response.access_token);
-            localStorage.setItem("refresh_token", response.refresh_token);
+            
+            // Store tokens in cookies
+            setAuthTokens({
+                access_token: response.access_token,
+                refresh_token: response.refresh_token,
+                role: response.role
+            });
             
             // Redirect based on role
             if (response.role === 'vendor') {
                 router.push("/vendor");
             } else if (response.role === 'admin') {
                 router.push("/admin/drivers");
-            }else{
+            } else {
                 setError("You are not authorized to access this page");
+                clearAuthTokens();
             }
 
-
         } catch (e) {
+            clearAuthTokens();
             if (e instanceof Error) {
                 setError(e.message);
             } else {
@@ -130,6 +139,9 @@ const VendorLoginForm = () => {
                         }}
                         inputRef={(input) => input && (input.tabIndex = 2)}
                     />
+                </div>
+                <div className="flex justify-end font-semibold underline cursor-pointer">
+                    <Link href="/forgot-password" className="text-black">Forgot Password?</Link>
                 </div>
                 {error && <p className="text-red-500">{error}</p>}
                 <div className="grid grid-cols-1 mt-3">

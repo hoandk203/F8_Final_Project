@@ -1,12 +1,9 @@
 import axios from "axios";
+import { clientCookies, AuthTokens } from "@/utils/cookies";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-
-
 export const loginAPI = async (userData: any) => {
-    console.log(API_BASE_URL)
-    console.log(userData)
     try {
         const response = await axios.post(`${API_BASE_URL}/auth/login`, userData, {
             headers: {
@@ -23,11 +20,11 @@ export const loginAPI = async (userData: any) => {
 };
 
 export const verificationStatusAPI = async () => {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     try {
         const response = await axios.get(`${API_BASE_URL}/auth/verification-status`, {
             headers: {
-                Authorization: `Bearer ${accessToken}`
+                Authorization: `Bearer ${tokens?.access_token}`
             }
         });
         return response.data;
@@ -169,15 +166,15 @@ export const createAdmin = async (adminData: any) => {
 
 export const updateUserProfile = async (profileData: any) => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
     const response = await axios.put(`${API_BASE_URL}/auth/update-profile`, profileData, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${tokens.access_token}`
       }
     });
     
@@ -192,15 +189,15 @@ export const updateUserProfile = async (profileData: any) => {
 
 export const changePassword = async (data: { oldPassword: string; newPassword: string }) => {
   try {
-    const accessToken = localStorage.getItem("access_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (!accessToken) {
+    if (!tokens?.access_token) {
       throw new Error("Authentication required");
     }
     
     const response = await axios.post(`${API_BASE_URL}/auth/change-password`, data, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${tokens.access_token}`
       }
     });
     
@@ -228,3 +225,45 @@ export const resetPassword = async (userData: any) => {
         throw error;
     }
 }
+
+// Helper functions for authentication management
+export const setAuthTokens = (tokens: AuthTokens) => {
+    clientCookies.setAuthTokens(tokens);
+};
+
+export const getAuthTokens = (): AuthTokens | null => {
+    return clientCookies.getAuthTokens();
+};
+
+export const clearAuthTokens = () => {
+    clientCookies.clearAuthTokens();
+};
+
+export const isAuthenticated = (): boolean => {
+    const tokens = getAuthTokens();
+    return Boolean(tokens?.access_token && tokens?.refresh_token);
+};
+
+// Logout function that clears tokens and redirects
+export const logout = async () => {
+    try {
+        const tokens = getAuthTokens();
+        if (tokens?.refresh_token) {
+            // Call logout API
+            await axios.post(`${API_BASE_URL}/auth/logout`, 
+                { refresh_token: tokens.refresh_token },
+                {
+                    headers: {
+                        Authorization: `Bearer ${tokens.access_token}`,
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+        }
+    } catch (error) {
+        console.error('Error during logout API call:', error);
+    } finally {
+        // Always clear tokens regardless of API call success
+        clearAuthTokens();
+    }
+};

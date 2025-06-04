@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { logoutUser } from "@/redux/middlewares/authMiddleware";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
+import { clientCookies } from "@/utils/cookies";
 
 const StoreSidebar = () => {
   const pathname = usePathname();
@@ -71,11 +72,10 @@ const StoreSidebar = () => {
   }
 
   const handleLogout = async () => {
-    const accessToken = localStorage.getItem("access_token");
-    const refreshToken = localStorage.getItem("refresh_token");
+    const tokens = clientCookies.getAuthTokens();
     
-    if (accessToken && refreshToken) {
-      await dispatch(logoutUser({ accessToken, refreshToken }));
+    if (tokens?.access_token && tokens?.refresh_token) {
+      await dispatch(logoutUser({ accessToken: tokens.access_token, refreshToken: tokens.refresh_token }));
     }
     
     if(pathname.startsWith("/vendor")){
@@ -83,8 +83,7 @@ const StoreSidebar = () => {
     }else{
       window.location.href= ("/store-login");
     }
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    clientCookies.clearAuthTokens();
   };
 
   const isActive = (href: string) => {
