@@ -159,7 +159,7 @@ const ConfirmIdentity = ({setStep, userId, identityDocumentId}: Props) => {
     };
 
     return (
-        <div>
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-1">Verify driver identity</h1>
             <p className="text-[#666]">Confirm your information to verify your identity</p>
             

@@ -156,7 +156,7 @@ const ConfirmStoreInfo = () => {
     const selectedVendorId = watch("vendorId");
 
     return (
-        <div>
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-1">Verify store information</h1>
             <p className="text-[#666]">Confirm your information to create a new store</p>
             

@@ -52,7 +52,7 @@ const UploadIdentity = ({setStep, userId, setIdentityDocumentId}:Props) => {
 
 
     return (
-        <div>
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-1">Verify driver identity</h1>
             <p className="text-[#666]">Please upload a photo of your ID card & drive license to confirm your identity</p>
             <div className="mt-8">

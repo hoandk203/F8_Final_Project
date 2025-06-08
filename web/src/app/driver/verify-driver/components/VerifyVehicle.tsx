@@ -77,7 +77,7 @@ const VerifyVehicle = () => {
     }
 
     return (
-        <>
+        <div className="max-w-md mx-auto">
             <h1 className="text-3xl font-bold mb-1">Set up your vehicle</h1>
             <p className="text-[#666]">Please upload information of your vehicle</p>
 
@@ -119,7 +119,7 @@ const VerifyVehicle = () => {
                     </div>
                 </form>
             </div>
-        </>
+        </div>
     )
 }
 

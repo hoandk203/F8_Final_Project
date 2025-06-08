@@ -117,7 +117,7 @@ const VendorRegisterForm = () => {
     };
 
     return (
-        <div>
+        <div className="max-w-md mx-auto">
             {isSubmitting && <LoadingOverlay/>}
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">

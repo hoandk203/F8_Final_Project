@@ -73,7 +73,7 @@ const AdminLoginForm = () => {
     }
 
     return (
-        <div>
+        <div className="max-w-md mx-auto">
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
                 <div className="flex flex-col gap-y-1">
                     <label htmlFor={"email"} className="font-semibold">

@@ -163,7 +163,7 @@ export class AuthService {
             await this.mailerService.sendMail({
               from: "hoanyttv@gmail.com",
               to: data.email,
-              subject: "New password for Scrap Plan",
+              subject: "New password for Scraplan",
               html: `
             <!DOCTYPE html>
             <html lang="en">

@@ -149,7 +149,7 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
     }, []);
 
     return (
-        <>
+        <div className="max-w-md mx-auto">
             {isResending && <LoadingOverlay/>}
             <h1 className="text-3xl font-bold mb-1">Verify your email</h1>
             <p className="text-[#666]">Enter the 6-digit code we sent to {
@@ -180,7 +180,7 @@ const VerifyEmail = ({stepVerifyStore, email, changePassword}: VerifyEmailProps)
             <div className="text-center mt-5">
                 Need help? <a href="/contact-us" className="text-black underline font-semibold">Contact support</a>
             </div>
-        </>
+        </div>
     )
 }
 

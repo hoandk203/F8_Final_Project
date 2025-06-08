@@ -43,14 +43,14 @@ export class UsersService extends BaseService{
     await this.mailerService.sendMail({
       from: "hoanyttv@gmail.com",
       to: email,
-      subject: "Verify email - Scrap website",
+      subject: "Verify email - Scraplan",
       html: `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verify Email</title>
+        <title>Verify Email - Scraplan</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -120,14 +120,14 @@ export class UsersService extends BaseService{
         await this.mailerService.sendMail({
           from: "hoanyttv@gmail.com",
           to: email,
-          subject: "Password for Scrap Plan",
+          subject: "Password for Scraplan",
           html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome to Scrap Plan</title>
+            <title>Welcome to Scraplan</title>
             <style>
                 body {
                     font-family: Arial, sans-serif;
@@ -223,14 +223,14 @@ export class UsersService extends BaseService{
     await this.mailerService.sendMail({
       from: "hoanyttv@gmail.com",
       to: email,
-      subject: "Password for Scrap Plan",
+      subject: "Password for Scraplan",
       html: `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Scrap Plan</title>
+        <title>Welcome to Scraplan</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
