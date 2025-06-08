@@ -1,3 +1,19 @@
+drop table if exists admin cascade;
+create table if not exists admin
+(
+    id          bigserial,
+    email       text,
+    user_id     bigint,
+    created_at  timestamp with time zone NOT NULL DEFAULT now(),
+    created_by  bigint,
+    modified_at timestamp with time zone NOT NULL DEFAULT now(),
+    modified_by bigint,
+    deleted_at  timestamp with time zone NOT NULL DEFAULT now(),
+    deleted_by  bigint,
+    active      boolean DEFAULT TRUE,
+    constraint pkey_admin primary key (id)
+);
+
 create table image
 (
     id          serial

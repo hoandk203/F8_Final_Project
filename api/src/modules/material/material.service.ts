@@ -76,4 +76,31 @@ export class MaterialService extends BaseService {
 
         return query.getRawMany();
     }
+
+    async getPublicMaterials() {
+        try {
+            const materials = await this.materialRepository
+                .createQueryBuilder("material")
+                .select([
+                    'material.id',
+                    'material.name', 
+                    'material.unit_price as unitPrice'
+                ])
+                .where("material.active = :active", { active: true })
+                .orderBy("material.name", "ASC")
+                .limit(10) // Limit to 10 materials for home page
+                .getRawMany();
+
+            return {
+                success: true,
+                data: materials
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to fetch materials',
+                data: []
+            };
+        }
+    }
 }

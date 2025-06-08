@@ -17,6 +17,12 @@ import { JwtAuthGuard } from '../../guard/jwt-auth.guard';
 export class MaterialController {
     constructor(private materialService: MaterialService) {}
 
+    // Public endpoint for home page
+    @Get('/public')
+    getPublicMaterials() {
+        return this.materialService.getPublicMaterials();
+    }
+
     @UseGuards(JwtAuthGuard)
     @Get('/')
     getAll() {
