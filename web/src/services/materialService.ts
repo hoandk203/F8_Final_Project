@@ -1,4 +1,17 @@
 import apiClient from "@/utils/axiosInterceptor";
+import axios from "axios";
+
+// Public function for home page (no auth required)
+export const getPublicMaterials = async () => {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/material/public`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error("Error fetching public materials:", error);
+    throw error;
+  }
+};
 
 export const getMaterials = async () => {
   try {
