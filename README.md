@@ -26,15 +26,19 @@
 
 ### Driver
 - Tài xế được hiển thị đơn hàng của cửa hàng cách vị trí 5km
+
 ![Giao diện tài xế](./web/public/screenshot/driver-home.jpeg)
 
 - Tài xế nhận đơn và cập nhật trạng thái đơn
+
 ![Giao diện tài xế](./web/public/screenshot/driver-process.jpeg)
 
 - Tài xế giao hàng xong cần thanh toán
+
 ![Giao diện tài xế](./web/public/screenshot/driver-payment.jpeg)
 
 - Nếu không sẽ không được nhận đơn hàng mới. Thanh toán chậm 12h sẽ bị khóa tài khoản
+
 ![Giao diện tài xế](./web/public/screenshot/driver-payment-request.png)
 
 ### Vendor
