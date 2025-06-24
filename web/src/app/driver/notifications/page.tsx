@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import DriverBottomNav from "../components/DriverBottomNav";
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import { getUnpaidPayments } from "@/services/driverService";
 
 export default function NotificationsPage() {
   const router = useRouter();
@@ -16,6 +17,15 @@ export default function NotificationsPage() {
       router.push("/login");
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    const driverId= Number(localStorage.getItem("driverId"));
+    if (isAuthenticated) {
+      const interval = setInterval(async () => {
+        await getUnpaidPayments(driverId) 
+      }, 600000);
+    }
+  }, []);
 
   return (
     <div className="container mx-auto pb-20">
