@@ -55,7 +55,6 @@ export class OrderDetailService extends BaseService {
 
     async findByOrderId(orderId: number) {
         try {
-            console.log(`Finding order details for order ${orderId}`);
             
             const details = await this.orderDetailRepository
                 .createQueryBuilder('order_detail')
@@ -70,7 +69,6 @@ export class OrderDetailService extends BaseService {
                 .andWhere('order_detail.active = :active', { active: true })
                 .getRawMany();
                 
-            console.log(`Found ${details.length} order details for order ${orderId}`);
             
             // Chuyển đổi kết quả để phù hợp với cấu trúc mong muốn
             const formattedDetails = details.map(detail => ({

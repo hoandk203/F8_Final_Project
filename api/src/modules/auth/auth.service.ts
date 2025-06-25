@@ -123,7 +123,6 @@ export class AuthService {
     async changePassword(userId: number, oldPassword: string, newPassword: string) {
         // Lấy thông tin user từ database
         const user = await this.userService.getOne(userId);
-        console.log(user);
         
         if (!user) {
             throw new UnauthorizedException('User not found');

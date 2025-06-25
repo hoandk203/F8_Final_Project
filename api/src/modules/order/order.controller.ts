@@ -37,7 +37,6 @@ export class OrderController {
     async getAll(@Req() req) {
         const userId = req.user.id;
         const store = await this.storeService.getStoreIdByUserId(userId);
-        console.log(store);
         return this.orderService.getOrdersByStoreId(store.id);
     }
 
@@ -93,7 +92,6 @@ export class OrderController {
         @Query('radius') radius: number = 5, // Mặc định 5km
         @Query('driverStatus') driverStatus: string
     ) {
-        console.log(`Controller: Getting nearby orders for driver ${driverId} at (${latitude}, ${longitude}) with radius ${radius}km`);
         
         // Kiểm tra tham số đầu vào
         if (!driverId || !latitude || !longitude) {

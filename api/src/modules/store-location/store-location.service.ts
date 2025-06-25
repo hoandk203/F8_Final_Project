@@ -12,9 +12,7 @@ export class StoreLocationService {
 
     async findAll() {
         try {
-            console.log('Finding all store locations');
             const locations = await this.storeLocationRepository.find();
-            console.log(`Found ${locations.length} store locations`);
             return locations;
         } catch (error) {
             console.error('Error finding store locations:', error);

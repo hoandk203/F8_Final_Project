@@ -13,7 +13,7 @@ async function bootstrap() {
     "http://192.168.0.108:5000",
     "https://f8-final-project-opfoj7thz-shinki1809s-projects.vercel.app",
     "f8-final-project-git-main-shinki1809s-projects.vercel.app",
-      "https://f8-final-project.vercel.app",
+    "https://f8-final-project.vercel.app",
   ];
   
   app.enableCors({
@@ -51,8 +51,8 @@ async function bootstrap() {
     app.getHttpAdapter().getInstance().set('trust proxy', 1);
   }
 
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const port = process.env.PORT || 3001;
+  await app.listen(port, '0.0.0.0');
   console.log(`Application is running on port ${port}`);
 }
 bootstrap();

@@ -255,7 +255,6 @@ export class OrderService extends BaseService {
 
     async getNearbyOrders(driverStatus: string, driverId: number, latitude: number, longitude: number, radius: number): Promise<any[]> {
         try {
-            console.log("Driver status:", driverStatus);
             
             let orderList: any[];
             
@@ -328,7 +327,6 @@ export class OrderService extends BaseService {
                 const ordersWithDetails = await Promise.all(
                     orderList.map(async (order) => {
                         const store = await this.getStoreInfo(order.storeId);
-                        console.log(store);
                         
                         const orderDetails = await this.orderDetailService.findByOrderId(order.id);
                         
@@ -350,11 +348,9 @@ export class OrderService extends BaseService {
 
     // Hàm lấy thông tin cửa hàng
     async getStoreInfo(storeId: number) {
-        console.log("1: ", storeId);
         
         try {
             const store = await this.storeService.getStoreById(storeId);
-            console.log("2: ", store);
             return store;
         } catch (error) {
             console.error(`Error getting store info for store ${storeId}:`, error);
@@ -417,8 +413,6 @@ export class OrderService extends BaseService {
 
     async cancelOrder(orderId: number, driverId: number) {
         const order = await this.orderRepository.findOne({ where: { id: orderId } });
-        console.log(order.driverId);
-        console.log(driverId);
         
         if (!order) {
             throw new BadRequestException('Order not found');
