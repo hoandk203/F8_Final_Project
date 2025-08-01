@@ -18,15 +18,6 @@ export default function NotificationsPage() {
     }
   }, [isAuthenticated, router]);
 
-  useEffect(() => {
-    const driverId= Number(localStorage.getItem("driverId"));
-    if (isAuthenticated) {
-      const interval = setInterval(async () => {
-        await getUnpaidPayments(driverId) 
-      }, 600000);
-    }
-  }, []);
-
   return (
     <div className="container mx-auto pb-20">
       <div className="p-4">
